@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Anacronismo">
+<meta name="theme-color" content="#F2EBDC">
+<title>Anacronismo · Calculadora</title>
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEmklEQVR4nO3cPXIVSRBFYYnQYvBwsFkXS2Bd2Dh4GNqBPK0A4xEvREu3O/u3bmaez5yRJrqrTmWJ4GkeX1+eH4CPfBr9APBFHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oDUPY7PX75t/rflPY1+gPFuBfz5/fP9P2zusfP/EyxYwKSbPrpfK5jRN474xdH2iukbBxYRB6Smcay9KXreLE3jQARxQOoYx7Y7ouHN0jEOBLWLY88A6DY82sWBOOKA1CuO/fdCq5ulVxxYpVEcrQ79IRrFcZQ+kRHHf9p+rudDXeI49rg3GR5d4ohgbEy0iGPVQSeRuxZxnKHDzUIc/7wdGAyPm/pxdDjiJ6kfR8S2UVE+O+L4GDfLQ/k4zj7ctYdH8TgiGBJK5Th2HmuiqRxHxP4CCt8s3eOY13x4lI3jygNddXiUjSOi+WBYVDOOA49y54BqxnG9kjdL3zjiI6Ht8CgYR8lDPETBOCLOGAb1oqwWx0k71PNmqRbHWMWGR8c4eo6BDUrFcerBbZhUqTgizt7jSjdLuzj26DY86sRR6ciaqBNHxDVHv0ymReK4bD9a3SxF4oi4cl9rDI9GcWCtCnFcfEz73CwV4oi4fkcL3Czp4xiyB02GR/o4cJ4WcYw66NlvltxxDFz9DjdL7jgixu5i6uGROI7h615+eCSOA2crHofD4R4+4TbLGofJijvEd56scUT47JxJymtVjgM7PY1+gC0OP4g/vk7/g99/rfhlyaSDYdHj68vz6GdYLbIZwTvlfRZvBRMJxuFzzQXlu1YOPKbzZUS+4CbdrgfliyMislvBjQ9+WUk141i0asuP6iPdjybJ4jhkfTds9uK3lLxZksUR4bxPuYZHpjhGjY2d35hXpjjMOU+sbarF4b9DiW6WNHGkWFP/NFdJE0dEsb0ZLkccKcZGXJbXyRHHgeJ/o7btGytNrzpx5NqVFMMjQRyHr+OG4bF53qSWII6ItWNj1WavLSPXDJtRJI4Nglt+3szwv1nc4zh1BRc3fnMZNYaH+yfBDvzQ14w9HxNUCnw8zPozpJcN3p4/by5yv1YW2Z482weLSx9Hds4/lvrG4bxqQdmHh28cEdlX35xpHAXGRpzty5rGUUbq2ZY4jtTrPuE5PBzj8FyphhzjiEg0NhI96oRdHG3HhuGL28VRUtLhkTKOpGudjlcchqP1Sm6v7xVHRNKxkfGx88VRm9XwMIrDal3wYBVHRMbhfJfu4V3iYGzc+SyFSxwR6U7ee7leIVMcuJhFHD6D1ITJgljEEZFrIM9I9CLj4zA5JW4clmV8HLBl9BtvM2cl0SgOSvGyRr/xdlsUh3E6ik8WN0aTY+JeiduSHcX/BY0mx0SHQWKbxY3v5MBw/GkFEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckP4Cl+82S2ZNHp8AAAAASUVORK5CYII=">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEmklEQVR4nO3cPXIVSRBFYYnQYvBwsFkXS2Bd2Dh4GNqBPK0A4xEvREu3O/u3bmaez5yRJrqrTmWJ4GkeX1+eH4CPfBr9APBFHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oDUPY7PX75t/rflPY1+gPFuBfz5/fP9P2zusfP/EyxYwKSbPrpfK5jRN474xdH2iukbBxYRB6Smcay9KXreLE3jQARxQOoYx7Y7ouHN0jEOBLWLY88A6DY82sWBOOKA1CuO/fdCq5ulVxxYpVEcrQ79IRrFcZQ+kRHHf9p+rudDXeI49rg3GR5d4ohgbEy0iGPVQSeRuxZxnKHDzUIc/7wdGAyPm/pxdDjiJ6kfR8S2UVE+O+L4GDfLQ/k4zj7ctYdH8TgiGBJK5Th2HmuiqRxHxP4CCt8s3eOY13x4lI3jygNddXiUjSOi+WBYVDOOA49y54BqxnG9kjdL3zjiI6Ht8CgYR8lDPETBOCLOGAb1oqwWx0k71PNmqRbHWMWGR8c4eo6BDUrFcerBbZhUqTgizt7jSjdLuzj26DY86sRR6ciaqBNHxDVHv0ymReK4bD9a3SxF4oi4cl9rDI9GcWCtCnFcfEz73CwV4oi4fkcL3Czp4xiyB02GR/o4cJ4WcYw66NlvltxxDFz9DjdL7jgixu5i6uGROI7h615+eCSOA2crHofD4R4+4TbLGofJijvEd56scUT47JxJymtVjgM7PY1+gC0OP4g/vk7/g99/rfhlyaSDYdHj68vz6GdYLbIZwTvlfRZvBRMJxuFzzQXlu1YOPKbzZUS+4CbdrgfliyMislvBjQ9+WUk141i0asuP6iPdjybJ4jhkfTds9uK3lLxZksUR4bxPuYZHpjhGjY2d35hXpjjMOU+sbarF4b9DiW6WNHGkWFP/NFdJE0dEsb0ZLkccKcZGXJbXyRHHgeJ/o7btGytNrzpx5NqVFMMjQRyHr+OG4bF53qSWII6ItWNj1WavLSPXDJtRJI4Nglt+3szwv1nc4zh1BRc3fnMZNYaH+yfBDvzQ14w9HxNUCnw8zPozpJcN3p4/by5yv1YW2Z482weLSx9Hds4/lvrG4bxqQdmHh28cEdlX35xpHAXGRpzty5rGUUbq2ZY4jtTrPuE5PBzj8FyphhzjiEg0NhI96oRdHG3HhuGL28VRUtLhkTKOpGudjlcchqP1Sm6v7xVHRNKxkfGx88VRm9XwMIrDal3wYBVHRMbhfJfu4V3iYGzc+SyFSxwR6U7ee7leIVMcuJhFHD6D1ITJgljEEZFrIM9I9CLj4zA5JW4clmV8HLBl9BtvM2cl0SgOSvGyRr/xdlsUh3E6ik8WN0aTY+JeiduSHcX/BY0mx0SHQWKbxY3v5MBw/GkFEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckP4Cl+82S2ZNHp8AAAAASUVORK5CYII=">
+<style>
+  :root{ --negro:#1A1A1A; --rojoOsc:#7A1F1A; --rojoCal:#B5462E; --crema:#F2EBDC; --crema2:#E8DEC9; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; background:var(--crema); color:var(--negro);
+    font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif; }
+  body{ padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+  .wrap{ max-width:460px; margin:0 auto; padding:26px 20px 48px; }
+  .mono{ font-family:ui-monospace,"SF Mono",Menlo,monospace; }
+  /* logo */
+  .logo{ display:flex; flex-direction:column; align-items:center; margin-bottom:16px; }
+  .wm{ font-size:13px; letter-spacing:.42em; text-transform:uppercase; font-weight:300; margin-top:10px; padding-left:.42em; }
+  .div{ display:flex; align-items:center; gap:8px; margin-top:8px; opacity:.7; }
+  .div span.l{ width:34px; height:1px; background:var(--negro); opacity:.4; }
+  .div span.d{ width:5px; height:5px; border-radius:50%; background:var(--rojoOsc); }
+  .sub{ font-size:13px; opacity:.6; text-align:center; margin:0 0 18px; }
+  /* toggles */
+  .toggle{ display:flex; border:1.5px solid var(--negro); margin-bottom:20px; }
+  .toggle button{ flex:1; padding:10px 8px; border:none; cursor:pointer; background:transparent; color:var(--negro);
+    font-size:14px; font-weight:700; font-family:inherit; }
+  .toggle button .s{ display:block; font-size:10px; font-weight:400; opacity:.5; margin-top:1px; }
+  .toggle button.on{ background:var(--negro); color:var(--crema); }
+  .toggle button.on .s{ opacity:.7; }
+  /* fields */
+  label.f{ display:block; margin-bottom:14px; }
+  label.f .lab{ display:block; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--rojoOsc); margin-bottom:6px; font-weight:600; }
+  .inp{ display:flex; align-items:center; border:1.5px solid var(--negro); background:var(--crema); }
+  .inp .pfx{ padding:0 10px; font-size:14px; opacity:.6; }
+  .inp .sfx{ padding:0 12px; font-size:14px; opacity:.6; }
+  .inp input{ flex:1; border:none; outline:none; background:transparent; padding:11px 12px 11px 0;
+    font-size:20px; color:var(--negro); width:100%; font-family:ui-monospace,Menlo,monospace; }
+  .hint{ font-size:11px; opacity:.5; margin-top:4px; display:block; }
+  .row2{ display:flex; gap:12px; } .row2>div{ flex:1; }
+  .chk{ width:100%; text-align:left; border:1.5px solid var(--negro); background:transparent; color:var(--negro);
+    padding:11px 14px; cursor:pointer; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; font-family:inherit; font-size:13px; }
+  .chk.on{ background:var(--negro); color:var(--crema); }
+  .chk b{ font-size:12px; color:var(--rojoOsc); } .chk.on b{ color:var(--rojoCal); }
+  /* panel resultado */
+  .panel{ background:var(--negro); color:var(--crema); padding:22px; margin-top:8px; }
+  .panel .cap{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--rojoCal); margin-bottom:4px; }
+  .panel .big{ font-size:40px; font-weight:800; line-height:1; }
+  .panel .sub2{ font-size:15px; opacity:.7; margin-top:4px; }
+  .panel .lines{ border-top:1px solid #ffffff22; margin-top:16px; padding-top:12px; font-size:13px; }
+  .li{ display:flex; justify-content:space-between; padding:3px 0; }
+  .li.dim{ opacity:.55; } .li .ac{ color:var(--rojoCal); }
+  .li.strong{ font-weight:700; border-top:1px solid #ffffff22; margin-top:6px; padding-top:8px; }
+  /* margen box */
+  .mbox{ background:var(--crema2); border:1.5px solid var(--negro); padding:16px 18px; margin-top:2px; }
+  .mbox .top{ display:flex; justify-content:space-between; align-items:baseline; }
+  .mbox .lbl{ font-size:13px; letter-spacing:.1em; text-transform:uppercase; opacity:.7; }
+  .mbox .val{ font-size:28px; font-weight:800; }
+  .mbox .pct{ font-size:13px; opacity:.7; text-align:right; margin-top:-2px; }
+  .mbox .warn{ margin-top:12px; padding-top:12px; border-top:1px solid #1A1A1A22; font-size:12.5px; line-height:1.45; }
+  /* tabla */
+  table{ width:100%; border-collapse:collapse; border:1.5px solid var(--negro); margin-top:18px; font-size:13px; }
+  thead th{ background:var(--negro); color:var(--crema); font-size:10px; letter-spacing:.05em; text-transform:uppercase;
+    padding:8px 6px; font-weight:600; }
+  tbody td{ padding:9px 6px; font-family:ui-monospace,Menlo,monospace; }
+  tbody tr:nth-child(even){ background:var(--crema2); }
+  td.c{ text-align:center; } td.r{ text-align:right; }
+  .note{ background:var(--crema2); border:1.5px solid var(--negro); padding:14px 16px; margin-top:16px; font-size:12.5px; line-height:1.5; }
+  .note b{ color:var(--rojoOsc); }
+  .foot{ font-size:11px; opacity:.45; margin-top:20px; line-height:1.5; }
+  .hidden{ display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <svg width="40" height="40" viewBox="0 0 100 100" aria-label="Anacronismo">
+      <line x1="27" y1="80" x2="50" y2="20" stroke="#1A1A1A" stroke-width="6.5" stroke-linecap="butt"/>
+      <line x1="73" y1="80" x2="50" y2="20" stroke="#1A1A1A" stroke-width="6.5" stroke-linecap="butt"/>
+      <circle cx="50" cy="60" r="5.5" fill="#7A1F1A"/>
+    </svg>
+    <div class="wm">Anacronismo</div>
+    <div class="div"><span class="l"></span><span class="d"></span><span class="l"></span></div>
+  </div>
+
+  <div class="toggle" id="modeT">
+    <button data-m="pieza" class="on">Pieza</button>
+    <button data-m="rueda">Rueda</button>
+  </div>
+
+  <!-- ===== PIEZA ===== -->
+  <div id="pieza">
+    <p class="sub">Costo final de una pieza importada.</p>
+    <div class="toggle" id="viaT">
+      <button data-v="postal" class="on">Postal<span class="s">Correo · franq. 50</span></button>
+      <button data-v="courier">Courier<span class="s">DHL · solo IVA &lt;400</span></button>
+    </div>
+    <label class="f"><span class="lab">Precio / remate</span><span class="inp"><span class="pfx">US$</span><input id="p_precio" type="number" inputmode="decimal" value="50"></span></label>
+    <div class="row2">
+      <div><label class="f"><span class="lab">Flete</span><span class="inp"><span class="pfx">US$</span><input id="p_flete" type="number" inputmode="decimal" value="15"></span></label></div>
+      <div><label class="f"><span class="lab">Seguro</span><span class="inp"><span class="pfx">US$</span><input id="p_seguro" type="number" inputmode="decimal" value="0"></span></label></div>
+    </div>
+    <label class="f"><span class="lab">Cotización dólar</span><span class="inp"><span class="pfx">$</span><input id="p_cotiz" type="number" inputmode="decimal" value="1430"></span><span class="hint">Editá según el dólar del día.</span></label>
+
+    <div class="panel">
+      <div class="cap">Te aterriza en</div>
+      <div class="big mono" id="p_ars">$ —</div>
+      <div class="sub2 mono" id="p_usd">US$ — · CIF US$ —</div>
+      <div class="lines" id="p_lines"></div>
+    </div>
+
+    <label class="f" style="margin-top:24px"><span class="lab">Precio de venta (target)</span><span class="inp"><span class="pfx">US$</span><input id="p_venta" type="number" inputmode="decimal" value="0"></span><span class="hint">Dejá en 0 si solo querés el costo.</span></label>
+    <div id="p_margen"></div>
+    <p class="foot">Estimación. Impuesto postal = 50% sobre el excedente de la franquicia (USD 50, 12 envíos/año); tasa de Correo aproximada. Courier = solo IVA 21% hasta 400; sobre el excedente se suma 50%.</p>
+  </div>
+
+  <!-- ===== RUEDA ===== -->
+  <div id="rueda" class="hidden">
+    <p class="sub">Rueda de stock con envío combinado (1 franquicia por ronda) y reinversión compuesta.</p>
+    <div class="row2">
+      <div><label class="f"><span class="lab">Relojes ronda 1</span><span class="inp"><input id="r_cant" type="number" inputmode="decimal" value="4"></span></label></div>
+      <div><label class="f"><span class="lab">Rondas</span><span class="inp"><input id="r_rondas" type="number" inputmode="decimal" value="4"></span><span class="hint">Máx 12 (cupo anual).</span></label></div>
+    </div>
+    <div class="row2">
+      <div><label class="f"><span class="lab">Compra c/u</span><span class="inp"><span class="pfx">US$</span><input id="r_precio" type="number" inputmode="decimal" value="45"></span></label></div>
+      <div><label class="f"><span class="lab">Venta c/u</span><span class="inp"><span class="pfx">US$</span><input id="r_venta" type="number" inputmode="decimal" value="170"></span></label></div>
+    </div>
+    <label class="f"><span class="lab">Flete internacional (combinado)</span><span class="inp"><span class="pfx">US$</span><input id="r_flete" type="number" inputmode="decimal" value="25"></span></label>
+    <div class="row2">
+      <div><label class="f"><span class="lab">Caja c/u</span><span class="inp"><span class="pfx">US$</span><input id="r_caja" type="number" inputmode="decimal" value="5"></span></label></div>
+      <div><label class="f"><span class="lab">Andreani c/u</span><span class="inp"><span class="pfx">US$</span><input id="r_andreani" type="number" inputmode="decimal" value="15"></span></label></div>
+    </div>
+    <label class="f"><span class="lab">Publicidad por reloj (CAC)</span><span class="inp"><span class="pfx">US$</span><input id="r_publi" type="number" inputmode="decimal" value="50"></span><span class="hint">Costo de adquirir cada venta. La capa que más pesa.</span></label>
+    <button class="chk" id="r_cliente"><span>El cliente paga el envío Andreani</span><b id="r_cliente_v">NO</b></button>
+    <div class="row2">
+      <div><label class="f"><span class="lab">Comisión cobro</span><span class="inp"><input id="r_comision" type="number" inputmode="decimal" value="6"><span class="sfx">%</span></span></label></div>
+      <div><label class="f"><span class="lab">Reinversión</span><span class="inp"><input id="r_reinv" type="number" inputmode="decimal" value="50"><span class="sfx">%</span></span><span class="hint">El resto lo retirás.</span></label></div>
+    </div>
+    <label class="f"><span class="lab">Cotización dólar</span><span class="inp"><span class="pfx">$</span><input id="r_cotiz" type="number" inputmode="decimal" value="1430"></span></label>
+
+    <div class="panel">
+      <div class="cap" id="r_cap">Rondas · tu bolsillo</div>
+      <div class="big mono" id="r_big">US$ —</div>
+      <div class="sub2 mono" id="r_big2">$ —</div>
+      <div class="lines" id="r_lines"></div>
+    </div>
+    <table><thead><tr><th style="width:26px">#</th><th>Relojes</th><th class="r">Costo</th><th class="r">Ganan.</th><th class="r">Retiro</th></tr></thead><tbody id="r_tbody"></tbody></table>
+    <div class="note"><b>Realidad del sell-through:</b> esto asume que vendés TODOS los relojes de cada ronda dentro del mes. Tu ritmo es 2–5 ventas/mes. Si una ronda no se vende entera, el stock y el capital se traban — la rueda vive del sell-through, no de la cuenta.</div>
+    <p class="foot">Estimación. La rueda reparte 1 franquicia por envío combinado y reinvierte el % indicado de cada ganancia. Las cantidades por ronda se redondean según presupuesto. No incluye impuestos a las ganancias.</p>
+  </div>
+</div>
+
+<script>
+var FR=50, TASA=5, TMIN=380, TMAX=420;
+function usd(n){ return "US$ " + (isFinite(n)? Math.round(n).toLocaleString("es-AR"):"—"); }
+function usd1(n){ return "US$ " + (isFinite(n)? (Math.round(n*10)/10).toLocaleString("es-AR"):"—"); }
+function ars(n){ return "$ " + (isFinite(n)? Math.round(n).toLocaleString("es-AR"):"—"); }
+function val(id){ var v=parseFloat(document.getElementById(id).value); return isNaN(v)?0:v; }
+
+/* ---- PIEZA ---- */
+var via="postal";
+function renderPieza(){
+  var precio=val("p_precio"), flete=val("p_flete"), seguro=val("p_seguro"), cotiz=val("p_cotiz"), venta=val("p_venta");
+  var cif=precio+flete+seguro, derecho=0, iva=0, tasa=0;
+  if(via==="postal"){ var exc=Math.max(0,cif-FR); derecho=0.5*exc; tasa=cif>0?TASA:0; }
+  else { iva=0.21*cif; if(cif>400) derecho=0.5*(cif-400); }
+  var imp=derecho+iva+tasa, landed=cif+imp;
+  document.getElementById("p_ars").textContent=ars(landed*cotiz);
+  document.getElementById("p_usd").textContent=usd1(landed)+" · CIF "+usd(cif);
+  var pct=cif>0?Math.round(imp/cif*100):0, h="";
+  h+="<div class='li'><span>CIF (precio + flete + seguro)</span><span class='mono'>"+usd1(cif)+"</span></div>";
+  if(via==="postal"){
+    h+="<div class='li dim'><span>Franquicia</span><span class='mono'>− "+usd(FR)+"</span></div>";
+    h+="<div class='li'><span class='ac'>Impuesto 50% s/ excedente</span><span class='mono ac'>"+usd1(derecho)+"</span></div>";
+    h+="<div class='li dim'><span>Tasa Correo</span><span class='mono'>"+usd1(tasa)+"</span></div>";
+  } else {
+    h+="<div class='li'><span class='ac'>IVA 21% s/ CIF</span><span class='mono ac'>"+usd1(iva)+"</span></div>";
+    if(derecho>0) h+="<div class='li'><span class='ac'>Derecho 50% s/ excedente +400</span><span class='mono ac'>"+usd1(derecho)+"</span></div>";
+  }
+  h+="<div class='li strong'><span>Impuestos ("+pct+"% del CIF)</span><span class='mono'>"+usd1(imp)+"</span></div>";
+  document.getElementById("p_lines").innerHTML=h;
+
+  var m=document.getElementById("p_margen");
+  if(venta>0){
+    var margen=venta-landed, mpct=landed>0?Math.round(margen/landed*100):0;
+    var warn="";
+    if(venta>TMAX) warn="<div class='warn' style='color:#9b1c1c'>Ojo: US$ "+venta+" pasa el techo de reventa argentino (~US$ "+TMIN+"–"+TMAX+"). Salvo pieza excepcional, va a costar venderla.</div>";
+    else if(venta>=TMIN) warn="<div class='warn' style='color:#7A1F1A'>Estás en el techo de reventa argentino (~US$ "+TMIN+"–"+TMAX+"). Margen real pero poco recorrido.</div>";
+    m.innerHTML="<div class='mbox'><div class='top'><span class='lbl'>Margen</span><span class='val mono' style='color:"+(margen>=0?'#7A1F1A':'#9b1c1c')+"'>"+usd1(margen)+"</span></div><div class='pct mono'>"+(mpct>=0?'+':'')+mpct+"% sobre costo</div>"+warn+"</div>";
+  } else m.innerHTML="";
+}
+
+/* ---- RUEDA ---- */
+var clientePaga=false;
+function landedRonda(cant,precio,flete){ var cif=cant*precio+flete; var imp=0.5*Math.max(0,cif-FR)+(cif>0?TASA:0); return cif+imp; }
+function renderRueda(){
+  var precio=val("r_precio"), venta=val("r_venta"), flete=val("r_flete"),
+      caja=val("r_caja"), andreani=val("r_andreani"), publi=val("r_publi"),
+      comision=val("r_comision"), reinv=val("r_reinv"), cotiz=val("r_cotiz");
+  var rondas=Math.min(12,Math.max(1,Math.round(val("r_rondas"))));
+  var local=caja+(clientePaga?0:andreani);
+  var neto=venta - venta*comision/100 - local - publi;
+  var cant=Math.max(1,Math.round(val("r_cant"))), carry=0, totR=0, totG=0, totRet=0, capIni=0, rows=[], lastCosto=0, lastRe=0;
+  for(var i=1;i<=rondas;i++){
+    var costo=landedRonda(cant,precio,flete);
+    if(i===1) capIni=costo;
+    var ingreso=neto*cant, ganancia=ingreso-costo;
+    var reinvierte=ganancia>0?(reinv/100)*ganancia:0;
+    var retiro=ganancia-reinvierte;
+    rows.push([i,cant,costo,ganancia,retiro]);
+    totR+=cant; totG+=ganancia; totRet+=retiro;
+    var unit=costo/cant, budget=costo+reinvierte+carry, nx=Math.floor(budget/unit); if(nx<1)nx=1;
+    carry=budget-nx*unit; lastCosto=costo; lastRe=reinvierte; cant=nx;
+  }
+  var capFin=lastCosto+lastRe;
+  document.getElementById("r_cap").textContent=rondas+" rondas · tu bolsillo";
+  document.getElementById("r_big").textContent=usd(totRet);
+  document.getElementById("r_big2").textContent=ars(totRet*cotiz);
+  var netoReloj = neto - (rows.length? rows[0][2]/rows[0][1] : 0);
+  var h="";
+  h+="<div class='li'><span>Relojes vendidos</span><span class='mono'>"+totR+"</span></div>";
+  h+="<div class='li'><span class='ac'>Ganancia total</span><span class='mono ac'>"+usd(totG)+"</span></div>";
+  h+="<div class='li dim'><span>Neto por reloj</span><span class='mono'>"+usd1(netoReloj)+"</span></div>";
+  h+="<div class='li'><span>Capital inicial</span><span class='mono'>"+usd(capIni)+"</span></div>";
+  h+="<div class='li strong'><span>Capital final (rueda)</span><span class='mono'>"+usd(capFin)+"</span></div>";
+  document.getElementById("r_lines").innerHTML=h;
+  var tb="";
+  for(var j=0;j<rows.length;j++){ var r=rows[j];
+    tb+="<tr><td style='font-weight:700'>"+r[0]+"</td><td class='c'>"+r[1]+"</td><td class='r'>"+usd(r[2])+"</td><td class='r' style='color:#7A1F1A'>"+usd(r[3])+"</td><td class='r' style='font-weight:700'>"+usd(r[4])+"</td></tr>";
+  }
+  document.getElementById("r_tbody").innerHTML=tb;
+}
+
+/* ---- wiring ---- */
+document.querySelectorAll("#modeT button").forEach(function(b){ b.onclick=function(){
+  document.querySelectorAll("#modeT button").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
+  var m=b.getAttribute("data-m");
+  document.getElementById("pieza").classList.toggle("hidden", m!=="pieza");
+  document.getElementById("rueda").classList.toggle("hidden", m!=="rueda");
+};});
+document.querySelectorAll("#viaT button").forEach(function(b){ b.onclick=function(){
+  document.querySelectorAll("#viaT button").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
+  via=b.getAttribute("data-v"); renderPieza();
+};});
+document.getElementById("r_cliente").onclick=function(){
+  clientePaga=!clientePaga; this.classList.toggle("on",clientePaga);
+  document.getElementById("r_cliente_v").textContent=clientePaga?"SÍ":"NO"; renderRueda();
+};
+["p_precio","p_flete","p_seguro","p_cotiz","p_venta"].forEach(function(id){ document.getElementById(id).addEventListener("input",renderPieza); });
+["r_cant","r_rondas","r_precio","r_venta","r_flete","r_caja","r_andreani","r_publi","r_comision","r_reinv","r_cotiz"].forEach(function(id){ document.getElementById(id).addEventListener("input",renderRueda); });
+renderPieza(); renderRueda();
+</script>
+</body>
+</html>
