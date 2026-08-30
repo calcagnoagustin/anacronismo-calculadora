@@ -318,6 +318,8 @@ var VEND={tiers:{},items:[]}, vendTimer=null, vAbiertas={};
 var TIERS=[1,2,3,4,5];
 var TIERLBL={1:"Tier 1 · service y garantía formal",2:"Tier 2 · caso por caso",3:"Sin garantía formal",4:"Otras fuentes",5:"Fuera de eBay"};
 
+var ENVLBL={"si":"envía a AR","no":"NO envía a AR","?":"envío a AR sin confirmar"};
+function envAr(v){ var e=(v&&v.envia_ar)||"?"; return ENVLBL[e]?e:"?"; }
 function vendPorId(id){ for(var i=0;i<VEND.items.length;i++){ if(VEND.items[i].id===id) return VEND.items[i]; } return null; }
 function comprasDe(id){ return (COMPRAS.items||[]).filter(function(x){ return x.vendedor_id===id; }); }
 function statsVend(id){
@@ -337,7 +339,8 @@ function opcionesVend(sel){
     if(!g.length) return;
     h+="<optgroup label='"+esc(TIERLBL[t])+"'>";
     g.forEach(function(v){
-      h+="<option value='"+esc(v.id)+"'"+(sel===v.id?" selected":"")+">"+esc(v.nombre)+"</option>";
+      var e=envAr(v), mk=(e==="no"?" ✕ no envía a AR":(e==="?"?" · envío a AR sin confirmar":""));
+      h+="<option value='"+esc(v.id)+"'"+(sel===v.id?" selected":"")+">"+esc(v.nombre+mk)+"</option>";
     });
     h+="</optgroup>";
   });
@@ -354,8 +357,10 @@ function renderVend(){
     g.forEach(function(o){
       var v=o.v, ix=o.ix, st=statsVend(v.id);
       var sub = st.n ? (st.n+(st.n===1?" pieza":" piezas")+" · landed prom. "+usd(st.prom)) : "sin compras";
+      var ea = envAr(v);
+      sub += " · " + ENVLBL[ea];
       h+="<details class='pza' data-vix='"+ix+"'"+(vAbiertas[ix]?" open":"")+">"+
-         "<summary><div><div class='sm'>"+esc(v.nombre)+"</div><div class='ss'>"+esc(v.pais||"")+"</div></div>"+
+         "<summary><div><div class='sm'>"+esc(v.nombre)+(envAr(v)==="no"?" <span style='color:#7A1F1A'>✕ AR</span>":(envAr(v)==="?"?" <span style='color:#9a8f80'>? AR</span>":""))+"</div><div class='ss'>"+esc(v.pais||"")+"</div></div>"+
          "<div class='sr'><div class='sc'><span class='sc-n'>"+esc(String(st.n))+"</span><small class='sc-s'>"+(st.n?"compras":"—")+"</small></div>"+
          "<span class='cv'>&#9662;</span></div></summary>"+
          "<div class='body'>"+
@@ -370,6 +375,9 @@ function renderVend(){
          "</select></span></label></div>"+
          "<div><label class='f'><span class='lab'>País</span><span class='inp'><input class='txt' type='text' data-vk='pais' placeholder='UA' value='"+esc(v.pais||"")+"'></span></label></div>"+
          "</div>"+
+         "<label class='f'><span class='lab'>¿Envía a Argentina?</span><span class='inp'><select class='txt' data-vk='envia_ar'>"+
+         ["?","si","no"].map(function(e){ return "<option value='"+e+"'"+(envAr(v)===e?" selected":"")+">"+esc(ENVLBL[e])+"</option>"; }).join("")+
+         "</select></span><span class='hint'>Si no envía, no sirve por más barato que esté.</span></label>"+
          "<label class='f'><span class='lab'>Nota</span><span class='inp'><input class='txt' type='text' data-vk='nota' value='"+esc(v.nota||"")+"'></span></label>"+
          "<button class='btn del' data-vdel='"+ix+"'>Eliminar vendedor</button>"+
          "</div></details>";
@@ -385,7 +393,7 @@ function renderVend(){
         var k=inp.getAttribute("data-vk");
         VEND.items[ix][k] = (k==="tier") ? num(inp.value) : inp.value;
         programarVend();
-        if(k==="tier"||k==="nombre"){ renderVend(); renderCompras(); }
+        if(k==="tier"||k==="nombre"||k==="envia_ar"){ renderVend(); renderCompras(); }
       });
     });
     var del=d.querySelector("[data-vdel]");
@@ -435,7 +443,7 @@ document.getElementById("vd_add").onclick=function(){
   if(!n) return;
   var id=slugVend(n), base=id, k=2;
   while(vendPorId(id)){ id=base+"-"+(k++); }
-  VEND.items.unshift({id:id,nombre:n,usuario:n,url:"https://www.ebay.com/usr/"+n,tier:4,pais:"",nota:""});
+  VEND.items.unshift({id:id,nombre:n,usuario:n,url:"https://www.ebay.com/usr/"+n,tier:4,pais:"",envia_ar:"?",nota:""});
   vAbiertas={0:true}; renderVend(); renderCompras(); guardarVend();
 };
 
@@ -954,7 +962,9 @@ function pintarHintVend(d, id){
   var h=d.querySelector(".hvend"); if(!h) return;
   var v=id?vendPorId(id):null;
   if(!v){ h.textContent="Asignalo para que la compra cuente en la ficha del vendedor."; return; }
-  h.innerHTML = (v.url?"<a href='"+esc(v.url)+"' target='_blank' rel='noopener' style='color:#7A1F1A'>Ver tienda &rarr;</a> · ":"")+esc(TIERLBL[num(v.tier)]||"");
+  var e=envAr(v);
+  h.innerHTML = (v.url?"<a href='"+esc(v.url)+"' target='_blank' rel='noopener' style='color:#7A1F1A'>Ver tienda &rarr;</a> · ":"")+esc(TIERLBL[num(v.tier)]||"")+
+    (e==="no"?" · <b style='color:#7A1F1A'>NO envía a AR</b>":(e==="?"?" · envío a AR sin confirmar":""));
 }
 function renderCompras(){
   var h="";
