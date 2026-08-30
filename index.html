@@ -120,6 +120,21 @@
   .chips button.no.on{ background:var(--rojoOsc); border-color:var(--rojoOsc); color:var(--crema); }
   .card.descartado{ opacity:.5; }
   .card.descartado .nm{ text-decoration:line-through; }
+  /* ===== busquedas ===== */
+  .vsw{ font-family:inherit; font-size:10px; letter-spacing:.12em; font-weight:700; padding:5px 9px;
+    border:1.5px solid var(--negro); background:transparent; color:var(--negro); opacity:.45; cursor:pointer; }
+  .vsw.on{ background:var(--rojoOsc); border-color:var(--rojoOsc); color:var(--crema); opacity:1; }
+  .pza[open]>summary .vsw{ border-color:var(--crema); color:var(--crema); }
+  .pza[open]>summary .vsw.on{ background:var(--rojoCal); border-color:var(--rojoCal); }
+  .nota{ font-size:12.5px; opacity:.6; line-height:1.45; margin:0 0 14px; }
+  .q{ display:flex; align-items:center; gap:7px; margin-bottom:7px; }
+  .q .inp{ flex:1; min-width:0; }
+  .q .inp input{ font-size:13.5px; padding:9px 10px; }
+  .qt{ width:34px; height:36px; flex:none; border:1.5px solid var(--negro); background:transparent;
+    color:transparent; cursor:pointer; font-size:14px; font-family:inherit; line-height:1; }
+  .qt.on{ background:var(--negro); color:var(--crema); }
+  .qx{ width:26px; height:36px; flex:none; border:none; background:transparent; color:var(--negro);
+    opacity:.3; font-size:19px; cursor:pointer; font-family:inherit; line-height:1; }
   /* ===== compras ===== */
   .dash{ background:var(--negro); color:var(--crema); padding:22px; margin-bottom:20px; }
   .dash .cap{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--rojoCal); margin-bottom:4px; }
@@ -169,6 +184,7 @@
 
   <div class="toggle nav" id="navT">
     <button data-s="radar" class="on">Radar</button>
+    <button data-s="busq">Búsquedas</button>
     <button data-s="compras">Compras</button>
     <button data-s="calc">Calculadora</button>
   </div>
@@ -187,6 +203,15 @@
     <div id="rd_lista"></div>
     <div class="estado" id="rd_guardado"></div>
     <p class="foot">El bot corre los viernes y publica acá lo que pasa los filtros duros: foto del mecanismo, funcionando, estado cosmético sano y publicación activa. Los precios son del momento de la corrida — verificá antes de ofertar.</p>
+  </section>
+
+  <!-- ===================== BÚSQUEDAS ===================== -->
+  <section id="s_busq" class="hidden">
+    <p class="sub">Lo que el bot sale a buscar cada viernes.</p>
+    <label class="f"><span class="lab">Techo landed</span><span class="inp"><span class="pfx">US$</span><input id="bq_techo" type="number" inputmode="decimal" value="100"></span><span class="hint">Máximo all-in por pieza. Arriba de esto el bot ni te lo muestra.</span></label>
+    <div id="bq_lista"></div>
+    <div class="estado" id="bq_estado"></div>
+    <p class="foot">Prendé o apagá una vertical entera con el ON/OFF, o cada búsqueda con el tilde. El bot lee esto antes de salir a buscar: lo que esté apagado no se consulta.</p>
   </section>
 
   <!-- ===================== COMPRAS ===================== -->
@@ -291,7 +316,7 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ retu
 function num(v){ var n=parseFloat(v); return isNaN(n)?0:n; }
 
 /* ===================== NAVEGACIÓN ===================== */
-var SECS={ radar:"s_radar", compras:"s_compras", calc:"s_calc" };
+var SECS={ radar:"s_radar", busq:"s_busq", compras:"s_compras", calc:"s_calc" };
 function irA(s){
   document.querySelectorAll("#navT button").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-s")===s); });
   for(var k in SECS) document.getElementById(SECS[k]).classList.toggle("hidden", k!==s);
@@ -441,34 +466,178 @@ function cargarRadar(){
     });
 }
 
+/* ===================== BÚSQUEDAS ===================== */
+var BUSQ={ techo_landed_usd:100, verticales:[] };
+var bqTimer=null;
+
+function bqEstado(txt, err){
+  var e=document.getElementById("bq_estado");
+  e.textContent=txt; e.className = err? "estado err":"estado";
+  if(txt==="guardado ✓") setTimeout(function(){ if(e.textContent==="guardado ✓") e.textContent=""; },2500);
+}
+function programarBusq(){
+  bqEstado("editando…");
+  clearTimeout(bqTimer);
+  bqTimer=setTimeout(guardarBusq,1200);
+}
+function guardarBusq(){
+  clearTimeout(bqTimer);
+  bqEstado("guardando…");
+  try{ localStorage.setItem("anacro_busq", JSON.stringify(BUSQ)); }catch(x){}
+  fetch(BASE+"/api/busquedas",{ method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN },
+    body:JSON.stringify(BUSQ) })
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(){ bqEstado("guardado ✓"); })
+    .catch(function(){ bqEstado("sin conexión — quedó guardado en este dispositivo", true); });
+}
+function refrescarCabecerasBusq(){
+  document.querySelectorAll("#bq_lista .pza").forEach(function(d){
+    var v=BUSQ.verticales[+d.getAttribute("data-vi")]; if(!v) return;
+    var qs=v.queries||[], act=qs.filter(function(q){ return q.activa!==false; }).length;
+    d.querySelector(".ss").textContent = (v.activa===false)
+      ? "apagada" : act+" de "+qs.length+(qs.length===1?" búsqueda":" búsquedas");
+    var sw=d.querySelector(".vsw");
+    sw.classList.toggle("on", v.activa!==false);
+    sw.textContent = v.activa===false ? "OFF" : "ON";
+  });
+}
+function renderBusq(){
+  document.getElementById("bq_techo").value = num(BUSQ.techo_landed_usd)||100;
+  var h="";
+  (BUSQ.verticales||[]).forEach(function(v,vi){
+    h+="<details class='pza' data-vi='"+vi+"'>"+
+       "<summary><div><div class='sm'>"+esc(v.nombre||v.id)+"</div><div class='ss'></div></div>"+
+       "<div class='sr'><button class='vsw' data-vsw='"+vi+"'>ON</button><span class='cv'>&#9662;</span></div></summary>"+
+       "<div class='body'>";
+    if(v.nota) h+="<p class='nota'>"+esc(v.nota)+"</p>";
+    h+="<label class='f'><span class='lab'>Piezas máximas por corrida</span><span class='inp'><input type='number' inputmode='decimal' data-vcupo='"+vi+"' value='"+num(v.cupo)+"'></span></label>"+
+       "<span class='lab' style='display:block;margin-bottom:8px'>Búsquedas</span>";
+    (v.queries||[]).forEach(function(q,qi){
+      h+="<div class='q'><button class='qt"+(q.activa===false?"":" on")+"' data-vq='"+vi+"_"+qi+"'>&#10003;</button>"+
+         "<span class='inp'><input class='txt' type='text' data-vqt='"+vi+"_"+qi+"' value='"+esc(q.q||"")+"'></span>"+
+         "<button class='qx' data-vqd='"+vi+"_"+qi+"'>&times;</button></div>";
+    });
+    h+="<button class='btn' data-vadd='"+vi+"' style='margin-top:6px'>+ Agregar búsqueda</button>"+
+       "</div></details>";
+  });
+  document.getElementById("bq_lista").innerHTML=h;
+
+  document.querySelectorAll("#bq_lista [data-vsw]").forEach(function(b){
+    b.onclick=function(ev){
+      ev.preventDefault(); ev.stopPropagation();
+      var v=BUSQ.verticales[+b.getAttribute("data-vsw")];
+      v.activa = (v.activa===false);
+      refrescarCabecerasBusq(); programarBusq();
+    };
+  });
+  document.querySelectorAll("#bq_lista [data-vcupo]").forEach(function(inp){
+    inp.addEventListener("input",function(){
+      BUSQ.verticales[+inp.getAttribute("data-vcupo")].cupo=num(inp.value);
+      programarBusq();
+    });
+  });
+  document.querySelectorAll("#bq_lista [data-vq]").forEach(function(b){
+    b.onclick=function(){
+      var ix=b.getAttribute("data-vq").split("_");
+      var q=BUSQ.verticales[+ix[0]].queries[+ix[1]];
+      q.activa = (q.activa===false);
+      b.classList.toggle("on", q.activa!==false);
+      refrescarCabecerasBusq(); programarBusq();
+    };
+  });
+  document.querySelectorAll("#bq_lista [data-vqt]").forEach(function(inp){
+    inp.addEventListener("input",function(){
+      var ix=inp.getAttribute("data-vqt").split("_");
+      BUSQ.verticales[+ix[0]].queries[+ix[1]].q=inp.value;
+      programarBusq();
+    });
+  });
+  document.querySelectorAll("#bq_lista [data-vqd]").forEach(function(b){
+    b.onclick=function(){
+      var ix=b.getAttribute("data-vqd").split("_");
+      BUSQ.verticales[+ix[0]].queries.splice(+ix[1],1);
+      var abierto=BUSQ.verticales.map(function(_,i){
+        var d=document.querySelector("#bq_lista .pza[data-vi='"+i+"']"); return d && d.open;
+      });
+      renderBusq();
+      abierto.forEach(function(o,i){
+        var d=document.querySelector("#bq_lista .pza[data-vi='"+i+"']"); if(d&&o) d.open=true;
+      });
+      guardarBusq();
+    };
+  });
+  document.querySelectorAll("#bq_lista [data-vadd]").forEach(function(b){
+    b.onclick=function(){
+      var vi=+b.getAttribute("data-vadd");
+      BUSQ.verticales[vi].queries.push({ q:"", activa:true });
+      var abierto=BUSQ.verticales.map(function(_,i){
+        var d=document.querySelector("#bq_lista .pza[data-vi='"+i+"']"); return d && d.open;
+      });
+      renderBusq();
+      abierto.forEach(function(o,i){
+        var d=document.querySelector("#bq_lista .pza[data-vi='"+i+"']"); if(d&&o) d.open=true;
+      });
+      var det=document.querySelector("#bq_lista .pza[data-vi='"+vi+"']");
+      if(det){
+        det.open=true;
+        var inputs=det.querySelectorAll("input[data-vqt]");
+        var ult=inputs[inputs.length-1];
+        if(ult){ ult.scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(function(){ ult.focus(); },250); }
+      }
+      guardarBusq();
+    };
+  });
+  refrescarCabecerasBusq();
+}
+function cargarBusq(){
+  return fetch(BASE+"/busquedas.json?t="+Date.now(),{cache:"no-store"})
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(d){
+      BUSQ={ techo_landed_usd:num(d.techo_landed_usd)||100, verticales:d.verticales||[] };
+      try{ localStorage.setItem("anacro_busq", JSON.stringify(BUSQ)); }catch(e){}
+      renderBusq();
+    })
+    .catch(function(){
+      try{ var c=JSON.parse(localStorage.getItem("anacro_busq")||"null"); if(c) BUSQ=c; }catch(e){}
+      renderBusq();
+      bqEstado("sin conexión — mostrando la última copia local", true);
+    });
+}
+document.getElementById("bq_techo").addEventListener("input",function(){
+  BUSQ.techo_landed_usd=num(this.value)||100; programarBusq();
+});
+
 /* ===================== COMPRAS ===================== */
 var COMPRAS={ cotizacion:1430, items:[] };
 var guardarTimer=null, abiertas={};
 
-function costoItem(i,cotiz){ return num(i.precio)+num(i.envio)+(cotiz>0?num(i.service_ars)/cotiz:0); }
+function costoItem(i,cotiz){ return num(i.precio)+num(i.envio)+num(i.impuestos)+(cotiz>0?num(i.service_ars)/cotiz:0); }
 
 /* Recalcula el tablero y los encabezados SIN recrear los campos:
    así lo que estás tipeando nunca se pierde ni pierde el foco. */
 function actualizarTotales(){
   var cotiz=num(COMPRAS.cotizacion)||1430;
-  var piezas=0, envios=0, serv=0, gan=0, vendidas=0;
+  var piezas=0, envios=0, imps=0, serv=0, gan=0, vendidas=0;
   COMPRAS.items.forEach(function(i){
-    piezas+=num(i.precio); envios+=num(i.envio); serv+=cotiz>0?num(i.service_ars)/cotiz:0;
+    piezas+=num(i.precio); envios+=num(i.envio); imps+=num(i.impuestos);
+    serv+=cotiz>0?num(i.service_ars)/cotiz:0;
     if(num(i.venta)>0){ vendidas++; gan+=num(i.venta)-costoItem(i,cotiz); }
   });
-  var inv=piezas+envios+serv;
+  var inv=piezas+envios+imps+serv;
   document.getElementById("cp_inv").textContent=usd(inv);
   document.getElementById("cp_inv_ars").textContent=ars(inv*cotiz);
   document.getElementById("cp_lines").innerHTML=
     "<div class='li'><span>Piezas</span><span class='mono'>"+usd(piezas)+"</span></div>"+
     "<div class='li'><span>Envío</span><span class='mono'>"+usd(envios)+"</span></div>"+
+    "<div class='li'><span>Impuestos</span><span class='mono'>"+usd(imps)+"</span></div>"+
     "<div class='li'><span>Service</span><span class='mono'>"+usd(serv)+"</span></div>";
   document.getElementById("cp_gan").textContent=usd(gan);
   document.getElementById("cp_gan_ars").textContent=ars(gan*cotiz);
   document.getElementById("cp_n").textContent=COMPRAS.items.length;
   document.getElementById("cp_n2").textContent=vendidas+(vendidas===1?" vendida":" vendidas");
 
-  document.querySelectorAll(".pza").forEach(function(d){
+  document.querySelectorAll("#cp_lista .pza").forEach(function(d){
     var i=COMPRAS.items[+d.getAttribute("data-ix")]; if(!i) return;
     var c=costoItem(i,cotiz), vendida=num(i.venta)>0, margen=vendida?num(i.venta)-c:0;
     d.classList.toggle("vendida", vendida);
@@ -498,6 +667,9 @@ function renderCompras(){
        "<div><label class='f'><span class='lab'>Precio</span><span class='inp'><span class='pfx'>US$</span><input type='number' inputmode='decimal' data-k='precio' value='"+num(i.precio)+"'></span></label></div>"+
        "<div><label class='f'><span class='lab'>Envío</span><span class='inp'><span class='pfx'>US$</span><input type='number' inputmode='decimal' data-k='envio' value='"+num(i.envio)+"'></span></label></div>"+
        "</div>"+
+       "<div class='row2'>"+
+       "<div><label class='f'><span class='lab'>Impuestos</span><span class='inp'><span class='pfx'>US$</span><input type='number' inputmode='decimal' data-k='impuestos' value='"+num(i.impuestos)+"'></span></label></div>"+
+       "<div></div></div>"+
        "<label class='f'><span class='lab'>Service</span><span class='inp'><span class='pfx'>$</span><input type='number' inputmode='decimal' data-k='service_ars' value='"+num(i.service_ars)+"'></span><span class='hint hserv'></span></label>"+
        "<label class='f'><span class='lab'>Precio de venta</span><span class='inp'><span class='pfx'>US$</span><input type='number' inputmode='decimal' data-k='venta' value='"+num(i.venta)+"'></span><span class='hint'>Dejalo en 0 mientras siga en la colección.</span></label>"+
        "<label class='f'><span class='lab'>Nota</span><span class='inp'><input class='txt' type='text' data-k='nota' value='"+esc(i.nota)+"'></span></label>"+
@@ -506,7 +678,7 @@ function renderCompras(){
   });
   document.getElementById("cp_lista").innerHTML=h;
 
-  document.querySelectorAll(".pza").forEach(function(d){
+  document.querySelectorAll("#cp_lista .pza").forEach(function(d){
     var ix=+d.getAttribute("data-ix");
     d.addEventListener("toggle",function(){ abiertas[ix]=d.open; });
     d.querySelectorAll("input[data-k]").forEach(function(inp){
@@ -562,10 +734,10 @@ function cargarCompras(){
     });
 }
 document.getElementById("cp_add").onclick=function(){
-  COMPRAS.items.push({ id:"p"+Date.now(), modelo:"", fecha:"", precio:0, envio:0, service_ars:0, venta:0, nota:"" });
+  COMPRAS.items.push({ id:"p"+Date.now(), modelo:"", fecha:"", precio:0, envio:0, impuestos:0, service_ars:0, venta:0, nota:"" });
   abiertas[COMPRAS.items.length-1]=true;
   renderCompras(); guardarCompras();
-  var ult=document.querySelector(".pza:last-of-type");
+  var ult=document.querySelector("#cp_lista .pza:last-of-type");
   if(ult){
     ult.scrollIntoView({behavior:"smooth",block:"center"});
     var nombre=ult.querySelector("input[data-k='modelo']");
@@ -668,9 +840,9 @@ document.getElementById("r_cliente").onclick=function(){
 ["r_cant","r_rondas","r_precio","r_venta","r_flete","r_caja","r_andreani","r_publi","r_comision","r_reinv","r_cotiz"].forEach(function(id){ document.getElementById(id).addEventListener("input",renderRueda); });
 
 renderPieza(); renderRueda(); renderCompras();
-cargarFeedback().then(cargarRadar); cargarCompras();
+cargarFeedback().then(cargarRadar); cargarCompras(); cargarBusq();
 try{ var ult=localStorage.getItem("anacro_seccion"); if(ult&&SECS[ult]) irA(ult); }catch(e){}
-window.addEventListener("beforeunload",function(){ if(guardarTimer) guardarCompras(); if(fbTimer) guardarFeedback(); });
+window.addEventListener("beforeunload",function(){ if(guardarTimer) guardarCompras(); if(fbTimer) guardarFeedback(); if(bqTimer) guardarBusq(); });
 </script>
 </body>
 </html>
