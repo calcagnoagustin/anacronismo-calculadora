@@ -512,7 +512,7 @@ function cargarRadar(){
 var BUSQ={ techo_landed_usd:100, verticales:[], criterios:[], pedidos:[], agenda:{dias:[5],hora_local:"06:00"} };
 var DIAS_CORTO=["D","L","M","M","J","V","S"];
 var DIAS_LARGO=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
-var bqTimer=null;
+var bqTimer=null, bqBase=null;
 
 function bqEstado(txt, err){
   var e=document.getElementById("bq_estado");
@@ -528,11 +528,22 @@ function guardarBusq(){
   clearTimeout(bqTimer);
   bqEstado("guardando…");
   try{ localStorage.setItem("anacro_busq", JSON.stringify(BUSQ)); }catch(x){}
+  var cuerpo={}; for(var k in BUSQ) cuerpo[k]=BUSQ[k];
+  cuerpo.base=bqBase;
   fetch(BASE+"/api/busquedas",{ method:"POST",
     headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN },
-    body:JSON.stringify(BUSQ) })
-    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function(){ bqEstado("guardado ✓"); })
+    body:JSON.stringify(cuerpo) })
+    .then(function(r){
+      if(r.status===409){
+        // Alguien guardó después de que esta pestaña cargó. No pisamos: recargamos.
+        bqEstado("otra pestaña guardó primero — traigo lo último", true);
+        cargarBusq();
+        return null;
+      }
+      if(!r.ok) throw new Error(r.status);
+      return r.json();
+    })
+    .then(function(j){ if(j){ bqBase=j.actualizado; bqEstado("guardado ✓"); } })
     .catch(function(){ bqEstado("sin conexión — quedó guardado en este dispositivo", true); });
 }
 function refrescarCabecerasBusq(){
@@ -815,6 +826,7 @@ function cargarBusq(){
   return fetch(BASE+"/busquedas.json?t="+Date.now(),{cache:"no-store"})
     .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
     .then(function(d){
+      bqBase = d.actualizado || null;
       BUSQ={ techo_landed_usd:num(d.techo_landed_usd)||100, verticales:d.verticales||[],
              criterios:d.criterios||[], pedidos:d.pedidos||[],
              agenda:d.agenda||{dias:[5],hora_local:"06:00"} };
