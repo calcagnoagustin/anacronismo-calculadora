@@ -98,6 +98,28 @@
   .rk{ font-family:ui-monospace,Menlo,monospace; font-size:11px; opacity:.4; margin-right:6px; }
   .grupo{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; opacity:.45;
     margin:22px 0 10px; padding-top:12px; border-top:1px solid #1A1A1A22; }
+  .instr{ border:1.5px solid var(--negro); background:var(--crema2); margin-bottom:16px; }
+  .instr>summary{ list-style:none; cursor:pointer; padding:11px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--rojoOsc); }
+  .instr>summary::-webkit-details-marker{ display:none; }
+  .instr[open]>summary{ background:var(--negro); color:var(--rojoCal); }
+  .instr .ib{ padding:14px; }
+  .instr textarea{ width:100%; min-height:110px; border:1.5px solid var(--negro); background:var(--crema);
+    color:var(--negro); font-family:inherit; font-size:14px; line-height:1.45; padding:10px 12px; outline:none; resize:vertical; }
+  .fb{ border-top:1px solid #1A1A1A22; margin-top:11px; }
+  .fb>summary{ list-style:none; cursor:pointer; padding:9px 0 2px; display:flex; justify-content:space-between; align-items:center; gap:10px;
+    font-size:11px; letter-spacing:.12em; text-transform:uppercase; font-weight:600; color:var(--rojoOsc); }
+  .fb>summary::-webkit-details-marker{ display:none; }
+  .fb .fbe{ font-size:11.5px; letter-spacing:0; text-transform:none; font-weight:400; opacity:.55; color:var(--negro);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:60%; text-align:right; }
+  .fb .fbb{ padding:10px 0 4px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .chips button{ font-family:inherit; font-size:11px; letter-spacing:.06em; text-transform:uppercase; font-weight:600;
+    padding:6px 9px; border:1.5px solid var(--negro); background:transparent; color:var(--negro); cursor:pointer; opacity:.55; }
+  .chips button.on{ background:var(--negro); color:var(--crema); opacity:1; }
+  .chips button.no.on{ background:var(--rojoOsc); border-color:var(--rojoOsc); color:var(--crema); }
+  .card.descartado{ opacity:.5; }
+  .card.descartado .nm{ text-decoration:line-through; }
   /* ===== compras ===== */
   .dash{ background:var(--negro); color:var(--crema); padding:22px; margin-bottom:20px; }
   .dash .cap{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--rojoCal); margin-bottom:4px; }
@@ -116,6 +138,9 @@
   .pza .ss{ font-size:11px; opacity:.5; margin-top:3px; letter-spacing:.04em; }
   .pza .sc{ font-family:ui-monospace,Menlo,monospace; font-size:15px; font-weight:700; white-space:nowrap; text-align:right; }
   .pza .sc small{ display:block; font-size:10px; font-weight:400; opacity:.5; letter-spacing:.04em; }
+  .pza .sr{ display:flex; align-items:center; gap:11px; }
+  .pza .cv{ font-size:12px; opacity:.4; transition:transform .15s ease; }
+  .pza[open] .cv{ transform:rotate(180deg); opacity:.8; }
   .pza[open]>summary{ background:var(--negro); color:var(--crema); }
   .pza[open]>summary .ss{ opacity:.65; }
   .pza .body{ padding:16px 14px 4px; border-top:1.5px solid var(--negro); }
@@ -151,8 +176,16 @@
   <!-- ===================== RADAR ===================== -->
   <section id="s_radar">
     <p class="sub">Lo que trajo el bot en su última pasada por eBay.</p>
+    <details class="instr" id="rd_instr">
+      <summary><span>Instrucciones para el bot</span><span class="cv">&#9662;</span></summary>
+      <div class="ib">
+        <textarea id="rd_instr_txt" placeholder="Ej: no me traigas más Raketa con dial gastado; priorizá dials de color; bajá el techo a USD 40; sumá búsquedas de jump hour."></textarea>
+        <span class="hint">El bot lee esto antes de cada búsqueda del viernes, junto con tus comentarios de abajo.</span>
+      </div>
+    </details>
     <div class="barra"><span id="rd_corrida">Última corrida —</span><span class="st" id="rd_estado">cargando…</span></div>
     <div id="rd_lista"></div>
+    <div class="estado" id="rd_guardado"></div>
     <p class="foot">El bot corre los viernes y publica acá lo que pasa los filtros duros: foto del mecanismo, funcionando, estado cosmético sano y publicación activa. Los precios son del momento de la corrida — verificá antes de ofertar.</p>
   </section>
 
@@ -291,7 +324,9 @@ function pintarRadar(d){
     primero=false;
     ls.forEach(function(i){
       var precio=num(i.precio);
-      h+="<div class='card'>";
+      var idc=String(i.item||i.id||i.nombre), fc=FEEDBACK.comentarios[idc];
+      var descartado = fc && (fc.tags||[]).indexOf("No va")>=0;
+      h+="<div class='card"+(descartado?" descartado":"")+"'>";
       if(g.tag) h+="<span class='tag "+g.tag+"'>"+g.titulo+"</span>";
       h+="<div class='ch'><div class='nm'>"+(i.pos?"<span class='rk'>"+i.pos+"</span>":"")+esc(i.nombre)+"</div>"+
          "<div class='pr'>"+(precio?usd(precio):"—")+"</div></div>";
@@ -299,7 +334,18 @@ function pintarRadar(d){
       if(i.nota) h+="<div class='nt'>"+esc(i.nota)+"</div>";
       h+="<div class='acts'>";
       if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en eBay</a>";
-      h+="<button data-precio='"+precio+"'>Calcular</button></div></div>";
+      h+="<button data-precio='"+precio+"'>Calcular</button></div>";
+      var id=String(i.item||i.id||i.nombre), f=fbDe(id);
+      f.nombre=i.nombre;
+      var chips="";
+      CHIPS.forEach(function(t){
+        var on=(f.tags||[]).indexOf(t)>=0;
+        chips+="<button class='"+(t==="No va"?"no ":"")+(on?"on":"")+"' data-fbid='"+esc(id)+"' data-tag='"+esc(t)+"'>"+t+"</button>";
+      });
+      h+="<details class='fb'><summary><span>Mi comentario</span><span class='fbe'>"+esc(fbResumen(f))+"</span></summary>"+
+         "<div class='fbb'><div class='chips'>"+chips+"</div>"+
+         "<span class='inp'><input class='txt' type='text' data-fbtxt='"+esc(id)+"' placeholder='Por qué sí o por qué no…' value='"+esc(f.texto)+"'></span>"+
+         "</div></details></div>";
     });
   });
   document.getElementById("rd_lista").innerHTML=h;
@@ -309,7 +355,79 @@ function pintarRadar(d){
       renderPieza(); irA("calc");
     };
   });
+  document.querySelectorAll("#rd_lista .chips button").forEach(function(b){
+    b.onclick=function(){
+      var f=fbDe(b.getAttribute("data-fbid")), t=b.getAttribute("data-tag");
+      f.tags=f.tags||[];
+      var k=f.tags.indexOf(t);
+      if(k>=0) f.tags.splice(k,1); else f.tags.push(t);
+      b.classList.toggle("on", k<0);
+      var card=b.closest(".card");
+      card.classList.toggle("descartado", f.tags.indexOf("No va")>=0);
+      card.querySelector(".fbe").textContent=fbResumen(f);
+      programarFeedback();
+    };
+  });
+  document.querySelectorAll("#rd_lista input[data-fbtxt]").forEach(function(inp){
+    inp.addEventListener("input",function(){
+      var f=fbDe(inp.getAttribute("data-fbtxt"));
+      f.texto=inp.value;
+      inp.closest(".card").querySelector(".fbe").textContent=fbResumen(f);
+      programarFeedback();
+    });
+  });
 }
+/* ---- comentarios y directivas para el bot ---- */
+var FEEDBACK={ instrucciones:"", comentarios:{} };
+var fbTimer=null;
+var CHIPS=["Me interesa","No va","Caro","Deteriorado","Dudoso"];
+
+function fbDe(id){
+  if(!FEEDBACK.comentarios[id]) FEEDBACK.comentarios[id]={ nombre:"", tags:[], texto:"" };
+  return FEEDBACK.comentarios[id];
+}
+function fbResumen(f){
+  var p=[]; if(f.tags && f.tags.length) p.push(f.tags.join(" · "));
+  if(f.texto) p.push(f.texto);
+  return p.length? p.join(" — ") : "sin comentario";
+}
+function marcarFbEstado(txt, err){
+  var e=document.getElementById("rd_guardado");
+  e.textContent=txt; e.className = err? "estado err":"estado";
+  if(txt==="guardado ✓") setTimeout(function(){ if(e.textContent==="guardado ✓") e.textContent=""; },2500);
+}
+function programarFeedback(){
+  marcarFbEstado("editando…");
+  clearTimeout(fbTimer);
+  fbTimer=setTimeout(guardarFeedback,1200);
+}
+function guardarFeedback(){
+  clearTimeout(fbTimer);
+  marcarFbEstado("guardando…");
+  try{ localStorage.setItem("anacro_feedback", JSON.stringify(FEEDBACK)); }catch(x){}
+  fetch(BASE+"/api/feedback",{ method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN },
+    body:JSON.stringify(FEEDBACK) })
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(){ marcarFbEstado("guardado ✓"); })
+    .catch(function(){ marcarFbEstado("sin conexión — quedó guardado en este dispositivo", true); });
+}
+function cargarFeedback(){
+  return fetch(BASE+"/feedback.json?t="+Date.now(),{cache:"no-store"})
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(d){
+      FEEDBACK={ instrucciones:d.instrucciones||"", comentarios:d.comentarios||{} };
+      try{ localStorage.setItem("anacro_feedback", JSON.stringify(FEEDBACK)); }catch(e){}
+    })
+    .catch(function(){
+      try{ var c=JSON.parse(localStorage.getItem("anacro_feedback")||"null"); if(c) FEEDBACK=c; }catch(e){}
+    })
+    .then(function(){ document.getElementById("rd_instr_txt").value=FEEDBACK.instrucciones||""; });
+}
+document.getElementById("rd_instr_txt").addEventListener("input",function(){
+  FEEDBACK.instrucciones=this.value; programarFeedback();
+});
+
 function cargarRadar(){
   fetch(BASE+"/radar.json?t="+Date.now(),{cache:"no-store"})
     .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
@@ -329,7 +447,9 @@ var guardarTimer=null, abiertas={};
 
 function costoItem(i,cotiz){ return num(i.precio)+num(i.envio)+(cotiz>0?num(i.service_ars)/cotiz:0); }
 
-function renderCompras(){
+/* Recalcula el tablero y los encabezados SIN recrear los campos:
+   así lo que estás tipeando nunca se pierde ni pierde el foco. */
+function actualizarTotales(){
   var cotiz=num(COMPRAS.cotizacion)||1430;
   var piezas=0, envios=0, serv=0, gan=0, vendidas=0;
   COMPRAS.items.forEach(function(i){
@@ -348,21 +468,37 @@ function renderCompras(){
   document.getElementById("cp_n").textContent=COMPRAS.items.length;
   document.getElementById("cp_n2").textContent=vendidas+(vendidas===1?" vendida":" vendidas");
 
+  document.querySelectorAll(".pza").forEach(function(d){
+    var i=COMPRAS.items[+d.getAttribute("data-ix")]; if(!i) return;
+    var c=costoItem(i,cotiz), vendida=num(i.venta)>0, margen=vendida?num(i.venta)-c:0;
+    d.classList.toggle("vendida", vendida);
+    d.querySelector(".sm").textContent = i.modelo || "Sin nombre";
+    d.querySelector(".ss").textContent = i.modelo
+      ? (i.fecha? i.fecha+" · ":"")+(vendida?"vendida":"en colección")
+      : "tocá para ponerle nombre";
+    d.querySelector(".sc-n").textContent = usd1(c);
+    d.querySelector(".sc-s").textContent = vendida ? (margen>=0?"+":"")+usd1(margen) : "costo";
+    var hs=d.querySelector(".hserv");
+    if(hs) hs.textContent="En pesos. Hoy son "+usd1(cotiz>0?num(i.service_ars)/cotiz:0)+".";
+  });
+}
+
+/* Rearma la lista entera. Solo al cargar, agregar o borrar una pieza. */
+function renderCompras(){
   var h="";
   COMPRAS.items.forEach(function(i,ix){
-    var c=costoItem(i,cotiz), vendida=num(i.venta)>0, margen=vendida?num(i.venta)-c:0;
-    h+="<details class='pza"+(vendida?" vendida":"")+"' data-ix='"+ix+"'"+(abiertas[ix]?" open":"")+">"+
-       "<summary><div><div class='sm'>"+esc(i.modelo||"Sin nombre")+"</div>"+
-       "<div class='ss'>"+(i.fecha?esc(i.fecha)+" · ":"")+(vendida?"vendida":"en colección")+"</div></div>"+
-       "<div class='sc'>"+usd1(c)+"<small>"+(vendida?(margen>=0?"+":"")+usd1(margen):"costo")+"</small></div></summary>"+
+    h+="<details class='pza' data-ix='"+ix+"'"+(abiertas[ix]?" open":"")+">"+
+       "<summary><div><div class='sm'></div><div class='ss'></div></div>"+
+       "<div class='sr'><div class='sc'><span class='sc-n'></span><small class='sc-s'></small></div>"+
+       "<span class='cv'>&#9662;</span></div></summary>"+
        "<div class='body'>"+
-       "<label class='f'><span class='lab'>Modelo</span><span class='inp'><input class='txt' type='text' data-k='modelo' value='"+esc(i.modelo)+"'></span></label>"+
+       "<label class='f'><span class='lab'>Modelo</span><span class='inp'><input class='txt' type='text' data-k='modelo' placeholder='Vostok Olimpiada-80' value='"+esc(i.modelo)+"'></span></label>"+
        "<label class='f'><span class='lab'>Fecha de compra</span><span class='inp'><input class='txt' type='date' data-k='fecha' value='"+esc(i.fecha)+"'></span></label>"+
        "<div class='row2'>"+
        "<div><label class='f'><span class='lab'>Precio</span><span class='inp'><span class='pfx'>US$</span><input type='number' inputmode='decimal' data-k='precio' value='"+num(i.precio)+"'></span></label></div>"+
        "<div><label class='f'><span class='lab'>Envío</span><span class='inp'><span class='pfx'>US$</span><input type='number' inputmode='decimal' data-k='envio' value='"+num(i.envio)+"'></span></label></div>"+
        "</div>"+
-       "<label class='f'><span class='lab'>Service</span><span class='inp'><span class='pfx'>$</span><input type='number' inputmode='decimal' data-k='service_ars' value='"+num(i.service_ars)+"'></span><span class='hint'>En pesos. Hoy son "+usd1(cotiz>0?num(i.service_ars)/cotiz:0)+".</span></label>"+
+       "<label class='f'><span class='lab'>Service</span><span class='inp'><span class='pfx'>$</span><input type='number' inputmode='decimal' data-k='service_ars' value='"+num(i.service_ars)+"'></span><span class='hint hserv'></span></label>"+
        "<label class='f'><span class='lab'>Precio de venta</span><span class='inp'><span class='pfx'>US$</span><input type='number' inputmode='decimal' data-k='venta' value='"+num(i.venta)+"'></span><span class='hint'>Dejalo en 0 mientras siga en la colección.</span></label>"+
        "<label class='f'><span class='lab'>Nota</span><span class='inp'><input class='txt' type='text' data-k='nota' value='"+esc(i.nota)+"'></span></label>"+
        "<button class='btn del' data-del='"+ix+"'>Eliminar pieza</button>"+
@@ -377,15 +513,15 @@ function renderCompras(){
       inp.addEventListener("input",function(){
         var k=inp.getAttribute("data-k");
         COMPRAS.items[ix][k] = (k==="modelo"||k==="fecha"||k==="nota") ? inp.value : num(inp.value);
-        programarGuardado();
+        actualizarTotales(); programarGuardado();
       });
-      inp.addEventListener("change",function(){ if(inp.type==="number"||inp.type==="date") renderCompras(); });
     });
     var del=d.querySelector("[data-del]");
     if(del) del.onclick=function(){
       COMPRAS.items.splice(ix,1); abiertas={}; renderCompras(); guardarCompras();
     };
   });
+  actualizarTotales();
 }
 
 function programarGuardado(){
@@ -427,13 +563,17 @@ function cargarCompras(){
 }
 document.getElementById("cp_add").onclick=function(){
   COMPRAS.items.push({ id:"p"+Date.now(), modelo:"", fecha:"", precio:0, envio:0, service_ars:0, venta:0, nota:"" });
-  abiertas={}; abiertas[COMPRAS.items.length-1]=true;
+  abiertas[COMPRAS.items.length-1]=true;
   renderCompras(); guardarCompras();
   var ult=document.querySelector(".pza:last-of-type");
-  if(ult) ult.scrollIntoView({behavior:"smooth",block:"center"});
+  if(ult){
+    ult.scrollIntoView({behavior:"smooth",block:"center"});
+    var nombre=ult.querySelector("input[data-k='modelo']");
+    if(nombre) setTimeout(function(){ nombre.focus(); },250);
+  }
 };
 document.getElementById("cp_cotiz").addEventListener("input",function(){
-  COMPRAS.cotizacion=num(this.value)||1430; renderCompras(); programarGuardado();
+  COMPRAS.cotizacion=num(this.value)||1430; actualizarTotales(); programarGuardado();
 });
 
 /* ===================== CALCULADORA ===================== */
@@ -528,9 +668,9 @@ document.getElementById("r_cliente").onclick=function(){
 ["r_cant","r_rondas","r_precio","r_venta","r_flete","r_caja","r_andreani","r_publi","r_comision","r_reinv","r_cotiz"].forEach(function(id){ document.getElementById(id).addEventListener("input",renderRueda); });
 
 renderPieza(); renderRueda(); renderCompras();
-cargarRadar(); cargarCompras();
+cargarFeedback().then(cargarRadar); cargarCompras();
 try{ var ult=localStorage.getItem("anacro_seccion"); if(ult&&SECS[ult]) irA(ult); }catch(e){}
-window.addEventListener("beforeunload",function(){ if(guardarTimer) guardarCompras(); });
+window.addEventListener("beforeunload",function(){ if(guardarTimer) guardarCompras(); if(fbTimer) guardarFeedback(); });
 </script>
 </body>
 </html>
