@@ -135,6 +135,24 @@
   .qt.on{ background:var(--negro); color:var(--crema); }
   .qx{ width:26px; height:36px; flex:none; border:none; background:transparent; color:var(--negro);
     opacity:.3; font-size:19px; cursor:pointer; font-family:inherit; line-height:1; }
+  .agenda{ background:var(--negro); color:var(--crema); padding:20px; margin-bottom:20px; }
+  .agenda .cap{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--rojoCal); margin-bottom:4px; }
+  .agenda .big{ font-size:26px; font-weight:800; line-height:1.15; }
+  .dias{ display:flex; gap:6px; margin-top:16px; }
+  .dias button{ flex:1; padding:9px 0; font-family:inherit; font-size:12px; font-weight:700;
+    border:1.5px solid #ffffff44; background:transparent; color:var(--crema); opacity:.45; cursor:pointer; }
+  .dias button.on{ background:var(--crema); color:var(--negro); border-color:var(--crema); opacity:1; }
+  .agenda .hint{ opacity:.55; margin-top:12px; }
+  .agenda .hint b{ color:var(--rojoCal); }
+  .ped{ border:1.5px solid var(--negro); padding:10px 12px; margin-top:10px; font-size:12.5px; line-height:1.45; }
+  .ped .st{ font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--rojoOsc); display:block; margin-bottom:4px; }
+  .ped.hecho{ opacity:.55; }
+  .ped .rta{ margin-top:6px; opacity:.7; font-style:italic; }
+  .tagd{ font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:700;
+    border:1px solid var(--rojoOsc); color:var(--rojoOsc); padding:2px 6px; margin-right:6px; }
+  .pza[open]>summary .tagd{ border-color:var(--rojoCal); color:var(--rojoCal); }
+  .body textarea{ width:100%; min-height:90px; border:1.5px solid var(--negro); background:var(--crema);
+    color:var(--negro); font-family:inherit; font-size:13.5px; line-height:1.45; padding:9px 11px; outline:none; resize:vertical; }
   /* ===== compras ===== */
   .dash{ background:var(--negro); color:var(--crema); padding:22px; margin-bottom:20px; }
   .dash .cap{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--rojoCal); margin-bottom:4px; }
@@ -207,11 +225,35 @@
 
   <!-- ===================== BÚSQUEDAS ===================== -->
   <section id="s_busq" class="hidden">
-    <p class="sub">Lo que el bot sale a buscar cada viernes.</p>
-    <label class="f"><span class="lab">Techo landed</span><span class="inp"><span class="pfx">US$</span><input id="bq_techo" type="number" inputmode="decimal" value="100"></span><span class="hint">Máximo all-in por pieza. Arriba de esto el bot ni te lo muestra.</span></label>
+    <p class="sub">Lo que el bot sale a buscar, y cuándo.</p>
+
+    <div class="agenda">
+      <div class="cap">Próxima corrida</div>
+      <div class="big" id="ag_prox">—</div>
+      <div class="dias" id="ag_dias"></div>
+      <span class="hint">Tocá los días en que querés que salga a buscar. Sale a las <b id="ag_hora">06:00</b>.</span>
+    </div>
+
+    <details class="instr" id="bq_pedido">
+      <summary><span>Pedile una categoría al bot</span><span class="cv">&#9662;</span></summary>
+      <div class="ib">
+        <textarea id="pd_txt" placeholder="Ej: agregame una búsqueda de Seikos vintage de menos de 100 dólares"></textarea>
+        <button class="btn pri" id="pd_send" style="margin-top:10px">Anotar pedido</button>
+        <span class="hint">Lo lee la próxima corrida: arma la categoría, la deja apagada y te cuenta en el mail qué hizo.</span>
+        <div id="pd_lista"></div>
+      </div>
+    </details>
+
+    <div class="grupo">Criterios</div>
+    <div id="cr_lista"></div>
+    <button class="btn" id="cr_add">+ Agregar criterio</button>
+
+    <div class="grupo">Categorías</div>
     <div id="bq_lista"></div>
+    <button class="btn" id="bq_add">+ Agregar categoría</button>
+
     <div class="estado" id="bq_estado"></div>
-    <p class="foot">Prendé o apagá una vertical entera con el ON/OFF, o cada búsqueda con el tilde. El bot lee esto antes de salir a buscar: lo que esté apagado no se consulta.</p>
+    <p class="foot">Prendé o apagá una categoría entera con el ON/OFF, o cada búsqueda con el tilde. Los criterios marcados «script» se aplican antes de gastar nada; los marcados «fotos» se juzgan mirando las imágenes, así que solo pueden descartar, nunca rescatar algo que el script ya dejó afuera.</p>
   </section>
 
   <!-- ===================== COMPRAS ===================== -->
@@ -467,7 +509,9 @@ function cargarRadar(){
 }
 
 /* ===================== BÚSQUEDAS ===================== */
-var BUSQ={ techo_landed_usd:100, verticales:[] };
+var BUSQ={ techo_landed_usd:100, verticales:[], criterios:[], pedidos:[], agenda:{dias:[5],hora_local:"06:00"} };
+var DIAS_CORTO=["D","L","M","M","J","V","S"];
+var DIAS_LARGO=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
 var bqTimer=null;
 
 function bqEstado(txt, err){
@@ -502,8 +546,151 @@ function refrescarCabecerasBusq(){
     sw.textContent = v.activa===false ? "OFF" : "ON";
   });
 }
+function proximaCorrida(){
+  var ag=BUSQ.agenda||{}, dias=(ag.dias||[]);
+  if(!dias.length) return null;
+  var hm=String(ag.hora_local||"06:00").split(":");
+  var hh=parseInt(hm[0],10)||6, mm=parseInt(hm[1],10)||0;
+  var ahora=new Date();
+  for(var k=0;k<8;k++){
+    var d=new Date(ahora.getFullYear(),ahora.getMonth(),ahora.getDate()+k,hh,mm,0,0);
+    if(d>ahora && dias.indexOf(d.getDay())>=0) return d;
+  }
+  return null;
+}
+function renderAgenda(){
+  var ag=BUSQ.agenda||(BUSQ.agenda={dias:[5],hora_local:"06:00"});
+  document.getElementById("ag_hora").textContent=ag.hora_local||"06:00";
+  var d=proximaCorrida(), hoy=new Date();
+  var txt="—";
+  if(!d) txt="Ningún día marcado";
+  else{
+    var dif=Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()))/86400000);
+    var cuando = dif===0 ? "hoy" : (dif===1 ? "mañana" : DIAS_LARGO[d.getDay()]);
+    txt = cuando.charAt(0).toUpperCase()+cuando.slice(1)+" "+d.getDate()+"/"+(d.getMonth()+1)+" · "+(ag.hora_local||"06:00");
+  }
+  document.getElementById("ag_prox").textContent=txt;
+  var h="";
+  for(var i=0;i<7;i++) h+="<button data-dia='"+i+"' class='"+((ag.dias||[]).indexOf(i)>=0?"on":"")+"'>"+DIAS_CORTO[i]+"</button>";
+  document.getElementById("ag_dias").innerHTML=h;
+  document.querySelectorAll("#ag_dias button").forEach(function(b){
+    b.onclick=function(){
+      var i=+b.getAttribute("data-dia"), k=(BUSQ.agenda.dias||[]).indexOf(i);
+      if(k>=0) BUSQ.agenda.dias.splice(k,1); else BUSQ.agenda.dias.push(i);
+      BUSQ.agenda.dias.sort();
+      renderAgenda(); programarBusq();
+    };
+  });
+}
+
+function renderPedidos(){
+  var ps=(BUSQ.pedidos||[]).slice().reverse(), h="";
+  ps.forEach(function(p){
+    var hecho = p.estado==="hecho";
+    h+="<div class='ped"+(hecho?" hecho":"")+"'><span class='st'>"+(hecho?"hecho":"pendiente")+(p.fecha?" · "+esc(p.fecha):"")+"</span>"+
+       esc(p.texto)+(p.respuesta?"<div class='rta'>"+esc(p.respuesta)+"</div>":"")+"</div>";
+  });
+  document.getElementById("pd_lista").innerHTML=h;
+}
+document.getElementById("pd_send").onclick=function(){
+  var t=document.getElementById("pd_txt").value.trim();
+  if(!t) return;
+  BUSQ.pedidos=BUSQ.pedidos||[];
+  var f=new Date();
+  BUSQ.pedidos.push({ id:"pd"+Date.now(), texto:t, estado:"pendiente",
+    fecha:f.getDate()+"/"+(f.getMonth()+1), respuesta:"" });
+  document.getElementById("pd_txt").value="";
+  renderPedidos(); guardarBusq();
+};
+
+function abiertosBusq(sel){
+  var abiertos={};
+  document.querySelectorAll(sel).forEach(function(d,i){ abiertos[i]=d.open; });
+  return abiertos;
+}
+function renderCriterios(){
+  var h="";
+  (BUSQ.criterios||[]).forEach(function(c,ci){
+    var sub = (c.donde==="script"?"script":"fotos");
+    if(c.tipo==="numero" && c.valor!=null) sub += " · "+c.valor+" "+(c.unidad||"");
+    h+="<details class='pza' data-ci='"+ci+"'>"+
+       "<summary><div><div class='sm'>"+esc(c.nombre||"Criterio nuevo")+"</div>"+
+       "<div class='ss'>"+esc(sub)+"</div></div>"+
+       "<div class='sr'><button class='vsw"+(c.activo?" on":"")+"' data-csw='"+ci+"'>"+(c.activo?"ON":"OFF")+"</button>"+
+       "<span class='cv'>&#9662;</span></div></summary>"+
+       "<div class='body'>"+
+       "<p class='nota'><span class='tagd'>"+(c.donde==="script"?"script":"fotos")+"</span>"+
+       (c.donde==="script"?"Se aplica antes de gastar nada, con los datos del aviso."
+                          :"Se juzga mirando las fotos. Solo puede descartar.")+"</p>";
+    if(!c.fijo){
+      h+="<label class='f'><span class='lab'>Nombre</span><span class='inp'><input class='txt' type='text' data-cnom='"+ci+"' value='"+esc(c.nombre||"")+"'></span></label>";
+    }
+    if(c.tipo==="numero"){
+      h+="<label class='f'><span class='lab'>Valor</span><span class='inp'><input type='number' inputmode='decimal' data-cval='"+ci+"' value='"+num(c.valor)+"'><span class='sfx'>"+esc(c.unidad||"")+"</span></span></label>";
+    }
+    h+="<label class='f'><span class='lab'>Qué le pide al bot</span><textarea data-ctxt='"+ci+"'>"+esc(c.texto||"")+"</textarea></label>";
+    if(!c.fijo) h+="<button class='btn del' data-cdel='"+ci+"'>Eliminar criterio</button>";
+    h+="</div></details>";
+  });
+  document.getElementById("cr_lista").innerHTML=h;
+
+  document.querySelectorAll("#cr_lista [data-csw]").forEach(function(b){
+    b.onclick=function(ev){
+      ev.preventDefault(); ev.stopPropagation();
+      var c=BUSQ.criterios[+b.getAttribute("data-csw")];
+      c.activo=!c.activo;
+      b.classList.toggle("on",c.activo); b.textContent=c.activo?"ON":"OFF";
+      programarBusq();
+    };
+  });
+  document.querySelectorAll("#cr_lista [data-cval]").forEach(function(inp){
+    inp.addEventListener("input",function(){
+      var ci=+inp.getAttribute("data-cval"), c=BUSQ.criterios[ci];
+      c.valor=num(inp.value);
+      if(c.id==="techo_landed") BUSQ.techo_landed_usd=c.valor;
+      var d=inp.closest(".pza");
+      d.querySelector(".ss").textContent=(c.donde==="script"?"script":"fotos")+" · "+c.valor+" "+(c.unidad||"");
+      programarBusq();
+    });
+  });
+  document.querySelectorAll("#cr_lista [data-ctxt]").forEach(function(ta){
+    ta.addEventListener("input",function(){
+      BUSQ.criterios[+ta.getAttribute("data-ctxt")].texto=ta.value; programarBusq();
+    });
+  });
+  document.querySelectorAll("#cr_lista [data-cnom]").forEach(function(inp){
+    inp.addEventListener("input",function(){
+      var c=BUSQ.criterios[+inp.getAttribute("data-cnom")];
+      c.nombre=inp.value;
+      inp.closest(".pza").querySelector(".sm").textContent=c.nombre||"Criterio nuevo";
+      programarBusq();
+    });
+  });
+  document.querySelectorAll("#cr_lista [data-cdel]").forEach(function(b){
+    b.onclick=function(){
+      if(b.getAttribute("data-armado")!=="1"){
+        b.setAttribute("data-armado","1"); b.textContent="Tocá de nuevo para eliminar"; return;
+      }
+      BUSQ.criterios.splice(+b.getAttribute("data-cdel"),1);
+      renderCriterios(); guardarBusq();
+    };
+  });
+}
+document.getElementById("cr_add").onclick=function(){
+  BUSQ.criterios=BUSQ.criterios||[];
+  BUSQ.criterios.push({ id:"c"+Date.now(), nombre:"", donde:"fotos", activo:false,
+    tipo:"texto", texto:"", fijo:false });
+  renderCriterios();
+  var ult=document.querySelector("#cr_lista .pza:last-of-type");
+  if(ult){
+    ult.open=true; ult.scrollIntoView({behavior:"smooth",block:"center"});
+    var n=ult.querySelector("input[data-cnom]");
+    if(n) setTimeout(function(){ n.focus(); },250);
+  }
+  guardarBusq();
+};
+
 function renderBusq(){
-  document.getElementById("bq_techo").value = num(BUSQ.techo_landed_usd)||100;
   var h="";
   (BUSQ.verticales||[]).forEach(function(v,vi){
     h+="<details class='pza' data-vi='"+vi+"'>"+
@@ -511,6 +698,7 @@ function renderBusq(){
        "<div class='sr'><button class='vsw' data-vsw='"+vi+"'>ON</button><span class='cv'>&#9662;</span></div></summary>"+
        "<div class='body'>";
     if(v.nota) h+="<p class='nota'>"+esc(v.nota)+"</p>";
+    h+="<label class='f'><span class='lab'>Nombre</span><span class='inp'><input class='txt' type='text' data-vnom='"+vi+"' value='"+esc(v.nombre||"")+"'></span></label>";
     h+="<label class='f'><span class='lab'>Piezas máximas por corrida</span><span class='inp'><input type='number' inputmode='decimal' data-vcupo='"+vi+"' value='"+num(v.cupo)+"'></span></label>"+
        "<span class='lab' style='display:block;margin-bottom:8px'>Búsquedas</span>";
     (v.queries||[]).forEach(function(q,qi){
@@ -519,6 +707,7 @@ function renderBusq(){
          "<button class='qx' data-vqd='"+vi+"_"+qi+"'>&times;</button></div>";
     });
     h+="<button class='btn' data-vadd='"+vi+"' style='margin-top:6px'>+ Agregar búsqueda</button>"+
+       "<button class='btn del' data-vdel='"+vi+"' style='margin-top:14px'>Eliminar categoría</button>"+
        "</div></details>";
   });
   document.getElementById("bq_lista").innerHTML=h;
@@ -530,6 +719,14 @@ function renderBusq(){
       v.activa = (v.activa===false);
       refrescarCabecerasBusq(); programarBusq();
     };
+  });
+  document.querySelectorAll("#bq_lista [data-vnom]").forEach(function(inp){
+    inp.addEventListener("input",function(){
+      var v=BUSQ.verticales[+inp.getAttribute("data-vnom")];
+      v.nombre=inp.value;
+      inp.closest(".pza").querySelector(".sm").textContent=v.nombre||v.id;
+      programarBusq();
+    });
   });
   document.querySelectorAll("#bq_lista [data-vcupo]").forEach(function(inp){
     inp.addEventListener("input",function(){
@@ -588,25 +785,49 @@ function renderBusq(){
       guardarBusq();
     };
   });
+  document.querySelectorAll("#bq_lista [data-vdel]").forEach(function(b){
+    b.onclick=function(){
+      if(b.getAttribute("data-armado")!=="1"){
+        b.setAttribute("data-armado","1");
+        b.textContent="Tocá de nuevo para eliminar la categoría entera";
+        return;
+      }
+      BUSQ.verticales.splice(+b.getAttribute("data-vdel"),1);
+      renderBusq(); guardarBusq();
+    };
+  });
   refrescarCabecerasBusq();
 }
+document.getElementById("bq_add").onclick=function(){
+  BUSQ.verticales=BUSQ.verticales||[];
+  BUSQ.verticales.push({ id:"cat"+Date.now(), nombre:"Categoría nueva", activa:false,
+    cupo:10, filtro_movimiento:true, nota:"", queries:[{q:"",activa:true}] });
+  renderBusq();
+  var ult=document.querySelector("#bq_lista .pza:last-of-type");
+  if(ult){
+    ult.open=true; ult.scrollIntoView({behavior:"smooth",block:"center"});
+    var n=ult.querySelector("input[data-vnom]");
+    if(n) setTimeout(function(){ n.focus(); },250);
+  }
+  guardarBusq();
+};
 function cargarBusq(){
   return fetch(BASE+"/busquedas.json?t="+Date.now(),{cache:"no-store"})
     .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
     .then(function(d){
-      BUSQ={ techo_landed_usd:num(d.techo_landed_usd)||100, verticales:d.verticales||[] };
+      BUSQ={ techo_landed_usd:num(d.techo_landed_usd)||100, verticales:d.verticales||[],
+             criterios:d.criterios||[], pedidos:d.pedidos||[],
+             agenda:d.agenda||{dias:[5],hora_local:"06:00"} };
       try{ localStorage.setItem("anacro_busq", JSON.stringify(BUSQ)); }catch(e){}
-      renderBusq();
+      pintarBusquedas();
     })
     .catch(function(){
       try{ var c=JSON.parse(localStorage.getItem("anacro_busq")||"null"); if(c) BUSQ=c; }catch(e){}
-      renderBusq();
+      pintarBusquedas();
       bqEstado("sin conexión — mostrando la última copia local", true);
     });
 }
-document.getElementById("bq_techo").addEventListener("input",function(){
-  BUSQ.techo_landed_usd=num(this.value)||100; programarBusq();
-});
+function pintarBusquedas(){ renderAgenda(); renderPedidos(); renderCriterios(); renderBusq(); }
 
 /* ===================== COMPRAS ===================== */
 var COMPRAS={ cotizacion:1430, items:[] };
