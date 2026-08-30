@@ -202,9 +202,9 @@
 
   <div class="toggle nav" id="navT">
     <button data-s="radar" class="on">Radar</button>
+    <button data-s="vend">Vendedores</button>
     <button data-s="busq">Búsquedas</button>
     <button data-s="compras">Compras</button>
-    <button data-s="calc">Calculadora</button>
   </div>
 
   <!-- ===================== RADAR ===================== -->
@@ -224,6 +224,16 @@
   </section>
 
   <!-- ===================== BÚSQUEDAS ===================== -->
+
+  <!-- ===================== VENDEDORES ===================== -->
+  <section id="s_vend" class="hidden">
+    <p class="sub">A quién le compramos, y cómo lo clasificamos.</p>
+    <div id="vd_lista"></div>
+    <button class="btn pri" id="vd_add">+ Agregar vendedor</button>
+    <div class="estado" id="vd_estado"></div>
+    <p class="foot">El tier es criterio propio, no de eBay. Las piezas compradas y el landed promedio se calculan solos desde Compras.</p>
+  </section>
+
   <section id="s_busq" class="hidden">
     <p class="sub">Lo que el bot sale a buscar, y cuándo.</p>
 
@@ -277,73 +287,6 @@
   </section>
 
   <!-- ===================== CALCULADORA ===================== -->
-  <section id="s_calc" class="hidden">
-  <div class="toggle" id="modeT">
-    <button data-m="pieza" class="on">Pieza</button>
-    <button data-m="rueda">Rueda</button>
-  </div>
-
-  <!-- ===== PIEZA ===== -->
-  <div id="pieza">
-    <p class="sub">Costo final de una pieza importada.</p>
-    <div class="toggle" id="viaT">
-      <button data-v="postal" class="on">Postal<span class="s">Correo · franq. 50</span></button>
-      <button data-v="courier">Courier<span class="s">DHL · solo IVA &lt;400</span></button>
-    </div>
-    <label class="f"><span class="lab">Precio / remate</span><span class="inp"><span class="pfx">US$</span><input id="p_precio" type="number" inputmode="decimal" value="50"></span></label>
-    <div class="row2">
-      <div><label class="f"><span class="lab">Flete</span><span class="inp"><span class="pfx">US$</span><input id="p_flete" type="number" inputmode="decimal" value="15"></span></label></div>
-      <div><label class="f"><span class="lab">Seguro</span><span class="inp"><span class="pfx">US$</span><input id="p_seguro" type="number" inputmode="decimal" value="0"></span></label></div>
-    </div>
-    <label class="f"><span class="lab">Cotización dólar</span><span class="inp"><span class="pfx">$</span><input id="p_cotiz" type="number" inputmode="decimal" value="1430"></span><span class="hint">Editá según el dólar del día.</span></label>
-
-    <div class="panel">
-      <div class="cap">Te aterriza en</div>
-      <div class="big mono" id="p_ars">$ —</div>
-      <div class="sub2 mono" id="p_usd">US$ — · CIF US$ —</div>
-      <div class="lines" id="p_lines"></div>
-    </div>
-
-    <label class="f" style="margin-top:24px"><span class="lab">Precio de venta (target)</span><span class="inp"><span class="pfx">US$</span><input id="p_venta" type="number" inputmode="decimal" value="0"></span><span class="hint">Dejá en 0 si solo querés el costo.</span></label>
-    <div id="p_margen"></div>
-    <p class="foot">Estimación. Impuesto postal = 50% sobre el excedente de la franquicia (USD 50, 12 envíos/año); tasa de Correo aproximada. Courier = solo IVA 21% hasta 400; sobre el excedente se suma 50%.</p>
-  </div>
-
-  <!-- ===== RUEDA ===== -->
-  <div id="rueda" class="hidden">
-    <p class="sub">Rueda de stock con envío combinado (1 franquicia por ronda) y reinversión compuesta.</p>
-    <div class="row2">
-      <div><label class="f"><span class="lab">Relojes ronda 1</span><span class="inp"><input id="r_cant" type="number" inputmode="decimal" value="4"></span></label></div>
-      <div><label class="f"><span class="lab">Rondas</span><span class="inp"><input id="r_rondas" type="number" inputmode="decimal" value="4"></span><span class="hint">Máx 12 (cupo anual).</span></label></div>
-    </div>
-    <div class="row2">
-      <div><label class="f"><span class="lab">Compra c/u</span><span class="inp"><span class="pfx">US$</span><input id="r_precio" type="number" inputmode="decimal" value="45"></span></label></div>
-      <div><label class="f"><span class="lab">Venta c/u</span><span class="inp"><span class="pfx">US$</span><input id="r_venta" type="number" inputmode="decimal" value="170"></span></label></div>
-    </div>
-    <label class="f"><span class="lab">Flete internacional (combinado)</span><span class="inp"><span class="pfx">US$</span><input id="r_flete" type="number" inputmode="decimal" value="25"></span></label>
-    <div class="row2">
-      <div><label class="f"><span class="lab">Caja c/u</span><span class="inp"><span class="pfx">US$</span><input id="r_caja" type="number" inputmode="decimal" value="5"></span></label></div>
-      <div><label class="f"><span class="lab">Andreani c/u</span><span class="inp"><span class="pfx">US$</span><input id="r_andreani" type="number" inputmode="decimal" value="15"></span></label></div>
-    </div>
-    <label class="f"><span class="lab">Publicidad por reloj (CAC)</span><span class="inp"><span class="pfx">US$</span><input id="r_publi" type="number" inputmode="decimal" value="50"></span><span class="hint">Costo de adquirir cada venta. La capa que más pesa.</span></label>
-    <button class="chk" id="r_cliente"><span>El cliente paga el envío Andreani</span><b id="r_cliente_v">NO</b></button>
-    <div class="row2">
-      <div><label class="f"><span class="lab">Comisión cobro</span><span class="inp"><input id="r_comision" type="number" inputmode="decimal" value="6"><span class="sfx">%</span></span></label></div>
-      <div><label class="f"><span class="lab">Reinversión</span><span class="inp"><input id="r_reinv" type="number" inputmode="decimal" value="50"><span class="sfx">%</span></span><span class="hint">El resto lo retirás.</span></label></div>
-    </div>
-    <label class="f"><span class="lab">Cotización dólar</span><span class="inp"><span class="pfx">$</span><input id="r_cotiz" type="number" inputmode="decimal" value="1430"></span></label>
-
-    <div class="panel">
-      <div class="cap" id="r_cap">Rondas · tu bolsillo</div>
-      <div class="big mono" id="r_big">US$ —</div>
-      <div class="sub2 mono" id="r_big2">$ —</div>
-      <div class="lines" id="r_lines"></div>
-    </div>
-    <table><thead><tr><th style="width:26px">#</th><th>Relojes</th><th class="r">Costo</th><th class="r">Ganan.</th><th class="r">Retiro</th></tr></thead><tbody id="r_tbody"></tbody></table>
-    <div class="note"><b>Realidad del sell-through:</b> esto asume que vendés TODOS los relojes de cada ronda dentro del mes. Tu ritmo es 2–5 ventas/mes. Si una ronda no se vende entera, el stock y el capital se traban — la rueda vive del sell-through, no de la cuenta.</div>
-    <p class="foot">Estimación. La rueda reparte 1 franquicia por envío combinado y reinvierte el % indicado de cada ganancia. Las cantidades por ronda se redondean según presupuesto. No incluye impuestos a las ganancias.</p>
-  </div>
-  </section>
 </div>
 
 <script>
@@ -358,7 +301,7 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ retu
 function num(v){ var n=parseFloat(v); return isNaN(n)?0:n; }
 
 /* ===================== NAVEGACIÓN ===================== */
-var SECS={ radar:"s_radar", busq:"s_busq", compras:"s_compras", calc:"s_calc" };
+var SECS={ radar:"s_radar", vend:"s_vend", busq:"s_busq", compras:"s_compras" };
 function irA(s){
   document.querySelectorAll("#navT button").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-s")===s); });
   for(var k in SECS) document.getElementById(SECS[k]).classList.toggle("hidden", k!==s);
@@ -368,6 +311,133 @@ function irA(s){
 document.querySelectorAll("#navT button").forEach(function(b){
   b.onclick=function(){ irA(b.getAttribute("data-s")); };
 });
+
+
+/* ===================== VENDEDORES ===================== */
+var VEND={tiers:{},items:[]}, vendTimer=null, vAbiertas={};
+var TIERS=[1,2,3,4,5];
+var TIERLBL={1:"Tier 1 · service y garantía formal",2:"Tier 2 · caso por caso",3:"Sin garantía formal",4:"Otras fuentes",5:"Fuera de eBay"};
+
+function vendPorId(id){ for(var i=0;i<VEND.items.length;i++){ if(VEND.items[i].id===id) return VEND.items[i]; } return null; }
+function comprasDe(id){ return (COMPRAS.items||[]).filter(function(x){ return x.vendedor_id===id; }); }
+function statsVend(id){
+  var c=comprasDe(id), cot=num(COMPRAS.cotizacion)||1430;
+  if(!c.length) return {n:0, prom:0};
+  var t=0; c.forEach(function(x){ t+=costoItem(x,cot); });
+  return {n:c.length, prom:t/c.length};
+}
+function slugVend(t){
+  return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,40) || ("v"+Date.now());
+}
+function opcionesVend(sel){
+  var h="<option value=''>— sin asignar —</option>";
+  TIERS.forEach(function(t){
+    var g=VEND.items.filter(function(v){ return num(v.tier)===t; });
+    if(!g.length) return;
+    h+="<optgroup label='"+esc(TIERLBL[t])+"'>";
+    g.forEach(function(v){
+      h+="<option value='"+esc(v.id)+"'"+(sel===v.id?" selected":"")+">"+esc(v.nombre)+"</option>";
+    });
+    h+="</optgroup>";
+  });
+  if(sel && !vendPorId(sel)) h+="<option value='"+esc(sel)+"' selected>"+esc(sel)+" (no listado)</option>";
+  return h;
+}
+function renderVend(){
+  var h="";
+  TIERS.forEach(function(t){
+    var g=[];
+    VEND.items.forEach(function(v,ix){ if(num(v.tier)===t) g.push({v:v,ix:ix}); });
+    if(!g.length) return;
+    h+="<p class='sub' style='margin:22px 0 8px;font-weight:700'>"+esc(TIERLBL[t])+"</p>";
+    g.forEach(function(o){
+      var v=o.v, ix=o.ix, st=statsVend(v.id);
+      var sub = st.n ? (st.n+(st.n===1?" pieza":" piezas")+" · landed prom. "+usd(st.prom)) : "sin compras";
+      h+="<details class='pza' data-vix='"+ix+"'"+(vAbiertas[ix]?" open":"")+">"+
+         "<summary><div><div class='sm'>"+esc(v.nombre)+"</div><div class='ss'>"+esc(v.pais||"")+"</div></div>"+
+         "<div class='sr'><div class='sc'><span class='sc-n'>"+esc(String(st.n))+"</span><small class='sc-s'>"+(st.n?"compras":"—")+"</small></div>"+
+         "<span class='cv'>&#9662;</span></div></summary>"+
+         "<div class='body'>"+
+         "<p class='sub' style='margin:0 0 12px'>"+esc(sub)+"</p>"+
+         (v.url?"<p style='margin:0 0 14px'><a href='"+esc(v.url)+"' target='_blank' rel='noopener' style='color:#7A1F1A;font-weight:600'>Abrir tienda &rarr;</a></p>":"")+
+         "<label class='f'><span class='lab'>Nombre</span><span class='inp'><input class='txt' type='text' data-vk='nombre' value='"+esc(v.nombre)+"'></span></label>"+
+         "<label class='f'><span class='lab'>Usuario eBay</span><span class='inp'><input class='txt' type='text' data-vk='usuario' value='"+esc(v.usuario||"")+"'></span></label>"+
+         "<label class='f'><span class='lab'>Link</span><span class='inp'><input class='txt' type='url' data-vk='url' placeholder='https://www.ebay.com/str/...' value='"+esc(v.url||"")+"'></span></label>"+
+         "<div class='row2'>"+
+         "<div><label class='f'><span class='lab'>Clasificación</span><span class='inp'><select class='txt' data-vk='tier'>"+
+         TIERS.map(function(t2){ return "<option value='"+t2+"'"+(num(v.tier)===t2?" selected":"")+">"+esc(TIERLBL[t2])+"</option>"; }).join("")+
+         "</select></span></label></div>"+
+         "<div><label class='f'><span class='lab'>País</span><span class='inp'><input class='txt' type='text' data-vk='pais' placeholder='UA' value='"+esc(v.pais||"")+"'></span></label></div>"+
+         "</div>"+
+         "<label class='f'><span class='lab'>Nota</span><span class='inp'><input class='txt' type='text' data-vk='nota' value='"+esc(v.nota||"")+"'></span></label>"+
+         "<button class='btn del' data-vdel='"+ix+"'>Eliminar vendedor</button>"+
+         "</div></details>";
+    });
+  });
+  document.getElementById("vd_lista").innerHTML = h || "<p class='sub'>Todavía no hay vendedores cargados.</p>";
+
+  document.querySelectorAll("#vd_lista .pza").forEach(function(d){
+    var ix=+d.getAttribute("data-vix");
+    d.addEventListener("toggle",function(){ vAbiertas[ix]=d.open; });
+    d.querySelectorAll("[data-vk]").forEach(function(inp){
+      inp.addEventListener(inp.tagName==="SELECT"?"change":"input",function(){
+        var k=inp.getAttribute("data-vk");
+        VEND.items[ix][k] = (k==="tier") ? num(inp.value) : inp.value;
+        programarVend();
+        if(k==="tier"||k==="nombre"){ renderVend(); renderCompras(); }
+      });
+    });
+    var del=d.querySelector("[data-vdel]");
+    if(del) del.onclick=function(){
+      var v=VEND.items[ix], st=statsVend(v.id);
+      if(st.n && !confirm("Tiene "+st.n+" compra(s) asociada(s). ¿Eliminar igual? Esas compras quedan sin vendedor.")) return;
+      VEND.items.splice(ix,1); vAbiertas={}; renderVend(); renderCompras(); guardarVend();
+    };
+  });
+}
+function vdEstado(txt, err){
+  var e=document.getElementById("vd_estado");
+  e.textContent=txt; e.className = err ? "estado err" : "estado";
+}
+function programarVend(){
+  vdEstado("editando…"); clearTimeout(vendTimer);
+  vendTimer=setTimeout(guardarVend, 1200);
+}
+function guardarVend(){
+  clearTimeout(vendTimer); vendTimer=null;
+  vdEstado("guardando…");
+  VEND.actualizado = new Date().toISOString();
+  try{ localStorage.setItem("anacro_vendedores", JSON.stringify(VEND)); }catch(x){}
+  fetch(BASE+"/api/vendedores",{ method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN },
+    body:JSON.stringify(VEND) })
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(){ vdEstado("guardado ✓");
+      setTimeout(function(){ var e=document.getElementById("vd_estado");
+        if(e.textContent==="guardado ✓") e.textContent=""; },2500); })
+    .catch(function(){ vdEstado("sin conexión — quedó guardado en este dispositivo", true); });
+}
+function cargarVend(){
+  return fetch(BASE+"/vendedores.json?t="+Date.now(),{cache:"no-store"})
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(d){
+      VEND={ tiers:d.tiers||{}, items:(d.items||[]), actualizado:d.actualizado };
+      try{ localStorage.setItem("anacro_vendedores", JSON.stringify(VEND)); }catch(e){}
+    })
+    .catch(function(){
+      try{ var c=localStorage.getItem("anacro_vendedores"); if(c) VEND=JSON.parse(c); }catch(e){}
+    })
+    .then(function(){ renderVend(); renderCompras(); });
+}
+document.getElementById("vd_add").onclick=function(){
+  var n=prompt("Nombre o usuario de eBay del vendedor:");
+  if(!n) return;
+  var id=slugVend(n), base=id, k=2;
+  while(vendPorId(id)){ id=base+"-"+(k++); }
+  VEND.items.unshift({id:id,nombre:n,usuario:n,url:"https://www.ebay.com/usr/"+n,tier:4,pais:"",nota:""});
+  vAbiertas={0:true}; renderVend(); renderCompras(); guardarVend();
+};
 
 /* ===================== RADAR ===================== */
 var GRUPOS=[
@@ -401,7 +471,7 @@ function pintarRadar(d){
       if(i.nota) h+="<div class='nt'>"+esc(i.nota)+"</div>";
       h+="<div class='acts'>";
       if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en eBay</a>";
-      h+="<button data-precio='"+precio+"'>Calcular</button></div>";
+      h+="</div>";
       var id=String(i.item||i.id||i.nombre), f=fbDe(id);
       f.nombre=i.nombre;
       var chips="";
@@ -416,12 +486,6 @@ function pintarRadar(d){
     });
   });
   document.getElementById("rd_lista").innerHTML=h;
-  document.querySelectorAll("#rd_lista .acts button").forEach(function(b){
-    b.onclick=function(){
-      document.getElementById("p_precio").value=b.getAttribute("data-precio");
-      renderPieza(); irA("calc");
-    };
-  });
   document.querySelectorAll("#rd_lista .chips button").forEach(function(b){
     b.onclick=function(){
       var f=fbDe(b.getAttribute("data-fbid")), t=b.getAttribute("data-tag");
@@ -886,6 +950,12 @@ function actualizarTotales(){
 }
 
 /* Rearma la lista entera. Solo al cargar, agregar o borrar una pieza. */
+function pintarHintVend(d, id){
+  var h=d.querySelector(".hvend"); if(!h) return;
+  var v=id?vendPorId(id):null;
+  if(!v){ h.textContent="Asignalo para que la compra cuente en la ficha del vendedor."; return; }
+  h.innerHTML = (v.url?"<a href='"+esc(v.url)+"' target='_blank' rel='noopener' style='color:#7A1F1A'>Ver tienda &rarr;</a> · ":"")+esc(TIERLBL[num(v.tier)]||"");
+}
 function renderCompras(){
   var h="";
   COMPRAS.items.forEach(function(i,ix){
@@ -896,6 +966,7 @@ function renderCompras(){
        "<div class='body'>"+
        "<label class='f'><span class='lab'>Modelo</span><span class='inp'><input class='txt' type='text' data-k='modelo' placeholder='Vostok Olimpiada-80' value='"+esc(i.modelo)+"'></span></label>"+
        "<label class='f'><span class='lab'>Fecha de compra</span><span class='inp'><input class='txt' type='date' data-k='fecha' value='"+esc(i.fecha)+"'></span></label>"+
+       "<label class='f'><span class='lab'>Vendedor</span><span class='inp'><select class='txt' data-ksel='vendedor_id'>"+opcionesVend(i.vendedor_id)+"</select></span><span class='hint hvend'></span></label>"+
        "<div class='row2'>"+
        "<div><label class='f'><span class='lab'>Precio</span><span class='inp'><span class='pfx'>US$</span><input type='number' inputmode='decimal' data-k='precio' value='"+num(i.precio)+"'></span></label></div>"+
        "<div><label class='f'><span class='lab'>Envío</span><span class='inp'><span class='pfx'>US$</span><input type='number' inputmode='decimal' data-k='envio' value='"+num(i.envio)+"'></span></label></div>"+
@@ -921,9 +992,16 @@ function renderCompras(){
         actualizarTotales(); programarGuardado();
       });
     });
+    d.querySelectorAll("select[data-ksel]").forEach(function(sel){
+      sel.addEventListener("change",function(){
+        COMPRAS.items[ix].vendedor_id = sel.value;
+        pintarHintVend(d, sel.value); renderVend(); programarGuardado();
+      });
+    });
+    pintarHintVend(d, COMPRAS.items[ix].vendedor_id);
     var del=d.querySelector("[data-del]");
     if(del) del.onclick=function(){
-      COMPRAS.items.splice(ix,1); abiertas={}; renderCompras(); guardarCompras();
+      COMPRAS.items.splice(ix,1); abiertas={}; renderCompras(); renderVend(); guardarCompras();
     };
   });
   actualizarTotales();
@@ -949,7 +1027,7 @@ function guardarCompras(){
     .catch(function(){ e.textContent="sin conexión — quedó guardado en este dispositivo"; e.className="estado err"; });
 }
 function cargarCompras(){
-  fetch(BASE+"/compras.json?t="+Date.now(),{cache:"no-store"})
+  return fetch(BASE+"/compras.json?t="+Date.now(),{cache:"no-store"})
     .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
     .then(function(d){
       COMPRAS={ cotizacion:num(d.cotizacion)||1430, items:(d.items||[]) };
@@ -983,99 +1061,11 @@ document.getElementById("cp_cotiz").addEventListener("input",function(){
 
 /* ===================== CALCULADORA ===================== */
 var via="postal";
-function renderPieza(){
-  var precio=val("p_precio"), flete=val("p_flete"), seguro=val("p_seguro"), cotiz=val("p_cotiz"), venta=val("p_venta");
-  var cif=precio+flete+seguro, derecho=0, iva=0, tasa=0;
-  if(via==="postal"){ var exc=Math.max(0,cif-FR); derecho=0.5*exc; tasa=cif>0?TASA:0; }
-  else { iva=0.21*cif; if(cif>400) derecho=0.5*(cif-400); }
-  var imp=derecho+iva+tasa, landed=cif+imp;
-  document.getElementById("p_ars").textContent=ars(landed*cotiz);
-  document.getElementById("p_usd").textContent=usd1(landed)+" · CIF "+usd(cif);
-  var pct=cif>0?Math.round(imp/cif*100):0, h="";
-  h+="<div class='li'><span>CIF (precio + flete + seguro)</span><span class='mono'>"+usd1(cif)+"</span></div>";
-  if(via==="postal"){
-    h+="<div class='li dim'><span>Franquicia</span><span class='mono'>− "+usd(FR)+"</span></div>";
-    h+="<div class='li'><span class='ac'>Impuesto 50% s/ excedente</span><span class='mono ac'>"+usd1(derecho)+"</span></div>";
-    h+="<div class='li dim'><span>Tasa Correo</span><span class='mono'>"+usd1(tasa)+"</span></div>";
-  } else {
-    h+="<div class='li'><span class='ac'>IVA 21% s/ CIF</span><span class='mono ac'>"+usd1(iva)+"</span></div>";
-    if(derecho>0) h+="<div class='li'><span class='ac'>Derecho 50% s/ excedente +400</span><span class='mono ac'>"+usd1(derecho)+"</span></div>";
-  }
-  h+="<div class='li strong'><span>Impuestos ("+pct+"% del CIF)</span><span class='mono'>"+usd1(imp)+"</span></div>";
-  document.getElementById("p_lines").innerHTML=h;
+renderCompras();
 
-  var m=document.getElementById("p_margen");
-  if(venta>0){
-    var margen=venta-landed, mpct=landed>0?Math.round(margen/landed*100):0;
-    var warn="";
-    if(venta>TMAX) warn="<div class='warn' style='color:#9b1c1c'>Ojo: US$ "+venta+" pasa el techo de reventa argentino (~US$ "+TMIN+"–"+TMAX+"). Salvo pieza excepcional, va a costar venderla.</div>";
-    else if(venta>=TMIN) warn="<div class='warn' style='color:#7A1F1A'>Estás en el techo de reventa argentino (~US$ "+TMIN+"–"+TMAX+"). Margen real pero poco recorrido.</div>";
-    m.innerHTML="<div class='mbox'><div class='top'><span class='lbl'>Margen</span><span class='val mono' style='color:"+(margen>=0?'#7A1F1A':'#9b1c1c')+"'>"+usd1(margen)+"</span></div><div class='pct mono'>"+(mpct>=0?'+':'')+mpct+"% sobre costo</div>"+warn+"</div>";
-  } else m.innerHTML="";
-}
-
-var clientePaga=false;
-function landedRonda(cant,precio,flete){ var cif=cant*precio+flete; var imp=0.5*Math.max(0,cif-FR)+(cif>0?TASA:0); return cif+imp; }
-function renderRueda(){
-  var precio=val("r_precio"), venta=val("r_venta"), flete=val("r_flete"),
-      caja=val("r_caja"), andreani=val("r_andreani"), publi=val("r_publi"),
-      comision=val("r_comision"), reinv=val("r_reinv"), cotiz=val("r_cotiz");
-  var rondas=Math.min(12,Math.max(1,Math.round(val("r_rondas"))));
-  var local=caja+(clientePaga?0:andreani);
-  var neto=venta - venta*comision/100 - local - publi;
-  var cant=Math.max(1,Math.round(val("r_cant"))), carry=0, totR=0, totG=0, totRet=0, capIni=0, rows=[], lastCosto=0, lastRe=0;
-  for(var i=1;i<=rondas;i++){
-    var costo=landedRonda(cant,precio,flete);
-    if(i===1) capIni=costo;
-    var ingreso=neto*cant, ganancia=ingreso-costo;
-    var reinvierte=ganancia>0?(reinv/100)*ganancia:0;
-    var retiro=ganancia-reinvierte;
-    rows.push([i,cant,costo,ganancia,retiro]);
-    totR+=cant; totG+=ganancia; totRet+=retiro;
-    var unit=costo/cant, budget=costo+reinvierte+carry, nx=Math.floor(budget/unit); if(nx<1)nx=1;
-    carry=budget-nx*unit; lastCosto=costo; lastRe=reinvierte; cant=nx;
-  }
-  var capFin=lastCosto+lastRe;
-  document.getElementById("r_cap").textContent=rondas+" rondas · tu bolsillo";
-  document.getElementById("r_big").textContent=usd(totRet);
-  document.getElementById("r_big2").textContent=ars(totRet*cotiz);
-  var netoReloj = neto - (rows.length? rows[0][2]/rows[0][1] : 0);
-  var h="";
-  h+="<div class='li'><span>Relojes vendidos</span><span class='mono'>"+totR+"</span></div>";
-  h+="<div class='li'><span class='ac'>Ganancia total</span><span class='mono ac'>"+usd(totG)+"</span></div>";
-  h+="<div class='li dim'><span>Neto por reloj</span><span class='mono'>"+usd1(netoReloj)+"</span></div>";
-  h+="<div class='li'><span>Capital inicial</span><span class='mono'>"+usd(capIni)+"</span></div>";
-  h+="<div class='li strong'><span>Capital final (rueda)</span><span class='mono'>"+usd(capFin)+"</span></div>";
-  document.getElementById("r_lines").innerHTML=h;
-  var tb="";
-  for(var j=0;j<rows.length;j++){ var r=rows[j];
-    tb+="<tr><td style='font-weight:700'>"+r[0]+"</td><td class='c'>"+r[1]+"</td><td class='r'>"+usd(r[2])+"</td><td class='r' style='color:#7A1F1A'>"+usd(r[3])+"</td><td class='r' style='font-weight:700'>"+usd(r[4])+"</td></tr>";
-  }
-  document.getElementById("r_tbody").innerHTML=tb;
-}
-
-/* ---- wiring ---- */
-document.querySelectorAll("#modeT button").forEach(function(b){ b.onclick=function(){
-  document.querySelectorAll("#modeT button").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
-  var m=b.getAttribute("data-m");
-  document.getElementById("pieza").classList.toggle("hidden", m!=="pieza");
-  document.getElementById("rueda").classList.toggle("hidden", m!=="rueda");
-};});
-document.querySelectorAll("#viaT button").forEach(function(b){ b.onclick=function(){
-  document.querySelectorAll("#viaT button").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
-  via=b.getAttribute("data-v"); renderPieza();
-};});
-document.getElementById("r_cliente").onclick=function(){
-  clientePaga=!clientePaga; this.classList.toggle("on",clientePaga);
-  document.getElementById("r_cliente_v").textContent=clientePaga?"SÍ":"NO"; renderRueda();
-};
-["p_precio","p_flete","p_seguro","p_cotiz","p_venta"].forEach(function(id){ document.getElementById(id).addEventListener("input",renderPieza); });
-["r_cant","r_rondas","r_precio","r_venta","r_flete","r_caja","r_andreani","r_publi","r_comision","r_reinv","r_cotiz"].forEach(function(id){ document.getElementById(id).addEventListener("input",renderRueda); });
-
-renderPieza(); renderRueda(); renderCompras();
-cargarFeedback().then(cargarRadar); cargarCompras(); cargarBusq();
+cargarFeedback().then(cargarRadar); cargarCompras().then(cargarVend); cargarBusq();
 try{ var ult=localStorage.getItem("anacro_seccion"); if(ult&&SECS[ult]) irA(ult); }catch(e){}
-window.addEventListener("beforeunload",function(){ if(guardarTimer) guardarCompras(); if(fbTimer) guardarFeedback(); if(bqTimer) guardarBusq(); });
+window.addEventListener("beforeunload",function(){ if(guardarTimer) guardarCompras(); if(fbTimer) guardarFeedback(); if(bqTimer) guardarBusq(); if(vendTimer) guardarVend(); });
 </script>
 </body>
 </html>
