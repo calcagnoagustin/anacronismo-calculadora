@@ -214,7 +214,7 @@
       <summary><span>Instrucciones para el bot</span><span class="cv">&#9662;</span></summary>
       <div class="ib">
         <textarea id="rd_instr_txt" placeholder="Ej: no me traigas más Raketa con dial gastado; priorizá dials de color; bajá el techo a USD 40; sumá búsquedas de jump hour."></textarea>
-        <span class="hint">El bot lee esto antes de cada búsqueda del viernes, junto con tus comentarios de abajo.</span>
+        <span class="hint">El bot lee esto antes de buscar y despues vacia la caja: lo que escribiste queda archivado como regla permanente. Escribi solo lo nuevo.</span>
       </div>
     </details>
     <div class="barra"><span id="rd_corrida">Última corrida —</span><span class="st" id="rd_estado">cargando…</span></div>
@@ -518,7 +518,7 @@ function pintarRadar(d){
 }
 /* ---- comentarios y directivas para el bot ---- */
 var FEEDBACK={ instrucciones:"", comentarios:{} };
-var fbTimer=null;
+var fbTimer=null, fbInstrDirty=false;
 var CHIPS=["Me interesa","No va","Caro","Deteriorado","Dudoso"];
 
 function fbDe(id){
@@ -544,9 +544,10 @@ function guardarFeedback(){
   clearTimeout(fbTimer);
   marcarFbEstado("guardando…");
   try{ localStorage.setItem("anacro_feedback", JSON.stringify(FEEDBACK)); }catch(x){}
+  var envio = fbInstrDirty ? FEEDBACK : { comentarios:FEEDBACK.comentarios };
   fetch(BASE+"/api/feedback",{ method:"POST",
     headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN },
-    body:JSON.stringify(FEEDBACK) })
+    body:JSON.stringify(envio) })
     .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
     .then(function(){ marcarFbEstado("guardado ✓"); })
     .catch(function(){ marcarFbEstado("sin conexión — quedó guardado en este dispositivo", true); });
@@ -561,10 +562,19 @@ function cargarFeedback(){
     .catch(function(){
       try{ var c=JSON.parse(localStorage.getItem("anacro_feedback")||"null"); if(c) FEEDBACK=c; }catch(e){}
     })
-    .then(function(){ document.getElementById("rd_instr_txt").value=FEEDBACK.instrucciones||""; });
+    .then(function(){ document.getElementById("rd_instr_txt").value=FEEDBACK.instrucciones||"";
+                      fbInstrDirty=false; });
 }
 document.getElementById("rd_instr_txt").addEventListener("input",function(){
-  FEEDBACK.instrucciones=this.value; programarFeedback();
+  FEEDBACK.instrucciones=this.value; fbInstrDirty=true; programarFeedback();
+});
+
+/* Si el bot vacio la caja mientras la pestana quedo abierta, al volver refresca. */
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState!=="visible") return;
+  var ta=document.getElementById("rd_instr_txt");
+  if(fbInstrDirty || document.activeElement===ta) return;
+  cargarFeedback();
 });
 
 function cargarRadar(){
