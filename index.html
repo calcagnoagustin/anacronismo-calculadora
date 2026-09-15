@@ -217,6 +217,8 @@
         <span class="hint">El bot lee esto antes de buscar y despues vacia la caja: lo que escribiste queda archivado como regla permanente. Escribi solo lo nuevo.</span>
       </div>
     </details>
+    <button class="btn pri" id="rd_lanzar">Lanzar búsqueda</button>
+    <div class="estado" id="rd_lanzar_st" style="margin-bottom:14px"></div>
     <div class="barra"><span id="rd_corrida">Última corrida —</span><span class="st" id="rd_estado">cargando…</span></div>
     <div id="rd_lista"></div>
     <div class="estado" id="rd_guardado"></div>
@@ -589,6 +591,39 @@ function cargarRadar(){
             document.getElementById("rd_lista").innerHTML="<div class='note'>No pude traer el radar. Probá de nuevo con señal.</div>"; }
     });
 }
+
+/* ---- Lanzar búsqueda: dispara la rutina del bot en Claude Code ---- */
+function lanzarEstado(html, err){
+  var e=document.getElementById("rd_lanzar_st");
+  e.innerHTML=html; e.style.opacity=err?"1":".55"; e.style.color=err?"#9b1c1c":"";
+}
+function lanzarBusqueda(nota){
+  var b=document.getElementById("rd_lanzar");
+  if(nota===undefined && !confirm("¿Lanzar ahora una pasada completa del bot por eBay? Tarda un rato y llega el mail al terminar.")) return;
+  b.disabled=true; lanzarEstado("lanzando…");
+  fetch(BASE+"/api/lanzar",{ method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN },
+    body:JSON.stringify({ nota:nota||"" }) })
+    .then(function(r){ return r.json().then(function(d){ return {st:r.status, d:d}; }); })
+    .then(function(x){
+      var link=x.d.session_url? " · <a href='"+esc(x.d.session_url)+"' target='_blank' rel='noopener'>ver sesión</a>":"";
+      if(x.st===200){ lanzarEstado("búsqueda lanzada ✓ — el radar se actualiza cuando termine"+link); return; }
+      if(x.st===429){ lanzarEstado("ya hay una lanzada hace poco — probá en "+x.d.minutos+" min"+link, true); return; }
+      if(x.st===428){
+        var t=prompt("Falta conectar el bot con Claude Code (una sola vez).\nPegá el token de la rutina (empieza con sk-ant-):");
+        if(!t){ lanzarEstado("falta el token de la rutina", true); return; }
+        return fetch(BASE+"/api/rutina-token",{ method:"POST",
+          headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN },
+          body:JSON.stringify({ token:t.trim() }) })
+          .then(function(r){ if(!r.ok) throw new Error("token"); b.disabled=false; return lanzarBusqueda(""); })
+          .catch(function(){ lanzarEstado("ese token no tiene el formato correcto", true); });
+      }
+      lanzarEstado("no se pudo lanzar ("+esc(x.d.error||x.st)+")", true);
+    })
+    .catch(function(){ lanzarEstado("sin conexión — probá de nuevo con señal", true); })
+    .then(function(){ b.disabled=false; });
+}
+document.getElementById("rd_lanzar").addEventListener("click",function(){ lanzarBusqueda(); });
 
 /* ===================== BÚSQUEDAS ===================== */
 var BUSQ={ techo_landed_usd:100, verticales:[], criterios:[], pedidos:[], agenda:{dias:[5],hora_local:"06:00"} };
