@@ -218,7 +218,9 @@
       </div>
     </details>
     <button class="btn pri" id="rd_lanzar">Lanzar búsqueda</button>
-    <div class="estado" id="rd_lanzar_st" style="margin-bottom:14px"></div>
+    <div class="estado" id="rd_costo_est" style="margin-top:8px"></div>
+    <div class="estado" id="rd_lanzar_st" style="margin-bottom:6px"></div>
+    <div class="estado" id="rd_costo_ult" style="margin-top:0;margin-bottom:14px"></div>
     <div class="barra"><span id="rd_corrida">Última corrida —</span><span class="st" id="rd_estado">cargando…</span></div>
     <div id="rd_lista"></div>
     <div class="estado" id="rd_guardado"></div>
@@ -455,8 +457,33 @@ var GRUPOS=[
   { estado:"revisar",   titulo:"A revisar",  tag:"rev" },
   { estado:"watchlist", titulo:"Watchlist",  tag:"wl" }
 ];
+function tk(n){ n=num(n); return n>=1e6 ? (Math.round(n/1e5)/10).toLocaleString("es-AR")+" M" : Math.round(n/1000).toLocaleString("es-AR")+" mil"; }
+function textoCosto(c){
+  if(!c || !c.medido) return null;
+  var t="~"+tk(c.tokens_plan)+" tokens de tu plan (≈ US$ "+num(c.usd_plan_equiv).toFixed(2)+" a precio API)";
+  if(num(c.usd_api)>0) t+=" + US$ "+num(c.usd_api).toFixed(2)+" reales de API por las fotos";
+  return t;
+}
+function pintarCostoEstimado(){
+  var el=document.getElementById("rd_costo_est");
+  fetch(BASE+"/consumos.json?t="+Date.now(),{cache:"no-store"})
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(h){
+      var m=(h.corridas||[]).map(function(x){ return x.consumo; }).filter(function(c){ return c&&c.medido; }).slice(-5);
+      if(!m.length) throw 0;
+      var avg=function(k){ return m.reduce(function(a,c){ return a+num(c[k]); },0)/m.length; };
+      var t="Costo aprox.: ~"+tk(avg("tokens_plan"))+" tokens de tu plan (≈ US$ "+avg("usd_plan_equiv").toFixed(2)+")";
+      if(avg("usd_api")>0) t+=" + US$ "+avg("usd_api").toFixed(2)+" de API";
+      el.textContent=t+" · promedio de "+m.length+(m.length===1?" corrida":" corridas")+". Sale del plan, no se cobra aparte.";
+    })
+    .catch(function(){
+      el.textContent="Costo aprox.: 1 a 3 M tokens de tu plan (≈ US$ 3–8 a precio API). Estimado inicial: se ajusta solo con las corridas medidas. Sale del plan, no se cobra aparte.";
+    });
+}
 function pintarRadar(d){
   var items=(d&&d.items)||[];
+  var tc=textoCosto(d&&d.consumo);
+  document.getElementById("rd_costo_ult").textContent = tc ? "Corrida del "+(d.corrida||"—")+": costó "+tc+"." : "";
   document.getElementById("rd_corrida").textContent = "Última corrida · " + (d.corrida||"—");
   document.getElementById("rd_estado").textContent = items.length + (items.length===1?" pieza":" piezas");
   if(!items.length){
@@ -607,7 +634,7 @@ function lanzarBusqueda(nota){
     .then(function(r){ return r.json().then(function(d){ return {st:r.status, d:d}; }); })
     .then(function(x){
       var link=x.d.session_url? " · <a href='"+esc(x.d.session_url)+"' target='_blank' rel='noopener'>ver sesión</a>":"";
-      if(x.st===200){ lanzarEstado("búsqueda lanzada ✓ — el radar se actualiza cuando termine"+link); return; }
+      if(x.st===200){ lanzarEstado("búsqueda lanzada ✓ — al terminar se actualiza el radar y acá abajo ves cuánto costó"+link); return; }
       if(x.st===429){ lanzarEstado("ya hay una lanzada hace poco — probá en "+x.d.minutos+" min"+link, true); return; }
       if(x.st===428){
         var t=prompt("Falta conectar el bot con Claude Code (una sola vez).\nPegá el token de la rutina (empieza con sk-ant-):");
@@ -1118,7 +1145,7 @@ document.getElementById("cp_cotiz").addEventListener("input",function(){
 var via="postal";
 renderCompras();
 
-cargarFeedback().then(cargarRadar); cargarCompras().then(cargarVend); cargarBusq();
+cargarFeedback().then(cargarRadar); pintarCostoEstimado(); cargarCompras().then(cargarVend); cargarBusq();
 try{ var ult=localStorage.getItem("anacro_seccion"); if(ult&&SECS[ult]) irA(ult); }catch(e){}
 window.addEventListener("beforeunload",function(){ if(guardarTimer) guardarCompras(); if(fbTimer) guardarFeedback(); if(bqTimer) guardarBusq(); if(vendTimer) guardarVend(); });
 </script>
