@@ -33,7 +33,7 @@
   .toggle button .s{ display:block; font-size:10px; font-weight:400; opacity:.5; margin-top:1px; }
   .toggle button.on{ background:var(--negro); color:var(--crema); }
   .toggle button.on .s{ opacity:.7; }
-  .toggle.nav button{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; padding:11px 4px; }
+  .toggle.nav button{ font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; padding:11px 2px; }
   /* fields */
   label.f{ display:block; margin-bottom:14px; }
   label.f .lab{ display:block; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--rojoOsc); margin-bottom:6px; font-weight:600; }
@@ -186,6 +186,26 @@
   .btn.del{ border-color:#9b1c1c; color:#9b1c1c; font-size:11px; padding:9px; letter-spacing:.08em; margin-bottom:14px; }
   .estado{ font-size:11px; text-align:center; opacity:.55; margin-top:10px; min-height:14px; letter-spacing:.04em; }
   .estado.err{ color:#9b1c1c; opacity:1; }
+  /* analista */
+  .an-in{ width:100%; border:1.5px solid var(--negro); background:var(--crema); font-family:inherit; font-size:16px; padding:11px 12px; margin-bottom:8px; outline:none; }
+  textarea.an-in{ min-height:60px; resize:vertical; font-size:14px; }
+  .an{ border:1.5px solid var(--negro); background:var(--crema); margin-bottom:10px; }
+  .an>summary{ list-style:none; cursor:pointer; padding:12px 14px; }
+  .an>summary::-webkit-details-marker{ display:none; }
+  .an .vd{ display:inline-block; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; padding:3px 7px; border:1.5px solid var(--negro); margin-right:6px; }
+  .an .vd.comprar{ background:var(--negro); color:var(--crema); }
+  .an .vd.negociar{ border-color:var(--rojoCal); color:var(--rojoCal); }
+  .an .vd.pasar{ opacity:.55; }
+  .an .vd.curso{ border-style:dashed; opacity:.6; }
+  .an .ab{ padding:0 14px 14px; font-size:13px; line-height:1.5; }
+  .an h4{ font-size:10px; letter-spacing:.16em; text-transform:uppercase; margin:14px 0 6px; opacity:.6; }
+  .an ul{ margin:0; padding-left:18px; } .an li{ margin-bottom:4px; }
+  .an .fl{ display:flex; gap:8px; margin-bottom:4px; } .an .fl b{ width:16px; flex:none; }
+  .an .ok{ color:#2f6b2f; } .an .no{ color:#9b1c1c; } .an .nn{ opacity:.5; }
+  .an .ft{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .an .ft a{ text-decoration:none; color:inherit; font-size:11.5px; line-height:1.35; }
+  .an .ft img{ width:100%; aspect-ratio:1; object-fit:cover; border:1px solid var(--negro); display:block; margin-bottom:3px; background:var(--crema2); }
+  .an .preg{ background:var(--crema2); padding:8px 10px; margin-bottom:6px; font-size:12.5px; }
 </style>
 </head>
 <body>
@@ -205,6 +225,7 @@
     <button data-s="vend">Vendedores</button>
     <button data-s="busq">Búsquedas</button>
     <button data-s="compras">Compras</button>
+    <button data-s="anal">Analista</button>
   </div>
 
   <!-- ===================== RADAR ===================== -->
@@ -228,6 +249,18 @@
   </section>
 
   <!-- ===================== BÚSQUEDAS ===================== -->
+
+  <!-- ===================== ANALISTA ===================== -->
+  <section id="s_anal" class="hidden">
+    <p class="sub">Pegá un link y el bot lo mira a fondo, foto por foto.</p>
+    <input class="an-in" id="an_url" type="url" inputmode="url" placeholder="https://ebay.us/... o ebay.com/itm/...">
+    <textarea class="an-in" id="an_nota" placeholder="Opcional: qué querés que mire (ej: ¿la esfera es original?)"></textarea>
+    <button class="btn pri" id="an_go">Analizar</button>
+    <div class="estado" id="an_st"></div>
+    <div class="barra" style="margin-top:14px"><span>Análisis</span><span class="st" id="an_cnt"></span></div>
+    <div id="an_lista"></div>
+    <p class="foot">Usa la misma rutina que el radar (tu suscripción, sin costo de API). Tarda unos minutos; esta pantalla se actualiza sola. Los comparables son precios pedidos, no ventas cerradas.</p>
+  </section>
 
   <!-- ===================== VENDEDORES ===================== -->
   <section id="s_vend" class="hidden">
@@ -305,7 +338,7 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ retu
 function num(v){ var n=parseFloat(v); return isNaN(n)?0:n; }
 
 /* ===================== NAVEGACIÓN ===================== */
-var SECS={ radar:"s_radar", vend:"s_vend", busq:"s_busq", compras:"s_compras" };
+var SECS={ radar:"s_radar", vend:"s_vend", busq:"s_busq", compras:"s_compras", anal:"s_anal" };
 function irA(s){
   document.querySelectorAll("#navT button").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-s")===s); });
   for(var k in SECS) document.getElementById(SECS[k]).classList.toggle("hidden", k!==s);
@@ -651,6 +684,81 @@ function lanzarBusqueda(nota){
     .then(function(){ b.disabled=false; });
 }
 document.getElementById("rd_lanzar").addEventListener("click",function(){ lanzarBusqueda(); });
+
+/* ===================== ANALISTA ===================== */
+var AN={items:[]}, anTimer=null;
+function anEstado(h,err){ var e=document.getElementById("an_st"); e.innerHTML=h; e.style.opacity=err?"1":".55"; e.style.color=err?"#9b1c1c":""; }
+function anVd(v){ v=String(v||"").toLowerCase(); return v; }
+function pintarAnalisis(){
+  var L=document.getElementById("an_lista"), its=AN.items||[];
+  document.getElementById("an_cnt").textContent=its.length? its.length+" guardados":"";
+  if(!its.length){ L.innerHTML="<div class='note'>Todavía no analizaste nada. Pegá un link arriba.</div>"; return; }
+  L.innerHTML=its.map(function(a,ix){
+    var curso=a.estado==="en curso", err=a.estado==="error";
+    var vd=curso?"<span class='vd curso'>analizando…</span>":err?"<span class='vd pasar'>error</span>":"<span class='vd "+esc(anVd(a.veredicto))+"'>"+esc(a.veredicto||"—")+"</span>";
+    var conf=a.confianza?"<span style='font-size:11px;opacity:.55'>confianza "+esc(a.confianza)+"</span>":"";
+    var pr=isFinite(parseFloat(a.landed))?"<span class='pr mono' style='float:right;font-weight:700'>"+usd(parseFloat(a.landed))+"</span>":"";
+    var nm=a.nombre||a.url||"";
+    var h="<details class='an'"+(ix===0&&!curso?" open":"")+"><summary>"+pr+vd+conf+"<div style='font-weight:700;font-size:14.5px;margin-top:7px;line-height:1.3;word-break:break-word'>"+esc(nm)+"</div>";
+    if(a.resumen) h+="<div style='font-size:12.5px;opacity:.7;margin-top:5px;line-height:1.45'>"+esc(a.resumen)+"</div>";
+    if(curso){ var mins=Math.max(0,Math.round((Date.now()/1000-(a.epoch||0))/60)); h+="<div style='font-size:11.5px;opacity:.55;margin-top:5px'>lanzado hace "+mins+" min"+(a.nota_agus?" · "+esc(a.nota_agus):"")+"</div>"; }
+    h+="</summary><div class='ab'>";
+    var dat=[]; if(a.precio!=null) dat.push("precio "+usd1(parseFloat(a.precio))); if(a.envio) dat.push(esc(a.envio)); if(a.modalidad) dat.push(esc(a.modalidad)); if(a.vendedor) dat.push("vendedor "+esc(a.vendedor)+(a.pais?" · "+esc(a.pais):""));
+    if(dat.length) h+="<div style='font-size:12px;opacity:.65'>"+dat.join(" · ")+"</div>";
+    if(a.identificacion) h+="<h4>Qué es</h4><div>"+esc(a.identificacion)+"</div>";
+    if(a.alertas&&a.alertas.length) h+="<h4>Alertas</h4><ul>"+a.alertas.map(function(x){ return "<li class='no'>"+esc(x)+"</li>"; }).join("")+"</ul>";
+    if(a.filtros&&a.filtros.length) h+="<h4>Filtros</h4>"+a.filtros.map(function(f){ var c=f.ok===true?"ok":f.ok===false?"no":"nn", s=f.ok===true?"✓":f.ok===false?"✗":"?"; return "<div class='fl'><b class='"+c+"'>"+s+"</b><span><b style='width:auto'>"+esc(f.nombre)+"</b>"+(f.detalle?" — "+esc(f.detalle):"")+"</span></div>"; }).join("");
+    if(a.mercado) h+="<h4>Mercado</h4><div>"+esc(a.mercado)+"</div>";
+    if(a.preguntas&&a.preguntas.length) h+="<h4>Para preguntarle al vendedor</h4>"+a.preguntas.map(function(q){ return "<div class='preg'>"+esc(q)+" <a href='#' data-cp='"+esc(q)+"' style='font-size:10.5px;color:var(--rojoOsc)'>copiar</a></div>"; }).join("");
+    if(a.fotos&&a.fotos.length) h+="<h4>Fotos ("+a.fotos.length+")</h4><div class='ft'>"+a.fotos.map(function(f){ return "<a href='"+esc(f.url)+"' target='_blank' rel='noopener'><img loading='lazy' src='"+esc(f.url)+"'>"+esc((f.n?f.n+". ":"")+(f.nota||""))+"</a>"; }).join("")+"</div>";
+    h+="<div class='acts' style='display:flex;gap:8px;margin-top:14px'>";
+    if(a.url) h+="<a class='btn pri' style='text-align:center;text-decoration:none;padding:10px' href='"+esc(a.url)+"' target='_blank' rel='noopener'>Ver publicación</a>";
+    if(a.session_url) h+="<a class='btn' style='text-align:center;text-decoration:none;padding:10px' href='"+esc(a.session_url)+"' target='_blank' rel='noopener'>Sesión</a>";
+    h+="</div><button class='btn del' style='margin:10px 0 0' data-del='"+esc(a.id)+"'>Borrar</button></div></details>";
+    return h;
+  }).join("");
+}
+function cargarAnalisis(){
+  return fetch(BASE+"/analisis.json?t="+Date.now(),{cache:"no-store"})
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(d){ AN=d||{items:[]}; try{ localStorage.setItem("anacro_analisis", JSON.stringify(AN)); }catch(e){} pintarAnalisis(); programarPoll(); })
+    .catch(function(){ try{ var c=JSON.parse(localStorage.getItem("anacro_analisis")||"null"); if(c){ AN=c; pintarAnalisis(); } }catch(e){} });
+}
+function programarPoll(){
+  clearTimeout(anTimer);
+  if((AN.items||[]).some(function(a){ return a.estado==="en curso"; })) anTimer=setTimeout(cargarAnalisis, 20000);
+}
+function anPost(ruta, body){
+  return fetch(BASE+"/api/"+ruta,{ method:"POST", headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN }, body:JSON.stringify(body) })
+    .then(function(r){ return r.json().then(function(d){ return {st:r.status, d:d}; }); });
+}
+function analizar(){
+  var u=document.getElementById("an_url").value.trim(), n=document.getElementById("an_nota").value.trim(), b=document.getElementById("an_go");
+  var m=u.match(/https?:\/\/\S+/); if(!m){ anEstado("pegá un link que empiece con https://", true); return; }
+  u=m[0];
+  if(/ebay\.io\b/i.test(u)){ anEstado("ojo: ebay.io NO es eBay, es phishing. No lo abras.", true); return; }
+  b.disabled=true; anEstado("lanzando…");
+  anPost("analizar",{url:u, nota:n}).then(function(x){
+    if(x.st===200){ document.getElementById("an_url").value=""; document.getElementById("an_nota").value=""; anEstado("análisis lanzado ✓ — en unos minutos aparece acá abajo"); return cargarAnalisis(); }
+    if(x.st===429){ anEstado("esperá un minuto entre análisis", true); return; }
+    if(x.st===428){
+      var t=prompt("Falta conectar el bot con Claude Code (una sola vez).\nPegá el token de la rutina (empieza con sk-ant-):");
+      if(!t){ anEstado("falta el token de la rutina", true); return; }
+      return anPost("rutina-token",{token:t.trim()}).then(function(y){ if(y.st!==200) throw 0; b.disabled=false; return analizar(); })
+        .catch(function(){ anEstado("ese token no tiene el formato correcto", true); });
+    }
+    anEstado("no se pudo lanzar ("+esc(x.d.error||x.st)+")", true);
+  }).catch(function(){ anEstado("sin conexión — probá de nuevo con señal", true); })
+    .then(function(){ b.disabled=false; });
+}
+document.getElementById("an_go").addEventListener("click", analizar);
+document.getElementById("an_lista").addEventListener("click", function(ev){
+  var t=ev.target;
+  if(t.getAttribute("data-cp")){ ev.preventDefault(); try{ navigator.clipboard.writeText(t.getAttribute("data-cp")); t.textContent="copiado ✓"; }catch(e){} return; }
+  var id=t.getAttribute("data-del");
+  if(id && confirm("¿Borrar este análisis?")){ anPost("analisis-borrar",{id:id}).then(cargarAnalisis); }
+});
+document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible") cargarAnalisis(); });
 
 /* ===================== BÚSQUEDAS ===================== */
 var BUSQ={ techo_landed_usd:100, verticales:[], criterios:[], pedidos:[], agenda:{dias:[5],hora_local:"06:00"} };
@@ -1145,7 +1253,7 @@ document.getElementById("cp_cotiz").addEventListener("input",function(){
 var via="postal";
 renderCompras();
 
-cargarFeedback().then(cargarRadar); pintarCostoEstimado(); cargarCompras().then(cargarVend); cargarBusq();
+cargarFeedback().then(cargarRadar); pintarCostoEstimado(); cargarCompras().then(cargarVend); cargarBusq(); cargarAnalisis();
 try{ var ult=localStorage.getItem("anacro_seccion"); if(ult&&SECS[ult]) irA(ult); }catch(e){}
 window.addEventListener("beforeunload",function(){ if(guardarTimer) guardarCompras(); if(fbTimer) guardarFeedback(); if(bqTimer) guardarBusq(); if(vendTimer) guardarVend(); });
 </script>
