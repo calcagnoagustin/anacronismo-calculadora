@@ -552,6 +552,7 @@ function pintarRadar(d){
       if(i.nota) h+="<div class='nt'>"+esc(i.nota)+"</div>";
       h+="<div class='acts'>";
       if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en eBay</a>";
+      h+="<button class='chatb' data-ctipo='radar' data-cid='"+esc(String(i.item||i.id||i.nombre))+"' data-cnom='"+esc(i.nombre)+"' data-curl='"+esc(i.url||"")+"'>Preguntarle a la IA</button>";
       h+="</div>";
       var id=String(i.item||i.id||i.nombre), f=fbDe(id);
       f.nombre=i.nombre;
@@ -736,6 +737,7 @@ function pintarAnalisis(){
     if(a.fotos&&a.fotos.length) h+="<h4>Fotos ("+a.fotos.length+")</h4><div class='ft'>"+a.fotos.map(function(f){ return "<a href='"+esc(f.url)+"' target='_blank' rel='noopener'><img loading='lazy' src='"+esc(f.url)+"'>"+esc((f.n?f.n+". ":"")+(f.nota||""))+"</a>"; }).join("")+"</div>";
     h+="<div class='acts' style='display:flex;gap:8px;margin-top:14px'>";
     if(a.url) h+="<a class='btn pri' style='text-align:center;text-decoration:none;padding:10px' href='"+esc(a.url)+"' target='_blank' rel='noopener'>Ver publicación</a>";
+    if(!curso) h+="<button class='btn' style='padding:10px' data-ctipo='analisis' data-cid='"+esc(a.id)+"' data-cnom='"+esc(a.nombre||a.url||"")+"' data-curl='"+esc(a.url||"")+"'>Preguntarle a la IA</button>";
     if(a.session_url) h+="<a class='btn' style='text-align:center;text-decoration:none;padding:10px' href='"+esc(a.session_url)+"' target='_blank' rel='noopener'>Sesión</a>";
     h+="</div>";
     if(!curso){
@@ -1308,5 +1310,7 @@ cargarFeedback().then(cargarRadar); pintarCostoEstimado(); cargarCompras().then(
 try{ var ult=localStorage.getItem("anacro_seccion"); if(ult&&SECS[ult]) irA(ult); }catch(e){}
 window.addEventListener("beforeunload",function(){ if(guardarTimer) guardarCompras(); if(fbTimer) guardarFeedback(); if(bqTimer) guardarBusq(); if(vendTimer) guardarVend(); });
 </script>
+<script src="./chat.js?v=1"></script>
+<script src="./refresco.js?v=1"></script>
 </body>
 </html>
