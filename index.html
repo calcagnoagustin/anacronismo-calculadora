@@ -9,6 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="Anacronismo">
 <meta name="theme-color" content="#F2EBDC">
 <title>Anacronismo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEmklEQVR4nO3cPXIVSRBFYYnQYvBwsFkXS2Bd2Dh4GNqBPK0A4xEvREu3O/u3bmaez5yRJrqrTmWJ4GkeX1+eH4CPfBr9APBFHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oDUPY7PX75t/rflPY1+gPFuBfz5/fP9P2zusfP/EyxYwKSbPrpfK5jRN474xdH2iukbBxYRB6Smcay9KXreLE3jQARxQOoYx7Y7ouHN0jEOBLWLY88A6DY82sWBOOKA1CuO/fdCq5ulVxxYpVEcrQ79IRrFcZQ+kRHHf9p+rudDXeI49rg3GR5d4ohgbEy0iGPVQSeRuxZxnKHDzUIc/7wdGAyPm/pxdDjiJ6kfR8S2UVE+O+L4GDfLQ/k4zj7ctYdH8TgiGBJK5Th2HmuiqRxHxP4CCt8s3eOY13x4lI3jygNddXiUjSOi+WBYVDOOA49y54BqxnG9kjdL3zjiI6Ht8CgYR8lDPETBOCLOGAb1oqwWx0k71PNmqRbHWMWGR8c4eo6BDUrFcerBbZhUqTgizt7jSjdLuzj26DY86sRR6ciaqBNHxDVHv0ymReK4bD9a3SxF4oi4cl9rDI9GcWCtCnFcfEz73CwV4oi4fkcL3Czp4xiyB02GR/o4cJ4WcYw66NlvltxxDFz9DjdL7jgixu5i6uGROI7h615+eCSOA2crHofD4R4+4TbLGofJijvEd56scUT47JxJymtVjgM7PY1+gC0OP4g/vk7/g99/rfhlyaSDYdHj68vz6GdYLbIZwTvlfRZvBRMJxuFzzQXlu1YOPKbzZUS+4CbdrgfliyMislvBjQ9+WUk141i0asuP6iPdjybJ4jhkfTds9uK3lLxZksUR4bxPuYZHpjhGjY2d35hXpjjMOU+sbarF4b9DiW6WNHGkWFP/NFdJE0dEsb0ZLkccKcZGXJbXyRHHgeJ/o7btGytNrzpx5NqVFMMjQRyHr+OG4bF53qSWII6ItWNj1WavLSPXDJtRJI4Nglt+3szwv1nc4zh1BRc3fnMZNYaH+yfBDvzQ14w9HxNUCnw8zPozpJcN3p4/by5yv1YW2Z482weLSx9Hds4/lvrG4bxqQdmHh28cEdlX35xpHAXGRpzty5rGUUbq2ZY4jtTrPuE5PBzj8FyphhzjiEg0NhI96oRdHG3HhuGL28VRUtLhkTKOpGudjlcchqP1Sm6v7xVHRNKxkfGx88VRm9XwMIrDal3wYBVHRMbhfJfu4V3iYGzc+SyFSxwR6U7ee7leIVMcuJhFHD6D1ITJgljEEZFrIM9I9CLj4zA5JW4clmV8HLBl9BtvM2cl0SgOSvGyRr/xdlsUh3E6ik8WN0aTY+JeiduSHcX/BY0mx0SHQWKbxY3v5MBw/GkFEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckP4Cl+82S2ZNHp8AAAAASUVORK5CYII=">
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEmklEQVR4nO3cPXIVSRBFYYnQYvBwsFkXS2Bd2Dh4GNqBPK0A4xEvREu3O/u3bmaez5yRJrqrTmWJ4GkeX1+eH4CPfBr9APBFHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oDUPY7PX75t/rflPY1+gPFuBfz5/fP9P2zusfP/EyxYwKSbPrpfK5jRN474xdH2iukbBxYRB6Smcay9KXreLE3jQARxQOoYx7Y7ouHN0jEOBLWLY88A6DY82sWBOOKA1CuO/fdCq5ulVxxYpVEcrQ79IRrFcZQ+kRHHf9p+rudDXeI49rg3GR5d4ohgbEy0iGPVQSeRuxZxnKHDzUIc/7wdGAyPm/pxdDjiJ6kfR8S2UVE+O+L4GDfLQ/k4zj7ctYdH8TgiGBJK5Th2HmuiqRxHxP4CCt8s3eOY13x4lI3jygNddXiUjSOi+WBYVDOOA49y54BqxnG9kjdL3zjiI6Ht8CgYR8lDPETBOCLOGAb1oqwWx0k71PNmqRbHWMWGR8c4eo6BDUrFcerBbZhUqTgizt7jSjdLuzj26DY86sRR6ciaqBNHxDVHv0ymReK4bD9a3SxF4oi4cl9rDI9GcWCtCnFcfEz73CwV4oi4fkcL3Czp4xiyB02GR/o4cJ4WcYw66NlvltxxDFz9DjdL7jgixu5i6uGROI7h615+eCSOA2crHofD4R4+4TbLGofJijvEd56scUT47JxJymtVjgM7PY1+gC0OP4g/vk7/g99/rfhlyaSDYdHj68vz6GdYLbIZwTvlfRZvBRMJxuFzzQXlu1YOPKbzZUS+4CbdrgfliyMislvBjQ9+WUk141i0asuP6iPdjybJ4jhkfTds9uK3lLxZksUR4bxPuYZHpjhGjY2d35hXpjjMOU+sbarF4b9DiW6WNHGkWFP/NFdJE0dEsb0ZLkccKcZGXJbXyRHHgeJ/o7btGytNrzpx5NqVFMMjQRyHr+OG4bF53qSWII6ItWNj1WavLSPXDJtRJI4Nglt+3szwv1nc4zh1BRc3fnMZNYaH+yfBDvzQ14w9HxNUCnw8zPozpJcN3p4/by5yv1YW2Z482weLSx9Hds4/lvrG4bxqQdmHh28cEdlX35xpHAXGRpzty5rGUUbq2ZY4jtTrPuE5PBzj8FyphhzjiEg0NhI96oRdHG3HhuGL28VRUtLhkTKOpGudjlcchqP1Sm6v7xVHRNKxkfGx88VRm9XwMIrDal3wYBVHRMbhfJfu4V3iYGzc+SyFSxwR6U7ee7leIVMcuJhFHD6D1ITJgljEEZFrIM9I9CLj4zA5JW4clmV8HLBl9BtvM2cl0SgOSvGyRr/xdlsUh3E6ik8WN0aTY+JeiduSHcX/BY0mx0SHQWKbxY3v5MBw/GkFEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckIgDEnFAIg5IxAGJOCARByTigEQckP4Cl+82S2ZNHp8AAAAASUVORK5CYII=">
 <style>
@@ -216,52 +218,125 @@
   .an-f button.on{ background:var(--negro); color:var(--crema); }
   .an .preg{ background:var(--crema2); padding:8px 10px; margin-bottom:6px; font-size:12.5px; }
 
-  /* ===== rediseño 19/10/2026 (mockups) ===== */
-  .wrap{ max-width:1180px; padding:22px 20px 70px; }
-  .hdr{ display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:22px; }
-  .hdr .logo{ flex-direction:row; align-items:center; gap:14px; margin:0; }
-  .hdr .logo .wm{ margin:0; font-size:15px; }
-  .hdr .logo .div{ margin:0 0 0 6px; }
-  .hdr .toggle.nav{ margin:0; border:none; gap:4px; }
-  .hdr .toggle.nav button{ flex:none; padding:11px 16px; font-size:11px; letter-spacing:.14em; font-weight:700; border-radius:3px; }
-  .hdr .toggle.nav button.on{ background:var(--negro); color:var(--crema); }
-  .sub{ font-size:14px; text-align:center; }
-  .instr{ border-radius:4px; }
-  .instr>summary{ padding:14px 16px; font-size:12px; }
-  .instr>summary .cv{ color:var(--rojoOsc); }
+  /* ===== rediseño 19/10/2026 (mockups v2) ===== */
+  :root{ --crema:#F3ECDF; --crema2:#E9E0CE; --papel:#F8F3E9; --linea:#1A1A1A; --suave:#D9CFBA; }
+  html,body{ font-family:Inter,-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
+  .serif{ font-family:"Playfair Display",Georgia,serif; }
+  .wrap{ max-width:1100px; padding:24px 20px 80px; }
+  .logo{ margin-bottom:18px; }
+  .logo .wm{ font-size:16px; letter-spacing:.38em; font-weight:400; }
+  .toggle.nav{ border:1.5px solid var(--linea); border-radius:6px; overflow:hidden; margin-bottom:26px; }
+  .toggle.nav button{ font-size:12px; letter-spacing:.12em; font-weight:600; padding:16px 4px; border-right:1.5px solid var(--linea); }
+  .toggle.nav button:last-child{ border-right:0; }
+  .ht{ font-family:"Playfair Display",Georgia,serif; font-size:clamp(28px,4vw,40px); font-weight:600; text-align:center; margin:4px 0 8px; line-height:1.15; letter-spacing:-.01em; }
+  .sub{ font-family:"Playfair Display",Georgia,serif; font-size:17px; opacity:.72; margin:0 0 22px; line-height:1.45; }
+  .instr{ border-radius:8px; border-width:1px; background:var(--papel); }
+  .instr>summary{ padding:16px 18px; font-size:13px; letter-spacing:.12em; display:flex; align-items:center; }
+  .instr>summary:before{ content:""; width:40px; height:40px; border-radius:50%; background:var(--crema2); flex:none; margin-right:14px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237A1F1A' stroke-width='1.8'%3E%3Cpath d='M6 3h9l4 4v14H6z'/%3E%3Cpath d='M9 12h7M9 16h7'/%3E%3C/svg%3E"); background-size:20px; background-repeat:no-repeat; background-position:center; }
+  .instr>summary>span:first-of-type{ flex:1; }
+  .instr>summary .cv{ color:var(--rojoOsc); font-size:16px; }
+  .instr[open]>summary{ background:transparent; color:var(--rojoOsc); }
   .instr .idesc{ display:block; font-size:12.5px; letter-spacing:0; text-transform:none; font-weight:400; color:var(--negro); opacity:.65; margin-top:5px; line-height:1.45; }
-  .btn.pri#rd_lanzar{ background:var(--rojoOsc); border-color:var(--rojoOsc); border-radius:4px; padding:15px; display:flex; align-items:center; justify-content:center; gap:12px; font-size:13.5px; letter-spacing:.14em; }
-  .btn.pri#rd_lanzar svg{ width:18px; height:18px; }
-  @media(min-width:700px){ .btn.pri#rd_lanzar{ background:var(--negro); border-color:var(--negro); } }
-  .barra.rule{ align-items:center; gap:14px; margin:20px 0 12px; }
+  .btn{ border-radius:6px; }
+  .btn.pri#rd_lanzar, .btn.pri#an_go{ display:flex; align-items:center; justify-content:center; gap:14px; padding:18px; font-size:14px; letter-spacing:.16em; }
+  .btn.pri#rd_lanzar svg, .btn.pri#an_go svg{ width:20px; height:20px; }
+  .estado{ font-size:12.5px; }
+  .barra{ font-size:13px; letter-spacing:.16em; }
+  .barra.rule{ align-items:center; gap:14px; margin:22px 0 14px; }
   .barra.rule .ln{ flex:1; height:1px; background:#1A1A1A33; }
-  .rd-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
-  @media(min-width:860px){ .rd-grid{ grid-template-columns:1fr 1fr; } }
-  .card{ border-radius:4px; padding:14px; margin:0; }
-  .card .ch{ gap:14px; }
-  .card .ph{ width:112px; height:112px; flex:none; background:var(--crema2); border:1px solid #1A1A1A22; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .rd-grid{ display:grid; grid-template-columns:1fr; gap:14px; }
+  .card{ border-radius:10px; border-width:1px; padding:16px; margin:0; background:var(--papel); position:relative; }
+  .card .ch{ gap:16px; }
+  .card .ph{ width:34%; max-width:200px; min-width:120px; aspect-ratio:3/4; flex:none; background:var(--crema2); border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
   .card .ph img{ width:100%; height:100%; object-fit:cover; }
-  .card .ph svg{ width:40px; height:40px; opacity:.25; }
+  .card .ph svg{ width:46px; height:46px; opacity:.22; }
   .card .cb{ flex:1; min-width:0; }
-  .card .rk{ display:block; margin:0 0 2px; font-size:11px; }
-  .card .nm{ font-size:16px; }
-  .card .pr{ font-family:inherit; font-size:17px; }
-  .card .nt{ opacity:.75; }
-  .card .acts a, .card .acts button{ border-radius:3px; padding:10px 6px; display:flex; align-items:center; justify-content:center; gap:7px; }
+  .card .rk{ display:inline-block; margin:0 8px 0 0; font-size:12px; opacity:.45; }
+  .card .nm{ font-family:"Playfair Display",Georgia,serif; font-size:19px; font-weight:600; line-height:1.25; }
+  .card .pr{ font-family:"Playfair Display",Georgia,serif; font-size:19px; }
+  .card .nt{ font-size:13px; opacity:.78; line-height:1.5; margin-top:7px; }
+  .card .nt.vd:before{ content:"\1F3EC"; margin-right:6px; opacity:.7; font-size:12px; }
+  .card .acts{ margin-top:14px; gap:10px; }
+  .card .acts a, .card .acts button{ border-radius:6px; padding:12px 6px; display:flex; align-items:center; justify-content:center; gap:8px; font-size:11.5px; }
   .card .acts svg{ width:14px; height:14px; }
-  .card .ocultar{ position:absolute; right:8px; top:8px; width:26px; height:26px; border:none; background:transparent; opacity:.35; cursor:pointer; font-size:16px; line-height:1; color:var(--negro); }
+  .card .acts button.chatb{ color:var(--negro)!important; }
+  .card .acts button.chatb svg{ stroke:var(--rojoOsc); }
+  .card .ocultar{ position:absolute; right:10px; top:8px; width:26px; height:26px; border:none; background:transparent; opacity:.35; cursor:pointer; font-size:17px; line-height:1; color:var(--negro); z-index:2; }
   .card .ocultar:hover{ opacity:1; }
-  .card{ position:relative; }
-  .fb>summary{ font-size:11px; }
-  #acFab{ width:60px; height:60px; }
+  .fb>summary{ font-size:11.5px; letter-spacing:.12em; }
+  .fb>summary>span:first-child:before{ content:"\1F4AC"; margin-right:7px; font-size:11px; }
   .grupo{ grid-column:1/-1; margin:14px 0 2px; }
   .ocultos-bar{ grid-column:1/-1; font-size:12px; opacity:.6; text-align:center; padding:8px; }
   .ocultos-bar button{ background:none; border:none; text-decoration:underline; cursor:pointer; font:inherit; color:var(--rojoOsc); }
+  /* analista */
+  .an-caja{ border:1px solid var(--linea); border-radius:10px; background:var(--papel); padding:18px; margin-bottom:26px; }
+  #an_modo{ margin-bottom:18px; border-radius:6px; overflow:hidden; }
+  #an_modo button{ font-family:"Playfair Display",Georgia,serif; font-size:17px; text-transform:none; letter-spacing:0; padding:13px; display:flex; align-items:center; justify-content:center; gap:10px; }
+  #an_modo button svg{ width:20px; height:20px; }
+  .lab2{ display:block; font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--rojoOsc); font-weight:700; margin:0 0 8px; }
+  .an-in{ border-radius:8px; border-width:1px; background:var(--papel); padding:14px 14px; margin-bottom:16px; }
+  .an-hero{ display:grid; grid-template-columns:1fr; gap:18px; align-items:center; margin:4px 0 18px; }
+  .an-hero h3{ font-family:"Playfair Display",Georgia,serif; font-size:30px; line-height:1.1; margin:0 0 12px; }
+  .an-hero h3:before{ content:""; display:block; width:36px; height:3px; background:var(--rojoOsc); margin-bottom:14px; }
+  .an-hero p{ font-family:"Playfair Display",Georgia,serif; font-size:16px; line-height:1.5; opacity:.8; margin:0; }
+  .an-hero img{ width:100%; border-radius:8px; mix-blend-mode:multiply; }
+  @media(min-width:760px){ .an-hero{ grid-template-columns:1fr 1.15fr; } }
+  #an_abrir{ display:flex!important; align-items:center; justify-content:center; gap:14px; padding:18px; border-radius:6px; font-size:13.5px; letter-spacing:.16em; }
+  .an-f{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .an-f button{ border-radius:999px; border:1px solid var(--linea); background:transparent; padding:10px 16px; font:600 11.5px Inter; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; color:var(--negro); }
+  .an-f button.on{ background:var(--negro); color:var(--crema); }
+  .barra.hist{ font-family:"Playfair Display",Georgia,serif; font-size:26px; letter-spacing:.06em; font-weight:700; border-bottom:1px solid #1A1A1A33; padding-bottom:8px; margin:26px 0 14px; }
+  .an{ border-radius:10px; border-width:1px; background:var(--papel); }
+  .an>summary{ padding:14px 16px; }
+  .an .vd{ border-radius:4px; }
+  .an .tit{ font-family:"Playfair Display",Georgia,serif; font-size:18px; font-weight:600; line-height:1.25; display:block; margin-top:6px; }
+  .an .res{ font-family:"Playfair Display",Georgia,serif; font-size:14px; line-height:1.5; opacity:.8; margin-top:6px; }
+  .an .meta{ font-size:12px; opacity:.6; margin-top:8px; }
+  .an .pfoto{ float:left; width:110px; aspect-ratio:1; border-radius:8px; object-fit:cover; margin:0 14px 6px 0; background:var(--crema2); }
+  .an .prz{ float:right; font-family:"Playfair Display",Georgia,serif; font-size:19px; margin-left:12px; }
+  .ring{ float:right; width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:"Playfair Display",Georgia,serif; font-size:15px; margin-left:12px; position:relative; }
+  .ring:after{ content:"CONFIANZA"; position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); font:600 8px Inter; letter-spacing:.14em; opacity:.6; }
+  .ring i{ position:absolute; inset:5px; border-radius:50%; background:var(--papel); }
+  .ring b{ position:relative; font-weight:600; }
+  /* compras / busquedas / vendedores */
+  .dash, .agenda{ border-radius:12px; padding:26px; }
+  .dash .big, .agenda .big{ font-family:"Playfair Display",Georgia,serif; font-weight:700; }
+  .dash .big{ font-size:56px; }
+  .dash .cap, .agenda .cap{ font-size:13px; letter-spacing:.2em; }
+  .dash .split>div{ border:1px solid #ffffff22; border-radius:10px; padding:16px; }
+  .dash .split .v{ font-family:"Playfair Display",Georgia,serif; font-size:30px; }
+  .dash .lines .li span:last-child{ font-family:ui-monospace,Menlo,monospace; }
+  .agenda{ display:grid; grid-template-columns:1fr; gap:10px; background:#1A1A1A url(img-bolsillo.jpg) no-repeat right center; background-size:auto 100%; }
+  .agenda .big{ font-size:38px; }
+  .dias{ margin-top:12px; }
+  .dias button{ border-radius:6px; padding:14px 0; font-size:15px; }
+  @media(max-width:600px){ .agenda{ background-size:auto 60%; background-position:right bottom; } .agenda>*{ max-width:70%; } }
+  .pza{ border-radius:10px; border-width:1px; background:var(--papel); margin-bottom:12px; }
+  .pza>summary{ padding:16px; }
+  .pza .sm{ font-family:"Playfair Display",Georgia,serif; font-size:18px; font-weight:600; }
+  .pza .sc{ font-family:"Playfair Display",Georgia,serif; font-size:18px; }
+  .pza[open]>summary{ background:transparent; color:var(--negro); border-radius:10px 10px 0 0; }
+  .pza[open]>summary .ss{ opacity:.6; }
+  .pza[open]>summary .vsw{ border-color:var(--negro); color:var(--negro); }
+  .pza[open]>summary .vsw.on{ background:var(--rojoOsc); border-color:var(--rojoOsc); color:var(--crema); }
+  .pza[open]>summary .tagd{ border-color:var(--rojoOsc); color:var(--rojoOsc); }
+  .pza .body{ border-top:1px solid #1A1A1A22; }
+  .vsw{ border-radius:999px; padding:8px 14px; font-size:11px; }
+  .vsw.on{ background:var(--rojoOsc); border-color:var(--rojoOsc); }
+  .inp, .an-in, .instr textarea, .body textarea, .chk{ border-radius:8px; border-width:1px; background:var(--papel); }
+  .inp input{ font-family:inherit; }
+  .mbox, .note, .panel{ border-radius:10px; border-width:1px; }
+  table{ border-radius:8px; overflow:hidden; border-width:1px; }
+  .tag, .tagd{ border-radius:4px; }
+  #acFab{ width:62px; height:62px; }
+  .pie{ display:flex; align-items:center; justify-content:center; gap:10px; margin-top:40px; opacity:.6; }
+  .pie span{ width:80px; height:1px; background:var(--negro); } .pie b{ width:6px; height:6px; border-radius:50%; background:var(--rojoOsc); }
+  @media(min-width:860px){ .rd-grid{ grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="hdr">
   <div class="logo">
     <svg width="40" height="40" viewBox="0 0 100 100" aria-label="Anacronismo">
       <line x1="27" y1="80" x2="50" y2="20" stroke="#1A1A1A" stroke-width="6.5" stroke-linecap="butt"/>
@@ -279,11 +354,11 @@
     <button data-s="compras">Compras</button>
     <button data-s="anal">Analista</button>
   </div>
-  </div>
 
   <!-- ===================== RADAR ===================== -->
   <section id="s_radar">
-    <p class="sub">Lo que trajo el bot en su última pasada por eBay.</p>
+    <h1 class="ht">Lo que trajo el bot en su última pasada por eBay.</h1>
+    <p class="sub" style="text-align:center">Revisá los hallazgos, filtrá, comentá y seguí lo que te interesa.</p>
     <details class="instr" id="rd_instr">
       <summary><span>Instrucciones para el bot<span class="idesc">Definí qué buscar, qué evitar y cómo priorizar los hallazgos. El bot usa esto en cada pasada por eBay.</span></span><span class="cv">&#9662;</span></summary>
       <div class="ib">
@@ -305,23 +380,32 @@
 
   <!-- ===================== ANALISTA ===================== -->
   <section id="s_anal" class="hidden">
-    <div class="toggle" id="an_modo"><button data-m="link" class="on">Por link</button><button data-m="foto">Con foto</button></div>
+    <h1 class="ht" id="an_titulo">Analizá un reloj de eBay</h1>
+    <p class="sub" style="text-align:center" id="an_subt">Pegá un link y el bot lo mira a fondo, foto por foto.<br>Te cuenta qué tan original es, su estado y todo lo que encuentre.</p>
+    <div class="an-caja">
+    <div class="toggle" id="an_modo"><button data-m="link" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Por link</button><button data-m="foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Con foto</button></div>
     <div id="an_mlink">
-    <p class="sub">Pegá un link y el bot lo mira a fondo, foto por foto.</p>
+    <span class="lab2">Link de eBay</span>
     <input class="an-in" id="an_url" type="url" inputmode="url" placeholder="https://ebay.us/... o ebay.com/itm/...">
-    <textarea class="an-in" id="an_nota" placeholder="Opcional: qué querés que mire (ej: ¿la esfera es original?)"></textarea>
-    <button class="btn pri" id="an_go">Analizar</button>
+    <span class="lab2">Notas (opcional)</span>
+    <textarea class="an-in" id="an_nota" placeholder="Qué querés que mire (ej: ¿la esfera es original?)"></textarea>
+    <button class="btn pri" id="an_go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Analizar</button>
     <div class="estado" id="an_st"></div>
-    <div class="barra" style="margin-top:14px"><span>Historial</span><span class="st" id="an_cnt"></span></div>
+    </div>
+    <div id="an_mfoto" class="hidden">
+    <div class="an-hero"><div><h3>Analizá un reloj con una foto.</h3><p>Sacás 2 o 3 fotos de un reloj (en una feria, en una vidriera) y en segundos te dice SI / NO / DUDA. Es la app <b>Anacronismo Analista</b>: la misma que usa tu amigo en Suiza. Lo que se analiza acá queda separado del historial por link.</p></div><img src="img-analista.jpg" alt=""></div>
+    <a class="btn pri" href="/analista/" target="_blank" rel="noopener" id="an_abrir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Abrir Anacronismo Analista <span style="margin-left:auto">→</span></a>
+    </div>
+    </div>
+    <div id="an_mlink2">
+    <div class="barra hist"><span style="color:var(--rojoOsc)">Historial</span><span class="st" id="an_cnt"></span></div>
     <div class="an-f" id="an_f"><button data-f="todos" class="on">Todos</button><button data-f="ap">Aprobados</button><button data-f="de">Desaprobados</button><button data-f="sin">Sin marcar</button></div>
     <input class="an-in" id="an_q" type="search" placeholder="Buscar en el historial (marca, calibre, vendedor…)" style="font-size:14px;padding:8px 12px">
     <div id="an_lista"></div>
     <p class="foot">Usa la misma rutina que el radar (tu suscripción, sin costo de API). Tarda unos minutos; esta pantalla se actualiza sola. Los comparables son precios pedidos, no ventas cerradas.</p>
     </div>
-    <div id="an_mfoto" class="hidden">
-    <p class="sub">Sacás 2 o 3 fotos de un reloj (en una feria, en una vidriera) y en segundos te dice SI / NO / DUDA. Es la app <b>Anacronismo Analista</b>: la misma que usa tu amigo en Suiza. Lo que se analiza acá queda separado del historial por link.</p>
-    <a class="btn pri" style="display:block;text-align:center;text-decoration:none" href="/analista/" target="_blank" rel="noopener" id="an_abrir">📷 Abrir Anacronismo Analista</a>
-    <div class="barra" style="margin-top:14px"><span>Análisis con foto</span><span class="st" id="af_cnt"></span></div>
+    <div id="an_mfoto2" class="hidden">
+    <div class="barra rule"><span>Análisis con foto</span><span class="ln"></span><span class="st" id="af_cnt"></span></div>
     <div id="af_lista"></div>
     <p class="foot">Guardados con ubicación. Para repreguntar sobre uno, usá la burbuja de chat desde su reporte dentro de Anacronismo Analista.</p>
     </div>
@@ -329,7 +413,8 @@
 
   <!-- ===================== VENDEDORES ===================== -->
   <section id="s_vend" class="hidden">
-    <p class="sub">A quién le compramos, y cómo lo clasificamos.</p>
+    <h1 class="ht">A quién le compramos, y cómo lo clasificamos.</h1>
+    <p class="sub" style="text-align:center">Exploramos y evaluamos vendedores de eBay según su historial, nivel de servicio y garantías ofrecidas.</p>
     <div id="vd_lista"></div>
     <button class="btn pri" id="vd_add">+ Agregar vendedor</button>
     <div class="estado" id="vd_estado"></div>
@@ -337,7 +422,8 @@
   </section>
 
   <section id="s_busq" class="hidden">
-    <p class="sub">Lo que el bot sale a buscar, y cuándo.</p>
+    <h1 class="ht">Lo que el bot sale a buscar, y cuándo.</h1>
+    <p class="sub" style="text-align:center">Configurá la próxima corrida y los criterios de búsqueda.</p>
 
     <div class="agenda">
       <div class="cap">Próxima corrida</div>
@@ -370,7 +456,8 @@
 
   <!-- ===================== COMPRAS ===================== -->
   <section id="s_compras" class="hidden">
-    <p class="sub">Lo que ya está en la colección.</p>
+    <h1 class="ht">Lo que ya está en la colección.</h1>
+    <p class="sub" style="text-align:center">Un resumen de tu inversión y todas las piezas que forman parte de tu historia.</p>
     <div class="dash">
       <div class="cap">Invertido hasta hoy</div>
       <div class="big mono" id="cp_inv">US$ —</div>
@@ -391,6 +478,7 @@
   <!-- ===================== CALCULADORA ===================== -->
 </div>
 
+<div class="pie"><span></span><b></b><span></span></div>
 <script>
 var BASE="https://vm.semillaredes.com/anacronismo";
 var TOKEN="GNC5r4alB5AGTLEa7hqOuLwR4ULHuHJH";
@@ -610,13 +698,13 @@ function pintarRadar(d){
       var idc=String(i.item||i.id||i.nombre), fc=FEEDBACK.comentarios[idc];
       var descartado = fc && (fc.tags||[]).indexOf("No va")>=0;
       if(OCULTOS.indexOf(idc)>=0){ nOcultos++; return; }
-      var foto=FOTOS_RD[idc];
+      var foto=i.foto||FOTOS_RD[idc];
       h+="<div class='card"+(descartado?" descartado":"")+"'>";
       h+="<button class='ocultar' title='Ocultar esta pieza' data-ocultar='"+esc(idc)+"'>×</button>";
       if(g.tag) h+="<span class='tag "+g.tag+"'>"+g.titulo+"</span>";
       h+="<div class='ch'><div class='ph'>"+(foto? "<img src='"+esc(foto)+"' alt='' loading='lazy'>" : "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><circle cx='12' cy='12' r='8'/><path d='M12 7v5l3 2'/></svg>")+"</div>";
       h+="<div class='cb'>"+(i.pos?"<span class='rk'>"+i.pos+"</span>":"")+"<div class='ch' style='gap:10px'><div class='nm'>"+esc(i.nombre)+"</div><div class='pr'>"+(precio?usd(precio):"—")+"</div></div>";
-      if(i.vendedor) h+="<div class='nt'>Vendedor: "+esc(i.vendedor)+"</div>";
+      if(i.vendedor) h+="<div class='nt vd'>Vendedor: "+esc(i.vendedor)+"</div>";
       if(i.nota) h+="<div class='nt'>"+esc(i.nota)+"</div>";
       h+="</div></div>";
       h+="<div class='acts'>";
@@ -796,8 +884,13 @@ function pintarAnalisis(){
     var dc=a.decision==="aprobado"?"<span class='dc ap'>✓ aprobado</span>":a.decision==="desaprobado"?"<span class='dc de'>✗ desaprobado</span>":"";
     var fe=a.cuando?"<span style='font-size:11px;opacity:.45;margin-left:6px'>"+esc(new Date(a.cuando).toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit"}))+"</span>":"";
     var abierto=(a.id in anOpen)?anOpen[a.id]:(ix===0&&!curso&&!a.decision);
-    var h="<details class='an' data-id='"+esc(a.id)+"'"+(abierto?" open":"")+"><summary>"+pr+dc+vd+conf+fe+"<div style='font-weight:700;font-size:14.5px;margin-top:7px;line-height:1.3;word-break:break-word'>"+esc(nm)+"</div>";
-    if(a.resumen) h+="<div style='font-size:12.5px;opacity:.7;margin-top:5px;line-height:1.45'>"+esc(a.resumen)+"</div>";
+    var f0=(a.fotos&&a.fotos[0]&&a.fotos[0].url)? "<img class='pfoto' loading='lazy' src='"+esc(a.fotos[0].url)+"' alt=''>":"";
+    var pr2=isFinite(parseFloat(a.landed))?"<span class='prz'>"+usd(parseFloat(a.landed))+"</span>":"";
+    var h="<details class='an' data-id='"+esc(a.id)+"'"+(abierto?" open":"")+"><summary>"+f0+pr2+dc+vd+conf+fe+"<span class='tit'>"+esc(nm)+"</span>";
+    if(a.resumen) h+="<div class='res'>"+esc(a.resumen)+"</div>";
+    var mt=[]; if(a.marca) mt.push("\u{1F3F7} "+esc(a.marca)); if(a.calibre) mt.push("\u2699 "+esc(a.calibre)); if(a.vendedor) mt.push("\u{1F464} Vendedor: "+esc(a.vendedor)); if(a.cuando) mt.push("\u{1F4C5} "+esc(new Date(a.cuando).toISOString().slice(0,10)));
+    if(mt.length&&!curso) h+="<div class='meta'>"+mt.join(" &nbsp;·&nbsp; ")+"</div>";
+    h+="<div style='clear:both'></div>";
     if(curso){ var mins=Math.max(0,Math.round((Date.now()/1000-(a.epoch||0))/60)); h+="<div style='font-size:11.5px;opacity:.55;margin-top:5px'>lanzado hace "+mins+" min"+(a.nota_agus?" · "+esc(a.nota_agus):"")+"</div>"; }
     h+="</summary><div class='ab'>";
     var dat=[]; if(a.precio!=null) dat.push("precio "+usd1(parseFloat(a.precio))); if(a.envio) dat.push(esc(a.envio)); if(a.modalidad) dat.push(esc(a.modalidad)); if(a.vendedor) dat.push("vendedor "+esc(a.vendedor)+(a.pais?" · "+esc(a.pais):""));
@@ -862,6 +955,8 @@ if(location.hostname!=="anacronismo.com") document.getElementById("an_abrir").hr
 document.querySelectorAll("#an_modo button").forEach(function(b){ b.addEventListener("click", function(){
   var m=b.getAttribute("data-m"); document.querySelectorAll("#an_modo button").forEach(function(x){ x.classList.toggle("on", x===b); });
   document.getElementById("an_mlink").classList.toggle("hidden", m!=="link"); document.getElementById("an_mfoto").classList.toggle("hidden", m!=="foto");
+  document.getElementById("an_mlink2").classList.toggle("hidden", m!=="link"); document.getElementById("an_mfoto2").classList.toggle("hidden", m!=="foto");
+  document.getElementById("an_titulo").style.display = document.getElementById("an_subt").style.display = (m==="foto"?"none":"");
   try{ localStorage.setItem("anacro_an_modo", m); }catch(e){} if(m==="foto") cargarAF(); }); });
 try{ if(localStorage.getItem("anacro_an_modo")==="foto") document.querySelector('#an_modo button[data-m="foto"]').click(); }catch(e){}
 function afFoto(f,t){ return AF_API+"analista-foto?id="+(t? f.replace(".jpg","_t.jpg"): f); }
@@ -870,7 +965,8 @@ function pintarAF(){
   if(!AF.length){ L.innerHTML="<p class='foot'>Todavía no hay análisis con foto.</p>"; return; }
   L.innerHTML=AF.map(function(a){
     var vd={SI:"comprar",NO:"pasar",DUDA:"negociar"}[a.veredicto]||"curso";
-    var h="<details class='an' "+(anOpen["af"+a.id]?"open":"")+" data-afid='"+esc(a.id)+"'><summary><span class='vd "+vd+"'>"+esc(a.veredicto)+"</span><b>"+esc(a.titulo||"Reloj")+"</b>"+(a.confianza!=null?" <span style='opacity:.55;font-size:12px'>"+esc(a.confianza)+"%</span>":"")+"<div style='font-size:12px;opacity:.6;margin-top:3px'>"+esc(a.epoca||"")+(a.lugar? " · "+esc(a.lugar):"")+" · "+new Date(a.cuando).toLocaleDateString("es-AR")+(a.comprado?" · comprado":"")+"</div></summary><div class='ab'>";
+    var colr={SI:"#5B7F62",NO:"#B4432C",DUDA:"#C99A2E"}[a.veredicto]||"#75705F", cf=+a.confianza||0;
+    var h="<details class='an' "+(anOpen["af"+a.id]?"open":"")+" data-afid='"+esc(a.id)+"'><summary>"+(a.fotos&&a.fotos[0]? "<img class='pfoto' src='"+afFoto(a.fotos[0],true)+"' alt=''>":"")+(a.confianza!=null? "<span class='ring' style='background:conic-gradient("+colr+" "+(cf*3.6)+"deg,#D9CFBA 0)'><i></i><b>"+cf+"%</b></span>":"")+"<span class='vd "+vd+"'>"+esc(a.veredicto)+"</span><span class='tit'>"+esc(a.titulo||"Reloj")+"</span><div class='meta'>"+esc(a.epoca||"")+(a.lugar? " · "+esc(a.lugar):"")+" · "+new Date(a.cuando).toLocaleDateString("es-AR")+(a.comprado?" · comprado":"")+"</div><div style='clear:both'></div></summary><div class='ab'>";
     h+="<div style='display:flex;gap:6px;overflow-x:auto;margin-bottom:8px'>"+(a.fotos||[]).map(function(f){ return "<a href='"+afFoto(f,false)+"' target='_blank'><img src='"+afFoto(f,true)+"' style='height:90px;border:1.5px solid var(--negro)'></a>"; }).join("")+"</div>";
     h+="<p>"+esc(a.resumen||"")+"</p>";
     if(a.precio_max_chf!=null) h+="<p><b>Tope CHF "+esc(a.precio_max_chf)+"</b>"+(a.precio_pedido? " · piden CHF "+esc(a.precio_pedido):"")+"</p>";
