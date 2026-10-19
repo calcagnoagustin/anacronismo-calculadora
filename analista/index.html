@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Anacronismo Analista</title>
+<meta name="description" content="Sacá 2 o 3 fotos de un reloj en la feria y en segundos te dice SI, NO o DUDA.">
+<meta name="theme-color" content="#F3ECDF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Analista">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#F3ECDF;--bg2:#EDE4D3;--ink:#1C1A16;--mut:#75705F;--card:#FBF7EF;--line:#E2D8C4;--si:#5B7F62;--no:#B4432C;--duda:#C99A2E;--acc:#B4432C}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+body{padding-top:env(safe-area-inset-top)}
+.serif{font-family:"Playfair Display",Georgia,serif;font-weight:600;letter-spacing:-.01em}
+main{max-width:560px;margin:0 auto;padding:0 18px 110px}
+.screen{display:none}.screen.on{display:block}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 0 4px}
+.top .logo{display:flex;flex-direction:column;align-items:center;margin:0 auto}
+.top img{width:64px;height:64px}
+.top .wm{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink);margin-top:2px}
+.top .wm b{display:block;font-size:17px;letter-spacing:.22em;font-weight:700}
+.top button{position:absolute;right:16px;top:calc(14px + env(safe-area-inset-top));width:42px;height:42px;border-radius:50%;border:0;background:var(--bg2);color:var(--ink);font-size:18px}
+.hero{text-align:center;margin-top:18px}
+.hero h1{font-size:38px;line-height:1.08;margin:0 0 10px}
+.hero p{color:var(--mut);margin:0 0 20px;font-size:16px}
+.btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;border:0;border-radius:16px;padding:17px;font:600 17px Inter,sans-serif;background:var(--ink);color:#F3ECDF;margin:10px 0;cursor:pointer}
+.btn.big{padding:22px;font-size:20px;border-radius:20px}
+.btn.sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.rojo{background:var(--acc)}
+.btn:disabled{opacity:.5}
+.btn svg{width:26px;height:26px;flex:none}
+.ribbon{position:relative;height:120px;margin:4px -18px 0;overflow:hidden;background:radial-gradient(circle at 20% 120%,#B4432C 0 70px,transparent 71px),radial-gradient(circle at 60% 160%,#D8B98F 0 110px,transparent 111px),linear-gradient(180deg,transparent,var(--bg2))}
+.sect{display:flex;align-items:baseline;justify-content:space-between;margin:22px 0 10px}
+.sect h2{font-size:24px;margin:0}
+.sect a{color:var(--acc);font-weight:600;font-size:14px;text-decoration:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}
+.mut{color:var(--mut);font-size:14px}
+.hist{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;margin:10px 0;cursor:pointer}
+.hist img{width:76px;height:76px;border-radius:12px;object-fit:cover;background:var(--bg2);flex:none}
+.hist .t{flex:1;min-width:0}.hist b{display:block;font-size:16px;line-height:1.2;margin-bottom:4px}
+.hist span{font-size:12.5px;color:var(--mut);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{display:inline-block;border-radius:999px;padding:8px 14px;font-weight:700;font-size:13px;color:#fff;letter-spacing:.06em;flex:none}
+.SI{background:var(--si)}.NO{background:var(--no)}.DUDA{background:var(--duda)}
+.step{display:flex;gap:12px;align-items:center;background:var(--card);border:1px dashed var(--line);border-radius:16px;padding:12px;margin:10px 0}
+.step.done{border-style:solid}
+.step .th{width:74px;height:74px;border-radius:12px;background:var(--bg2);flex:none;display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden}
+.step .th img{width:100%;height:100%;object-fit:cover}
+.step b{display:block;font-size:15px}.step span{font-size:13px;color:var(--mut)}
+.step label{margin-left:auto;background:var(--ink);color:#F3ECDF;border-radius:12px;padding:11px 13px;font-size:14px;font-weight:600;flex:none;cursor:pointer}
+.step.done label{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+input[type=file]{display:none}
+input[type=text],input[type=number],select,textarea{width:100%;border:1px solid var(--line);border-radius:14px;padding:13px;font:16px Inter,sans-serif;background:var(--card);color:var(--ink);outline:none}
+.ver{text-align:center;padding:16px 10px 6px}
+.ver .big{font-size:48px;font-weight:800;letter-spacing:.02em;line-height:1;font-family:"Playfair Display",serif}
+.ver .big.SI{color:var(--si)}.ver .big.NO{color:var(--no)}.ver .big.DUDA{color:var(--duda)}
+.ver h2{font-size:21px;margin:12px 0 2px}
+.conf{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mut);justify-content:center;margin-top:8px}
+.conf i{display:inline-block;width:110px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.conf i b{display:block;height:100%;background:var(--ink)}
+.crit{list-style:none;padding:0;margin:0}
+.crit li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.crit li:last-child{border:0}
+.crit .ic{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+.crit .ok{background:var(--si)}.crit .bad{background:var(--no)}.crit .nn{background:#B6AD9B}
+.crit b{display:block;font-size:14px}.crit span{font-size:13px;color:var(--mut)}
+.precio{font-size:32px;font-weight:700;text-align:center;font-family:"Playfair Display",serif}
+.precio small{display:block;font:500 11px Inter;color:var(--mut);letter-spacing:.14em}
+ul.simple{padding-left:18px;margin:6px 0}ul.simple li{margin:6px 0;font-size:15px}
+.fotos{display:flex;gap:8px;overflow-x:auto;padding:4px 0}.fotos img{height:120px;border-radius:12px}
+.chk{display:flex;align-items:center;gap:10px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 0;font-size:15px}
+.chk input{width:22px;height:22px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:5}
+nav button{flex:1;background:none;border:0;font:500 11.5px Inter;color:var(--mut);padding:4px;letter-spacing:.06em;text-transform:uppercase}
+nav button.on{color:var(--ink);font-weight:700}
+nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
+#map{height:calc(100vh - 230px);border-radius:16px;border:1px solid var(--line)}
+.spin{text-align:center;padding:50px 10px}
+.spin .dot{width:56px;height:56px;border:4px solid var(--line);border-top-color:var(--ink);border-radius:50%;margin:0 auto 18px;animation:r 1s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+.err{background:#FBE9E7;color:var(--no);border-radius:14px;padding:12px;margin:10px 0;font-size:14px}
+.row{display:flex;gap:10px}.row>*{flex:1}
+/* instalar */
+#inst{display:none;align-items:center;gap:12px;background:var(--ink);color:#F3ECDF;border-radius:16px;padding:12px 14px;margin:14px 0 4px}
+#inst.on{display:flex}#inst img{width:40px;height:40px;border-radius:9px}
+#inst div{flex:1;font-size:13.5px;line-height:1.3}#inst b{display:block;font-size:14.5px}
+#inst button{border:0;border-radius:10px;padding:9px 12px;font:600 13px Inter;background:#F3ECDF;color:var(--ink)}
+#inst .x{background:none;color:#F3ECDF;font-size:18px;padding:4px 6px}
+.ios{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.5}
+.ios b{font-weight:600}
+/* chat */
+#fab{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:9;width:60px;height:60px;border-radius:50%;border:1.5px solid #F3ECDF;background:var(--ink);color:#F3ECDF;box-shadow:0 10px 28px rgba(28,26,22,.35);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+#fab svg{width:28px;height:28px}#fab i{position:absolute;top:9px;right:11px;width:9px;height:9px;border-radius:50%;background:var(--acc)}
+#chat{position:fixed;inset:0;z-index:20;background:var(--bg);display:none;flex-direction:column;padding-top:env(safe-area-inset-top)}
+#chat.on{display:flex}
+#chHead{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--ink);color:#F3ECDF}
+#chHead b{flex:1;font-size:12px;letter-spacing:.28em;text-transform:uppercase;font-weight:500}
+#chHead button{background:transparent;color:#F3ECDF;border:1px solid rgba(243,236,223,.4);border-radius:8px;padding:6px 10px;font:500 12px Inter}
+#chCtx{display:none;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--line);font-size:13px}
+#chCtx.on{display:flex}#chCtx span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#chCtx span b{color:var(--acc)}#chCtx button{border:0;background:transparent;font-size:16px}
+#chMsgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:88%;padding:11px 14px;border-radius:16px;white-space:pre-wrap;word-wrap:break-word;font-size:15px;line-height:1.45}
+.m.yo{align-self:flex-end;background:var(--ink);color:#F3ECDF;border-bottom-right-radius:4px}
+.m.ia{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.m img{display:block;max-width:100%;max-height:220px;border-radius:10px;margin-top:6px}
+.m .dots:after{content:"\2026";animation:d 1.2s infinite}@keyframes d{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
+.hint{opacity:.7;font-size:13.5px;text-align:center;padding:10px 20px;line-height:1.5}
+.sug{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 8px}.sug button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 12px;font:500 13px Inter;color:var(--ink)}
+#chPend{display:none;gap:8px;padding:8px 10px 0;flex-wrap:wrap}#chPend.on{display:flex}
+#chPend div{position:relative}#chPend img{width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+#chPend b{position:absolute;top:-6px;right:-6px;background:var(--acc);color:#fff;border-radius:50%;width:20px;height:20px;font:12px/20px Inter;text-align:center}
+#chIn{display:flex;gap:6px;padding:10px;border-top:1px solid var(--line);background:var(--card);padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+#chIn textarea{flex:1;resize:none;height:46px;max-height:120px;border-radius:14px;padding:12px 13px}
+#chIn button{border:0;border-radius:12px;padding:0 14px;background:var(--ink);color:#F3ECDF;font:700 12px Inter;letter-spacing:.08em;text-transform:uppercase}
+#chIn .ic{background:var(--bg2);color:var(--ink);font-size:18px;padding:0 12px}
+#chIn button:disabled{opacity:.45}
+.leaflet-popup-content{font-size:13px}
+</style>
+</head>
+<body>
+<main>
+
+<!-- INICIO -->
+<section id="sInicio" class="screen on">
+  <div class="top"><div class="logo"><img src="icon-192.png" alt=""><div class="wm">Anacronismo<b>Analista</b></div></div><button id="bAjustes" title="Ajustes">☰</button></div>
+  <div class="hero">
+    <h1 class="serif">Analizá tu reloj<br>con inteligencia</h1>
+    <p>Sacás 2 o 3 fotos y en segundos<br>te dice SI, NO o DUDA.</p>
+    <button class="btn big serif" id="bNuevo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Analizar un reloj</button>
+  </div>
+  <div class="ribbon"></div>
+  <div id="inst"><img src="icon-192.png" alt=""><div><b>Instalá la app en tu celu</b><span id="instTxt">Para abrirla como una app más.</span></div><button id="bInst">Instalar</button><button class="x" id="bInstX">×</button></div>
+  <div id="iosHow" class="ios" style="display:none"><b>Para instalarla en iPhone:</b> tocá el botón <b>Compartir</b> (el cuadrado con la flecha, abajo en Safari) y después <b>“Agregar a pantalla de inicio”</b>. Listo: te queda el ícono como una app.</div>
+  <div class="sect"><h2 class="serif">Últimos análisis</h2><a href="#" id="verTodos">Ver todos →</a></div>
+  <div id="ultimos"></div>
+</section>
+
+<!-- CAPTURA -->
+<section id="sCaptura" class="screen">
+  <div class="top"><div class="logo"><div class="wm" style="margin-top:12px">Anacronismo<b>Analista</b></div></div></div>
+  <p class="mut" style="margin:8px 0 2px">Buena luz, fondo neutro, sin reflejos. Cuanto más cerca y nítida, mejor.</p>
+  <div class="step" id="st0"><div class="th">🕰</div><div><b>1 · Frente</b><span>El dial completo, de cerca</span></div><label>Foto<input type="file" accept="image/*" capture="environment" data-i="0"></label></div>
+  <div class="step" id="st1"><div class="th">🔙</div><div><b>2 · Tapa de atrás</b><span>Grabados, número de serie</span></div><label>Foto<input type="file" accept="image/*" capture="environment" data-i="1"></label></div>
+  <div class="step" id="st2"><div class="th">⚙️</div><div><b>3 · Mecanismo o detalle</b><span>Si te dejan abrir la tapa (opcional)</span></div><label>Foto<input type="file" accept="image/*" capture="environment" data-i="2"></label></div>
+  <div class="row" style="margin-top:12px"><input type="number" id="precio" placeholder="Precio que piden (CHF)" inputmode="numeric"></div>
+  <input type="text" id="nota" placeholder="Algo que viste o te dijeron (opcional)" style="margin-top:10px">
+  <div id="eCap" class="err" style="display:none"></div>
+  <button class="btn big serif rojo" id="bAnalizar" disabled>Analizar</button>
+  <button class="btn sec" id="bCancelar">Cancelar</button>
+</section>
+
+<!-- ESPERA -->
+<section id="sEspera" class="screen"><div class="spin"><div class="dot"></div><b class="serif" style="font-size:22px">Analizando…</b><p class="mut" id="tEspera">Mirando las fotos</p></div></section>
+
+<!-- REPORTE -->
+<section id="sReporte" class="screen">
+  <div id="reporte"></div>
+  <button class="btn" id="bPreg">💬 Preguntarle algo más</button>
+  <button class="btn sec" id="bOtro">📷 Analizar otro</button>
+  <button class="btn sec" id="bVolver">Volver al inicio</button>
+</section>
+
+<!-- HISTORIAL -->
+<section id="sHist" class="screen"><div class="sect"><h2 class="serif">Mis análisis</h2><span class="mut" id="histN"></span></div><div id="hist"></div></section>
+
+<!-- MAPA -->
+<section id="sMapa" class="screen"><div class="sect"><h2 class="serif">Dónde los vi</h2></div><div id="map"></div></section>
+
+<!-- AJUSTES -->
+<section id="sAjustes" class="screen">
+  <div class="sect"><h2 class="serif">Ajustes</h2></div>
+  <div class="card"><b>Idioma del reporte</b><select id="idioma" style="margin-top:8px"><option value="es">Español</option><option value="en">English</option><option value="de">Deutsch</option></select></div>
+  <div class="card"><b>Instalar en el celu</b><p class="mut" id="instAj">Android: tocá “Instalar” acá abajo. iPhone: Compartir → “Agregar a pantalla de inicio”.</p><button class="btn" id="bInst2">Instalar app</button></div>
+  <div class="card"><b>Consejos para mejores fotos</b><ul class="simple"><li>Luz natural, sin flash ni reflejos.</li><li>Frente: que se lea el texto del dial.</li><li>Tapa: que se vean los grabados y números.</li><li>Si te dejan abrir la tapa, el mecanismo lo dice casi todo.</li></ul></div>
+  <p class="mut" style="text-align:center">Anacronismo · <a href="https://www.instagram.com/anacronismo.relojes/" style="color:var(--mut)">@anacronismo.relojes</a></p>
+</section>
+</main>
+
+<nav>
+  <button data-s="sInicio" class="on"><i>◉</i>Analizar</button>
+  <button data-s="sHist"><i>☰</i>Historial</button>
+  <button data-s="sMapa"><i>⌖</i>Mapa</button>
+</nav>
+
+<button id="fab" title="Chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/></svg><i></i></button>
+<div id="chat">
+  <div id="chHead"><b>Analista · <span style="color:#D8B98F">chat</span></b><button id="chNuevo">Nuevo</button><button id="chCerrar">Cerrar</button></div>
+  <div id="chCtx"><span>sobre: <b id="chCtxT"></b></span><button id="chCtxX">×</button></div>
+  <div id="chMsgs"></div>
+  <div id="chPend"></div>
+  <div id="chIn"><label class="ic" style="display:flex;align-items:center;border-radius:12px;padding:0 12px;background:var(--bg2)">📷<input type="file" accept="image/*" multiple id="chFile"></label><textarea id="chT" placeholder="Preguntale lo que quieras…"></textarea><button id="chGo">Enviar</button></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var API = (location.hostname === 'anacronismo.com' ? 'https://anacronismo.com/api/' : 'https://vm.semillaredes.com/anacronismo/api/');
+var S = {idioma: localStorage.getItem('an_idioma') || 'es', fotos: [null,null,null], items: [], pos: null, map: null, actual: null, ctx: null, pend: [], deferred: null};
+try{ S.items = JSON.parse(localStorage.getItem('an_items') || '[]'); }catch(e){}
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function show(id){ document.querySelectorAll('.screen').forEach(function(s){ s.classList.toggle('on', s.id===id); });
+  document.querySelectorAll('nav button').forEach(function(b){ b.classList.toggle('on', b.dataset.s===id); }); window.scrollTo(0,0);
+  if(id==='sMapa') setTimeout(mapa, 50); if(id==='sHist') hist(); if(id==='sInicio') ultimos(); }
+function api(n, body){ return fetch(API+n, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body||{})})
+  .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error||('error '+r.status)); return j; }); }); }
+function fotoUrl(fid, t){ return API+'analista-foto?id='+(t? fid.replace('.jpg','_t.jpg'): fid); }
+function fecha(iso){ var d=new Date(iso); return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); }
+function gps(){ if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(function(p){ S.pos={lat:p.coords.latitude,lng:p.coords.longitude}; }, function(){}, {enableHighAccuracy:true, timeout:8000, maximumAge:60000}); }
+function guardar(){ try{ localStorage.setItem('an_items', JSON.stringify(S.items.slice(0,200))); }catch(e){} }
+function sync(){ return api('analista-historial').then(function(j){ S.items=j.items||[]; guardar(); }); }
+
+// --- instalar ---
+var esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+var instalada = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); S.deferred=e; if(!localStorage.getItem('an_inst_x')) $('inst').classList.add('on'); });
+function instalar(){ if(S.deferred){ S.deferred.prompt(); S.deferred.userChoice.then(function(){ S.deferred=null; $('inst').classList.remove('on'); }); }
+  else if(esIOS){ $('iosHow').style.display='block'; $('inst').classList.remove('on'); show('sInicio'); window.scrollTo(0,0); }
+  else alert('Abrí este link en Chrome (Android) o Safari (iPhone) y usá "Agregar a pantalla de inicio".'); }
+$('bInst').onclick = instalar; $('bInst2').onclick = instalar;
+$('bInstX').onclick = function(){ $('inst').classList.remove('on'); localStorage.setItem('an_inst_x','1'); };
+if(!instalada && esIOS && !localStorage.getItem('an_inst_x')){ $('instTxt').textContent='En iPhone: Compartir → Agregar a pantalla de inicio.'; $('bInst').textContent='Cómo'; $('inst').classList.add('on'); }
+if(instalada){ $('inst').classList.remove('on'); }
+
+// --- nav / ajustes ---
+$('bAjustes').onclick = function(){ $('idioma').value=S.idioma; show('sAjustes'); };
+$('idioma').onchange = function(){ S.idioma=this.value; localStorage.setItem('an_idioma',S.idioma); };
+document.querySelectorAll('nav button').forEach(function(b){ b.onclick=function(){ show(b.dataset.s); }; });
+$('verTodos').onclick = function(e){ e.preventDefault(); show('sHist'); };
+
+// --- captura ---
+function resetCap(){ S.fotos=[null,null,null]; [0,1,2].forEach(function(i){ var st=$('st'+i); st.classList.remove('done'); st.querySelector('.th').innerHTML=['🕰','🔙','⚙️'][i]; st.querySelector('label').firstChild.nodeValue='Foto'; st.querySelector('input').value=''; });
+  $('precio').value=''; $('nota').value=''; $('eCap').style.display='none'; $('bAnalizar').disabled=true; }
+$('bNuevo').onclick = function(){ resetCap(); gps(); show('sCaptura'); };
+$('bOtro').onclick = $('bNuevo').onclick;
+$('bCancelar').onclick = function(){ show('sInicio'); };
+document.querySelectorAll('#sCaptura input[type=file]').forEach(function(inp){ inp.onchange=function(){ var f=inp.files[0]; if(!f) return; var i=+inp.dataset.i;
+  comprimir(f).then(function(b64){ S.fotos[i]=b64; var st=$('st'+i); st.classList.add('done'); st.querySelector('.th').innerHTML='<img src="data:image/jpeg;base64,'+b64+'">'; st.querySelector('label').firstChild.nodeValue='Repetir'; $('bAnalizar').disabled=!S.fotos[0]; }); }; });
+function comprimir(file){ return new Promise(function(res,rej){ var img=new Image(); var u=URL.createObjectURL(file); img.onload=function(){ var M=1600, w=img.width, h=img.height, k=Math.min(1, M/Math.max(w,h)); var c=document.createElement('canvas'); c.width=Math.round(w*k); c.height=Math.round(h*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg',0.9).split(',')[1]); }; img.onerror=rej; img.src=u; }); }
+var msgsEspera=['Mirando las fotos','Leyendo el dial','Revisando la tapa','Buscando el calibre','Comparando precios'];
+$('bAnalizar').onclick = function(){ var fotos=S.fotos.filter(Boolean).map(function(b){ return {b64:b}; }); if(!fotos.length) return;
+  show('sEspera'); var k=0; var iv=setInterval(function(){ k=(k+1)%msgsEspera.length; $('tEspera').textContent=msgsEspera[k]; },2500);
+  var body={fotos:fotos, idioma:S.idioma, precio:$('precio').value, nota:$('nota').value}; if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; }
+  api('analista-analizar', body).then(function(it){ clearInterval(iv); S.items.unshift(it); guardar(); reporte(it); show('sReporte'); })
+  .catch(function(e){ clearInterval(iv); show('sCaptura'); $('eCap').textContent='No se pudo analizar: '+e.message; $('eCap').style.display='block'; }); };
+
+// --- reporte ---
+function reporte(it){ S.actual=it; var v=it.veredicto; var tx={SI:'SÍ, comprá',NO:'NO',DUDA:'DUDA'}[v]||v;
+  var h='<div class="ver"><div class="big '+v+'">'+tx+'</div><h2 class="serif">'+esc(it.titulo)+'</h2><div class="mut">'+esc(it.epoca)+(it.lugar? ' · '+esc(it.lugar):'')+'</div>';
+  if(it.confianza!=null) h+='<div class="conf">Confianza <i><b style="width:'+(+it.confianza||0)+'%"></b></i> '+esc(it.confianza)+'%</div>';
+  h+='</div>';
+  h+='<div class="card">'+esc(it.resumen)+'</div>';
+  if(it.precio_max_chf!=null) h+='<div class="card precio"><small>TOPE PARA PAGAR</small>CHF '+esc(it.precio_max_chf)+(it.precio_pedido? '<small>piden CHF '+esc(it.precio_pedido)+'</small>':'')+'</div>';
+  h+='<div class="card"><ul class="crit">'+(it.criterios||[]).map(function(c){ var k=c.ok===true?'ok':(c.ok===false?'bad':'nn'); var s=c.ok===true?'✓':(c.ok===false?'✗':'?'); return '<li><div class="ic '+k+'">'+s+'</div><div><b>'+esc(c.nombre)+'</b><span>'+esc(c.nota)+'</span></div></li>'; }).join('')+'</ul></div>';
+  if(it.lo_que_leo) h+='<div class="card"><b>Lo que leo en las fotos</b><p style="margin:6px 0 0;font-size:14.5px">'+esc(it.lo_que_leo)+'</p></div>';
+  if(it.preguntas&&it.preguntas.length) h+='<div class="card"><b>Probá / preguntá ahí mismo</b><ul class="simple">'+it.preguntas.map(function(p){ return '<li>'+esc(p)+'</li>'; }).join('')+'</ul></div>';
+  if(it.alertas&&it.alertas.length) h+='<div class="card" style="border-color:#E8C9C5"><b style="color:var(--no)">Ojo</b><ul class="simple">'+it.alertas.map(function(p){ return '<li>'+esc(p)+'</li>'; }).join('')+'</ul></div>';
+  h+='<div class="fotos">'+(it.fotos||[]).map(function(f){ return '<img src="'+fotoUrl(f,false)+'">'; }).join('')+'</div>';
+  if(it.chat&&it.chat.length) h+='<div class="card"><b>Charla sobre este reloj</b>'+it.chat.slice(-4).map(function(m){ return '<p style="margin:6px 0;font-size:14px"><b style="color:var(--mut)">'+(m.rol==='ia'?'Analista':'Vos')+':</b> '+esc(m.texto)+'</p>'; }).join('')+'</div>';
+  h+='<label class="chk"><input type="checkbox" id="chkComp" '+(it.comprado?'checked':'')+'> Lo compré</label>';
+  h+='<div class="mut" style="text-align:center">'+fecha(it.cuando)+(it.lat? ' · <a style="color:var(--mut)" href="https://maps.google.com/?q='+it.lat+','+it.lng+'">ver en mapa</a>':'')+'</div>';
+  h+='<button class="btn sec" id="bBorrar" style="color:var(--no)">Borrar este análisis</button>';
+  $('reporte').innerHTML=h;
+  $('chkComp').onchange=function(){ it.comprado=this.checked; guardar(); api('analista-item',{id:it.id,comprado:it.comprado}).catch(function(){}); };
+  $('bBorrar').onclick=function(){ if(!confirm('¿Borrar?')) return; S.items=S.items.filter(function(x){ return x.id!==it.id; }); guardar(); api('analista-borrar',{id:it.id}).catch(function(){}); show('sInicio'); }; }
+$('bPreg').onclick = function(){ abrirChat(S.actual); };
+
+// --- historial / inicio / mapa ---
+function fila(it){ return '<div class="hist" data-id="'+it.id+'"><img src="'+(it.fotos&&it.fotos[0]? fotoUrl(it.fotos[0],true):'')+'"><div class="t"><b class="serif">'+esc(it.titulo||'Reloj')+'</b><span>📍 '+esc(it.lugar||'Sin ubicación')+'</span><span>📅 '+fecha(it.cuando)+(it.comprado?' · comprado':'')+'</span></div><span class="badge '+it.veredicto+'">'+it.veredicto+'</span></div>'; }
+function bind(el){ el.querySelectorAll('.hist').forEach(function(d){ d.onclick=function(){ var it=S.items.find(function(x){ return x.id===d.dataset.id; }); if(it){ reporte(it); show('sReporte'); } }; }); }
+function ultimos(){ var u=S.items.slice(0,3); $('ultimos').innerHTML=u.length? u.map(fila).join(''):'<p class="mut" style="text-align:center;padding:16px 0">Todavía no analizaste ningún reloj. Tocá el botón de arriba.</p>'; bind($('ultimos')); }
+function hist(){ $('histN').textContent=S.items.length? S.items.length+' relojes':''; $('hist').innerHTML=S.items.length? S.items.map(fila).join(''):'<p class="mut" style="text-align:center;padding:40px 0">Todavía no analizaste ningún reloj.</p>'; bind($('hist'));
+  sync().then(hist2).catch(function(){}); }
+function hist2(){ $('histN').textContent=S.items.length? S.items.length+' relojes':''; if(S.items.length){ $('hist').innerHTML=S.items.map(fila).join(''); bind($('hist')); } }
+function mapa(){ if(!S.map){ S.map=L.map('map'); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(S.map); S.layer=L.layerGroup().addTo(S.map); }
+  S.layer.clearLayers(); var pts=[]; var col={SI:'#5B7F62',NO:'#B4432C',DUDA:'#C99A2E'};
+  S.items.forEach(function(it){ if(it.lat==null) return; pts.push([it.lat,it.lng]); var m=L.circleMarker([it.lat,it.lng],{radius:9,color:'#fff',weight:2,fillColor:col[it.veredicto]||'#888',fillOpacity:.95}).addTo(S.layer);
+    m.bindPopup('<b>'+esc(it.titulo)+'</b><br>'+it.veredicto+' · '+esc(it.lugar||'')+'<br><a href="#" data-id="'+it.id+'" class="pop">Ver reporte</a>'); });
+  S.map.invalidateSize(); if(pts.length) S.map.fitBounds(pts,{padding:[30,30],maxZoom:15}); else if(S.pos) S.map.setView([S.pos.lat,S.pos.lng],13); else S.map.setView([46.8,8.2],7);
+  S.map.off('popupopen'); S.map.on('popupopen',function(e){ var a=e.popup.getElement().querySelector('.pop'); if(a) a.onclick=function(ev){ ev.preventDefault(); var it=S.items.find(function(x){ return x.id===a.dataset.id; }); if(it){ reporte(it); show('sReporte'); } }; }); }
+
+// --- chat ---
+function abrirChat(it){ S.ctx=it||null; $('chat').classList.add('on'); document.documentElement.style.overflow='hidden'; pintarChat(); }
+function cerrarChat(){ $('chat').classList.remove('on'); document.documentElement.style.overflow=''; if(S.ctx){ var it=S.items.find(function(x){ return x.id===S.ctx.id; }); if(it && $('sReporte').classList.contains('on')) reporte(it); } }
+$('fab').onclick=function(){ abrirChat($('sReporte').classList.contains('on')? S.actual: null); };
+$('chCerrar').onclick=cerrarChat;
+$('chCtxX').onclick=function(){ S.ctx=null; pintarChat(); };
+$('chNuevo').onclick=function(){ S.ctx=null; S.libre=[]; pintarChat(); };
+function burbuja(m){ var d=document.createElement('div'); d.className='m '+(m.rol==='ia'?'ia':'yo'); d.textContent=m.texto||''; (m.fotos||[]).forEach(function(f){ var im=document.createElement('img'); im.src= f.length>200? 'data:image/jpeg;base64,'+f : fotoUrl(f,false); d.appendChild(im); }); $('chMsgs').appendChild(d); $('chMsgs').scrollTop=1e9; return d; }
+function pintarChat(){ var M=$('chMsgs'); M.innerHTML=''; $('chCtx').classList.toggle('on', !!S.ctx); if(S.ctx) $('chCtxT').textContent=S.ctx.titulo||'este reloj';
+  var hilo = S.ctx ? (S.ctx.chat||[]) : (S.libre||[]);
+  if(!hilo.length){ var h=document.createElement('div'); h.className='hint'; h.textContent = S.ctx ? 'Preguntale lo que quieras sobre este reloj. Podés mandarle más fotos.' : 'Hola, soy el Analista de Anacronismo. Mandame fotos de un reloj o preguntame lo que quieras.'; M.appendChild(h);
+    var sg=document.createElement('div'); sg.className='sug'; (S.ctx? ['¿Es original el dial?','¿Cuánto ofrezco?','¿Qué pruebo en mano?','¿Qué calibre tiene?'] : ['¿Cómo saco buenas fotos?','¿Qué marcas conviene buscar?','¿Cómo sé si es cuarzo?']).forEach(function(t){ var b=document.createElement('button'); b.textContent=t; b.onclick=function(){ $('chT').value=t; enviar(); }; sg.appendChild(b); }); M.appendChild(sg); }
+  hilo.forEach(burbuja); if(!S.ctx && !S.libre) api('analista-chat-libre').then(function(j){ S.libre=j.hilo||[]; if(S.libre.length) pintarChat(); }).catch(function(){}); }
+$('chFile').onchange=function(){ var fs=Array.prototype.slice.call(this.files,0,4); this.value=''; Promise.all(fs.map(comprimir)).then(function(bs){ S.pend=S.pend.concat(bs).slice(0,4); pintarPend(); }); };
+function pintarPend(){ var P=$('chPend'); P.innerHTML=''; P.classList.toggle('on', S.pend.length>0); S.pend.forEach(function(b,i){ var d=document.createElement('div'); d.innerHTML='<img src="data:image/jpeg;base64,'+b+'"><b>×</b>'; d.querySelector('b').onclick=function(){ S.pend.splice(i,1); pintarPend(); }; P.appendChild(d); }); }
+function enviar(){ var t=$('chT').value.trim(); var fotos=S.pend.slice(); if(!t && !fotos.length) return; $('chT').value=''; S.pend=[]; pintarPend(); $('chGo').disabled=true;
+  if(!$('chMsgs').querySelector('.m')) $('chMsgs').innerHTML='';
+  burbuja({rol:'yo',texto:t,fotos:fotos}); var w=burbuja({rol:'ia',texto:''}); w.innerHTML='<span class="dots">pensando</span>';
+  var body={id:S.ctx? S.ctx.id: null, texto:t, fotos:fotos.map(function(b){ return {b64:b}; }), idioma:S.idioma}; if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; }
+  api('analista-chat', body).then(function(j){ w.textContent=j.respuesta||'(sin respuesta)';
+    if(j.item){ var idx=S.items.findIndex(function(x){ return x.id===j.item.id; }); if(idx>=0) S.items[idx]=j.item; else S.items.unshift(j.item); guardar(); S.ctx=j.item; $('chCtx').classList.add('on'); $('chCtxT').textContent=j.item.titulo||'este reloj';
+      if(!S.actual || S.actual.id!==j.item.id){ var c=document.createElement('div'); c.className='m ia'; c.innerHTML='Te armé el reporte: <b>'+esc(j.item.veredicto)+'</b> · '+esc(j.item.titulo)+'. <a href="#" id="verRep">Ver reporte completo</a>'; $('chMsgs').appendChild(c); c.querySelector('#verRep').onclick=function(e){ e.preventDefault(); cerrarChat(); reporte(j.item); show('sReporte'); }; } }
+    else { S.libre=(S.libre||[]).concat([{rol:'yo',texto:t,fotos:j.fotos||[]},{rol:'ia',texto:j.respuesta}]); }
+    $('chMsgs').scrollTop=1e9; })
+  .catch(function(e){ w.textContent='No pude responder: '+e.message; }).then(function(){ $('chGo').disabled=false; }); }
+$('chGo').onclick=enviar;
+
+// --- arranque ---
+gps(); ultimos(); sync().then(ultimos).catch(function(){});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+</body>
+</html>

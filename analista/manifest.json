@@ -1,0 +1,15 @@
+{
+  "name": "Anacronismo Analista",
+  "short_name": "Analista",
+  "description": "Sacá 2 o 3 fotos de un reloj en la feria y en segundos te dice SI, NO o DUDA",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3ECDF",
+  "theme_color": "#F3ECDF",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

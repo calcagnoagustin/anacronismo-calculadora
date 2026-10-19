@@ -261,6 +261,8 @@
 
   <!-- ===================== ANALISTA ===================== -->
   <section id="s_anal" class="hidden">
+    <div class="toggle" id="an_modo"><button data-m="link" class="on">Por link</button><button data-m="foto">Con foto</button></div>
+    <div id="an_mlink">
     <p class="sub">Pegá un link y el bot lo mira a fondo, foto por foto.</p>
     <input class="an-in" id="an_url" type="url" inputmode="url" placeholder="https://ebay.us/... o ebay.com/itm/...">
     <textarea class="an-in" id="an_nota" placeholder="Opcional: qué querés que mire (ej: ¿la esfera es original?)"></textarea>
@@ -271,6 +273,14 @@
     <input class="an-in" id="an_q" type="search" placeholder="Buscar en el historial (marca, calibre, vendedor…)" style="font-size:14px;padding:8px 12px">
     <div id="an_lista"></div>
     <p class="foot">Usa la misma rutina que el radar (tu suscripción, sin costo de API). Tarda unos minutos; esta pantalla se actualiza sola. Los comparables son precios pedidos, no ventas cerradas.</p>
+    </div>
+    <div id="an_mfoto" class="hidden">
+    <p class="sub">Sacás 2 o 3 fotos de un reloj (en una feria, en una vidriera) y en segundos te dice SI / NO / DUDA. Es la app <b>Anacronismo Analista</b>: la misma que usa tu amigo en Suiza. Lo que se analiza acá queda separado del historial por link.</p>
+    <a class="btn pri" style="display:block;text-align:center;text-decoration:none" href="/analista/" target="_blank" rel="noopener" id="an_abrir">📷 Abrir Anacronismo Analista</a>
+    <div class="barra" style="margin-top:14px"><span>Análisis con foto</span><span class="st" id="af_cnt"></span></div>
+    <div id="af_lista"></div>
+    <p class="foot">Guardados con ubicación. Para repreguntar sobre uno, usá la burbuja de chat desde su reporte dentro de Anacronismo Analista.</p>
+    </div>
   </section>
 
   <!-- ===================== VENDEDORES ===================== -->
@@ -783,6 +793,42 @@ function analizar(){
     .then(function(){ b.disabled=false; });
 }
 document.getElementById("an_go").addEventListener("click", analizar);
+/* --- Analista con foto (app Anacronismo Analista, datos separados) --- */
+var AF=[], AF_API=(location.hostname==="anacronismo.com"? "https://anacronismo.com/api/":"https://vm.semillaredes.com/anacronismo/api/");
+if(location.hostname!=="anacronismo.com") document.getElementById("an_abrir").href="https://anacronismo.com/analista/";
+document.querySelectorAll("#an_modo button").forEach(function(b){ b.addEventListener("click", function(){
+  var m=b.getAttribute("data-m"); document.querySelectorAll("#an_modo button").forEach(function(x){ x.classList.toggle("on", x===b); });
+  document.getElementById("an_mlink").classList.toggle("hidden", m!=="link"); document.getElementById("an_mfoto").classList.toggle("hidden", m!=="foto");
+  try{ localStorage.setItem("anacro_an_modo", m); }catch(e){} if(m==="foto") cargarAF(); }); });
+try{ if(localStorage.getItem("anacro_an_modo")==="foto") document.querySelector('#an_modo button[data-m="foto"]').click(); }catch(e){}
+function afFoto(f,t){ return AF_API+"analista-foto?id="+(t? f.replace(".jpg","_t.jpg"): f); }
+function pintarAF(){
+  var L=document.getElementById("af_lista"); document.getElementById("af_cnt").textContent=AF.length? AF.length+" · "+AF.filter(function(a){return a.veredicto==="SI";}).length+" SI":"";
+  if(!AF.length){ L.innerHTML="<p class='foot'>Todavía no hay análisis con foto.</p>"; return; }
+  L.innerHTML=AF.map(function(a){
+    var vd={SI:"comprar",NO:"pasar",DUDA:"negociar"}[a.veredicto]||"curso";
+    var h="<details class='an' "+(anOpen["af"+a.id]?"open":"")+" data-afid='"+esc(a.id)+"'><summary><span class='vd "+vd+"'>"+esc(a.veredicto)+"</span><b>"+esc(a.titulo||"Reloj")+"</b>"+(a.confianza!=null?" <span style='opacity:.55;font-size:12px'>"+esc(a.confianza)+"%</span>":"")+"<div style='font-size:12px;opacity:.6;margin-top:3px'>"+esc(a.epoca||"")+(a.lugar? " · "+esc(a.lugar):"")+" · "+new Date(a.cuando).toLocaleDateString("es-AR")+(a.comprado?" · comprado":"")+"</div></summary><div class='ab'>";
+    h+="<div style='display:flex;gap:6px;overflow-x:auto;margin-bottom:8px'>"+(a.fotos||[]).map(function(f){ return "<a href='"+afFoto(f,false)+"' target='_blank'><img src='"+afFoto(f,true)+"' style='height:90px;border:1.5px solid var(--negro)'></a>"; }).join("")+"</div>";
+    h+="<p>"+esc(a.resumen||"")+"</p>";
+    if(a.precio_max_chf!=null) h+="<p><b>Tope CHF "+esc(a.precio_max_chf)+"</b>"+(a.precio_pedido? " · piden CHF "+esc(a.precio_pedido):"")+"</p>";
+    h+="<ul style='padding-left:18px;margin:6px 0'>"+(a.criterios||[]).map(function(c){ return "<li>"+(c.ok===true?"✓":(c.ok===false?"✗":"?"))+" <b>"+esc(c.nombre)+"</b>: "+esc(c.nota)+"</li>"; }).join("")+"</ul>";
+    if(a.lo_que_leo) h+="<p style='opacity:.8'><b>Lo que leyó:</b> "+esc(a.lo_que_leo)+"</p>";
+    if(a.alertas&&a.alertas.length) h+="<p style='color:#9b1c1c'><b>Ojo:</b> "+a.alertas.map(esc).join(" · ")+"</p>";
+    if(a.chat&&a.chat.length) h+="<p style='opacity:.8'><b>Charla:</b> "+a.chat.slice(-2).map(function(m){ return (m.rol==="ia"?"Analista":"Él")+": "+esc(m.texto); }).join(" / ")+"</p>";
+    if(a.lat!=null) h+="<p><a href='https://maps.google.com/?q="+a.lat+","+a.lng+"' target='_blank'>Ver en el mapa</a></p>";
+    h+="<button class='btn del' style='margin:10px 0 0' data-afdel='"+esc(a.id)+"'>Borrar</button></div></details>";
+    return h; }).join("");
+}
+function cargarAF(){
+  return fetch(AF_API+"analista-historial",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}).then(function(r){ return r.json(); })
+    .then(function(d){ AF=(d&&d.items)||[]; try{ localStorage.setItem("anacro_af", JSON.stringify(AF)); }catch(e){} pintarAF(); })
+    .catch(function(){ try{ AF=JSON.parse(localStorage.getItem("anacro_af")||"[]"); }catch(e){} pintarAF(); });
+}
+document.getElementById("af_lista").addEventListener("click", function(ev){
+  var id=ev.target.getAttribute("data-afdel");
+  if(id && confirm("¿Borrar este análisis con foto?")){ fetch(AF_API+"analista-borrar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:id})}).then(cargarAF); }
+});
+document.getElementById("af_lista").addEventListener("toggle", function(ev){ var d=ev.target; if(d.getAttribute&&d.getAttribute("data-afid")) anOpen["af"+d.getAttribute("data-afid")]=d.open; }, true);
 document.getElementById("an_lista").addEventListener("click", function(ev){
   var t=ev.target;
   if(t.getAttribute("data-cp")){ ev.preventDefault(); try{ navigator.clipboard.writeText(t.getAttribute("data-cp")); t.textContent="copiado ✓"; }catch(e){} return; }
