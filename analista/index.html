@@ -175,6 +175,49 @@ nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
 <!-- MAPA -->
 <section id="sMapa" class="screen"><div class="sect"><h2 class="serif">Dónde los vi</h2></div><div id="map"></div></section>
 
+<!-- FERIAS -->
+<section id="sFerias" class="screen">
+  <div class="sect"><h2 class="serif">Dónde comprar</h2><a href="#" id="feAgregar">+ Agregar lugar</a></div>
+  <div class="row"><input type="text" id="feCiudad" placeholder="Ciudad (o usá tu ubicación)"><button class="btn" style="width:auto;margin:0;padding:0 16px" id="feBuscar">Buscar</button></div>
+  <p class="mut" id="feEstado" style="margin:8px 0 4px"></p>
+  <div id="mapF" style="height:300px;border-radius:16px;border:1px solid var(--line)"></div>
+  <div class="sect" style="margin-top:14px"><h2 class="serif" style="font-size:19px">Ferias y mercados</h2><span class="mut">periódicos</span></div>
+  <div id="feFerias"></div>
+  <div class="sect" style="margin-top:14px"><h2 class="serif" style="font-size:19px">Locales</h2><span class="mut">anticuarios, vintage, relojerías</span></div>
+  <div id="feLocales"></div>
+  <p class="mut" style="font-size:12px">Fuentes: OpenStreetMap + lo que conoce el Analista. Puede haber errores: tocá un lugar para editarlo o borrarlo, y agregá los que descubras.</p>
+</section>
+
+<!-- EDITAR LUGAR -->
+<section id="sLugar" class="screen">
+  <div class="sect"><h2 class="serif" id="lgTit">Lugar</h2></div>
+  <input type="text" id="lgNombre" placeholder="Nombre" style="margin:6px 0">
+  <select id="lgTipo" style="margin:6px 0"><option value="feria">Feria / mercado de pulgas</option><option value="mercado">Mercado</option><option value="anticuario">Anticuario</option><option value="segunda mano">Segunda mano / vintage</option><option value="relojeria">Relojería</option><option value="otro">Otro</option></select>
+  <input type="text" id="lgCuando" placeholder="Cuándo (ej: sábados a la mañana)" style="margin:6px 0">
+  <input type="text" id="lgDir" placeholder="Dirección / ciudad" style="margin:6px 0">
+  <input type="text" id="lgNota" placeholder="Nota (qué conviene mirar ahí)" style="margin:6px 0">
+  <input type="text" id="lgWeb" placeholder="Web (opcional)" style="margin:6px 0">
+  <div class="row"><input type="number" step="any" id="lgLat" placeholder="Lat"><input type="number" step="any" id="lgLng" placeholder="Lng"></div>
+  <p class="mut" style="font-size:12.5px">Si no sabés las coordenadas, dejá la dirección y tocá "Ubicar por dirección".</p>
+  <button class="btn sec" id="lgGeo">Ubicar por dirección</button>
+  <div id="lgErr" class="err" style="display:none"></div>
+  <button class="btn" id="lgGuardar">Guardar</button>
+  <button class="btn sec" id="lgBorrar" style="color:var(--no)">Borrar este lugar</button>
+  <button class="btn sec" id="lgCancelar">Cancelar</button>
+</section>
+
+<!-- EDITAR ANALISIS -->
+<section id="sEditAn" class="screen">
+  <div class="sect"><h2 class="serif">Editar análisis</h2></div>
+  <input type="text" id="eaTitulo" placeholder="Título (marca y modelo)" style="margin:6px 0">
+  <select id="eaVer" style="margin:6px 0"><option value="SI">SI</option><option value="NO">NO</option><option value="DUDA">DUDA</option></select>
+  <input type="text" id="eaLugar" placeholder="Lugar" style="margin:6px 0">
+  <input type="number" id="eaPagado" placeholder="Precio pagado (CHF), si lo compraste" style="margin:6px 0">
+  <textarea id="eaNota" placeholder="Tu nota" style="margin:6px 0;min-height:80px"></textarea>
+  <button class="btn" id="eaGuardar">Guardar</button>
+  <button class="btn sec" id="eaCancelar">Cancelar</button>
+</section>
+
 <!-- AJUSTES -->
 <section id="sAjustes" class="screen">
   <div class="sect"><h2 class="serif">Ajustes</h2></div>
@@ -189,11 +232,12 @@ nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
   <button data-s="sInicio" class="on"><i>◉</i>Analizar</button>
   <button data-s="sHist"><i>☰</i>Historial</button>
   <button data-s="sMapa"><i>⌖</i>Mapa</button>
+  <button data-s="sFerias"><i>⚑</i>Ferias</button>
 </nav>
 
 <button id="fab" title="Chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/></svg><i></i></button>
 <div id="chat">
-  <div id="chHead"><b>Analista · <span style="color:#D8B98F">chat</span></b><button id="chNuevo">Nuevo</button><button id="chCerrar">Cerrar</button></div>
+  <div id="chHead"><b>Analista · <span style="color:#D8B98F">chat</span></b><button id="chNuevo">Borrar charla</button><button id="chCerrar">Cerrar</button></div>
   <div id="chCtx"><span>sobre: <b id="chCtxT"></b></span><button id="chCtxX">×</button></div>
   <div id="chMsgs"></div>
   <div id="chPend"></div>
@@ -203,18 +247,18 @@ nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 var API = (location.hostname === 'anacronismo.com' ? 'https://anacronismo.com/api/' : 'https://vm.semillaredes.com/anacronismo/api/');
-var S = {idioma: localStorage.getItem('an_idioma') || 'es', fotos: [null,null,null], items: [], pos: null, map: null, actual: null, ctx: null, pend: [], deferred: null};
+var F; var S = {idioma: localStorage.getItem('an_idioma') || 'es', fotos: [null,null,null], items: [], pos: null, map: null, actual: null, ctx: null, pend: [], deferred: null};
 try{ S.items = JSON.parse(localStorage.getItem('an_items') || '[]'); }catch(e){}
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 function show(id){ document.querySelectorAll('.screen').forEach(function(s){ s.classList.toggle('on', s.id===id); });
   document.querySelectorAll('nav button').forEach(function(b){ b.classList.toggle('on', b.dataset.s===id); }); window.scrollTo(0,0);
-  if(id==='sMapa') setTimeout(mapa, 50); if(id==='sHist') hist(); if(id==='sInicio') ultimos(); }
+  if(id==='sMapa') setTimeout(mapa, 50); if(id==='sHist') hist(); if(id==='sInicio') ultimos(); if(id==='sFerias'){ if(F.datos) setTimeout(pintarFerias,50); else setTimeout(function(){ cargarFerias(''); },300); } }
 function api(n, body){ return fetch(API+n, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body||{})})
   .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error||('error '+r.status)); return j; }); }); }
 function fotoUrl(fid, t){ return API+'analista-foto?id='+(t? fid.replace('.jpg','_t.jpg'): fid); }
 function fecha(iso){ var d=new Date(iso); return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); }
-function gps(){ if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(function(p){ S.pos={lat:p.coords.latitude,lng:p.coords.longitude}; }, function(){}, {enableHighAccuracy:true, timeout:8000, maximumAge:60000}); }
+function gps(){ if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(function(p){ S.pos={lat:p.coords.latitude,lng:p.coords.longitude}; if($('sFerias').classList.contains('on') && !F.datos) cargarFerias(''); }, function(){}, {enableHighAccuracy:true, timeout:8000, maximumAge:60000}); }
 function guardar(){ try{ localStorage.setItem('an_items', JSON.stringify(S.items.slice(0,200))); }catch(e){} }
 function sync(){ return api('analista-historial').then(function(j){ S.items=j.items||[]; guardar(); }); }
 
@@ -267,8 +311,10 @@ function reporte(it){ S.actual=it; var v=it.veredicto; var tx={SI:'SÍ, comprá'
   if(it.chat&&it.chat.length) h+='<div class="card"><b>Charla sobre este reloj</b>'+it.chat.slice(-4).map(function(m){ return '<p style="margin:6px 0;font-size:14px"><b style="color:var(--mut)">'+(m.rol==='ia'?'Analista':'Vos')+':</b> '+esc(m.texto)+'</p>'; }).join('')+'</div>';
   h+='<label class="chk"><input type="checkbox" id="chkComp" '+(it.comprado?'checked':'')+'> Lo compré</label>';
   h+='<div class="mut" style="text-align:center">'+fecha(it.cuando)+(it.lat? ' · <a style="color:var(--mut)" href="https://maps.google.com/?q='+it.lat+','+it.lng+'">ver en mapa</a>':'')+'</div>';
-  h+='<button class="btn sec" id="bBorrar" style="color:var(--no)">Borrar este análisis</button>';
+  if(it.nota_usuario) h+='<div class="card"><b>Tu nota</b><p style="margin:6px 0 0">'+esc(it.nota_usuario)+'</p></div>';
+  h+='<div class="row"><button class="btn sec" id="bEditar">✎ Editar</button><button class="btn sec" id="bBorrar" style="color:var(--no)">Borrar</button></div>';
   $('reporte').innerHTML=h;
+  $('bEditar').onclick=function(){ $('eaTitulo').value=it.titulo||''; $('eaVer').value=it.veredicto||'DUDA'; $('eaLugar').value=it.lugar||''; $('eaPagado').value=it.precio_pagado||''; $('eaNota').value=it.nota_usuario||''; show('sEditAn'); };
   $('chkComp').onchange=function(){ it.comprado=this.checked; guardar(); api('analista-item',{id:it.id,comprado:it.comprado}).catch(function(){}); };
   $('bBorrar').onclick=function(){ if(!confirm('¿Borrar?')) return; S.items=S.items.filter(function(x){ return x.id!==it.id; }); guardar(); api('analista-borrar',{id:it.id}).catch(function(){}); show('sInicio'); }; }
 $('bPreg').onclick = function(){ abrirChat(S.actual); };
@@ -293,7 +339,7 @@ function cerrarChat(){ $('chat').classList.remove('on'); document.documentElemen
 $('fab').onclick=function(){ abrirChat($('sReporte').classList.contains('on')? S.actual: null); };
 $('chCerrar').onclick=cerrarChat;
 $('chCtxX').onclick=function(){ S.ctx=null; pintarChat(); };
-$('chNuevo').onclick=function(){ S.ctx=null; S.libre=[]; pintarChat(); };
+$('chNuevo').onclick=function(){ if(S.ctx){ if(confirm('¿Borrar la charla sobre este reloj?')){ S.ctx.chat=[]; guardar(); api('analista-item',{id:S.ctx.id,borrar_chat:1}).catch(function(){}); pintarChat(); } } else { S.libre=[]; api('analista-chat-libre-borrar').catch(function(){}); pintarChat(); } };
 function burbuja(m){ var d=document.createElement('div'); d.className='m '+(m.rol==='ia'?'ia':'yo'); d.textContent=m.texto||''; (m.fotos||[]).forEach(function(f){ var im=document.createElement('img'); im.src= f.length>200? 'data:image/jpeg;base64,'+f : fotoUrl(f,false); d.appendChild(im); }); $('chMsgs').appendChild(d); $('chMsgs').scrollTop=1e9; return d; }
 function pintarChat(){ var M=$('chMsgs'); M.innerHTML=''; $('chCtx').classList.toggle('on', !!S.ctx); if(S.ctx) $('chCtxT').textContent=S.ctx.titulo||'este reloj';
   var hilo = S.ctx ? (S.ctx.chat||[]) : (S.libre||[]);
@@ -313,6 +359,51 @@ function enviar(){ var t=$('chT').value.trim(); var fotos=S.pend.slice(); if(!t 
     $('chMsgs').scrollTop=1e9; })
   .catch(function(e){ w.textContent='No pude responder: '+e.message; }).then(function(){ $('chGo').disabled=false; }); }
 $('chGo').onclick=enviar;
+
+// --- editar analisis ---
+$('eaCancelar').onclick=function(){ show('sReporte'); };
+$('eaGuardar').onclick=function(){ var it=S.actual; if(!it) return; var d={id:it.id, titulo:$('eaTitulo').value.trim(), veredicto:$('eaVer').value, lugar:$('eaLugar').value.trim(), precio_pagado:$('eaPagado').value, nota_usuario:$('eaNota').value.trim()};
+  Object.keys(d).forEach(function(k){ it[k]=d[k]; }); guardar(); reporte(it); show('sReporte'); api('analista-item', d).catch(function(e){ alert('No se guardó: '+e.message); }); };
+
+// --- ferias / lugares ---
+var F={mapa:null, capa:null, datos:null, propios:{propios:[],ediciones:{},ocultos:[]}, edit:null, centro:null};
+var COL={feria:'#B4432C',mercado:'#B4432C',anticuario:'#5B7F62',relojeria:'#1C1A16',relojero:'#1C1A16',joyeria:'#1C1A16','segunda mano':'#C99A2E',vintage:'#C99A2E',otro:'#75705F'};
+function feEstado(t){ $('feEstado').textContent=t||''; }
+function lugaresTodos(){ if(!F.datos) return []; var oc=F.propios.ocultos||[], ed=F.propios.ediciones||{};
+  var base=(F.datos.ferias||[]).concat(F.datos.osm||[]).filter(function(l){ return oc.indexOf(l.id)<0; }).map(function(l){ return ed[l.id]? Object.assign({}, l, ed[l.id]): l; });
+  return base.concat(F.propios.propios||[]); }
+function dist(a,b){ var R=6371, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180; var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2); return 2*R*Math.asin(Math.sqrt(x)); }
+function pintarFerias(){ if(!F.mapa){ F.mapa=L.map('mapF'); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(F.mapa); F.capa=L.layerGroup().addTo(F.mapa); }
+  F.capa.clearLayers(); var todos=lugaresTodos(), c=F.centro||S.pos; var pts=[];
+  if(c){ L.circleMarker([c.lat,c.lng],{radius:7,color:'#fff',weight:2,fillColor:'#2B6CB0',fillOpacity:1}).addTo(F.capa).bindPopup('Vos estás acá'); pts.push([c.lat,c.lng]); }
+  todos.forEach(function(l){ pts.push([l.lat,l.lng]); var m=L.circleMarker([l.lat,l.lng],{radius:9,color:'#fff',weight:2,fillColor:COL[l.tipo]||'#75705F',fillOpacity:.95}).addTo(F.capa);
+    m.bindPopup('<b>'+esc(l.nombre)+'</b><br>'+esc(l.tipo)+(l.cuando?' · '+esc(l.cuando):'')+'<br><a href="https://maps.google.com/?q='+l.lat+','+l.lng+'" target="_blank">Cómo llegar</a> · <a href="#" class="lgEd" data-id="'+esc(l.id)+'">Editar</a>'); });
+  F.mapa.invalidateSize(); if(pts.length) F.mapa.fitBounds(pts,{padding:[24,24],maxZoom:13}); else F.mapa.setView([46.8,8.2],7);
+  F.mapa.off('popupopen'); F.mapa.on('popupopen',function(e){ var a=e.popup.getElement().querySelector('.lgEd'); if(a) a.onclick=function(ev){ ev.preventDefault(); editarLugar(a.dataset.id); }; });
+  function fila(l){ var d=c? dist(c,l): null; return '<div class="hist" data-lg="'+esc(l.id)+'"><div class="t"><b class="serif">'+esc(l.nombre)+'</b><span>'+esc(l.tipo)+(l.cuando? ' · '+esc(l.cuando):'')+(d!=null? ' · '+(d<10? d.toFixed(1): Math.round(d))+' km':'')+'</span><span>'+esc(l.direccion||l.ciudad||'')+(l.horario? ' · '+esc(l.horario):'')+'</span>'+(l.nota? '<span style="white-space:normal">'+esc(l.nota)+'</span>':'')+'</div><a class="badge" style="background:'+(COL[l.tipo]||'#75705F')+';text-decoration:none" href="https://maps.google.com/?q='+l.lat+','+l.lng+'" target="_blank">IR</a></div>'; }
+  var fer=todos.filter(function(l){ return /feria|mercado/.test(l.tipo); }).sort(function(a,b){ return c? dist(c,a)-dist(c,b):0; });
+  var loc=todos.filter(function(l){ return !/feria|mercado/.test(l.tipo); }).sort(function(a,b){ return c? dist(c,a)-dist(c,b):0; });
+  $('feFerias').innerHTML=fer.length? fer.map(fila).join(''):'<p class="mut">No encontré ferias periódicas conocidas acá. Si conocés alguna, agregala.</p>';
+  $('feLocales').innerHTML=loc.length? loc.map(fila).join(''):'<p class="mut">Sin locales encontrados en la zona.</p>';
+  document.querySelectorAll('#sFerias .hist').forEach(function(d){ d.querySelector('.t').onclick=function(){ editarLugar(d.dataset.lg); }; }); }
+function cargarFerias(q){ feEstado('Buscando lugares… (la primera vez tarda unos 20 segundos)'); var body={idioma:S.idioma}; if(q) body.ciudad=q; else if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; } else { feEstado('Sin ubicación: escribí una ciudad.'); return; }
+  Promise.all([api('analista-lugares', body), api('analista-lugares-propios')]).then(function(r){ F.datos=r[0]; F.propios=r[1]; F.centro={lat:r[0].lat,lng:r[0].lng}; feEstado((r[0].ciudad? r[0].ciudad+', '+r[0].pais: 'Zona')+' · '+lugaresTodos().length+' lugares'); pintarFerias(); })
+  .catch(function(e){ feEstado('No pude buscar: '+e.message); }); }
+$('feBuscar').onclick=function(){ cargarFerias($('feCiudad').value.trim()); };
+$('feCiudad').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); $('feBuscar').click(); } });
+function editarLugar(id){ var l=id? lugaresTodos().find(function(x){ return x.id===id; }): null; F.edit=l||{id:''}; $('lgTit').textContent=l? 'Editar lugar':'Nuevo lugar';
+  $('lgNombre').value=l?l.nombre||'':''; $('lgTipo').value=l&&COL[l.tipo]!==undefined? (l.tipo==='vintage'?'segunda mano':l.tipo): (l? 'otro':'feria'); $('lgCuando').value=l?l.cuando||'':''; $('lgDir').value=l?(l.direccion||l.ciudad||''):''; $('lgNota').value=l?l.nota||'':''; $('lgWeb').value=l?l.web||'':'';
+  $('lgLat').value=l?l.lat:(F.centro?F.centro.lat.toFixed(5):''); $('lgLng').value=l?l.lng:(F.centro?F.centro.lng.toFixed(5):''); $('lgBorrar').style.display=l?'flex':'none'; $('lgErr').style.display='none'; show('sLugar'); }
+$('feAgregar').onclick=function(e){ e.preventDefault(); editarLugar(null); };
+$('lgCancelar').onclick=function(){ show('sFerias'); };
+$('lgGeo').onclick=function(){ var q=$('lgDir').value.trim(); if(!q) return; fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q)).then(function(r){ return r.json(); }).then(function(j){ if(j[0]){ $('lgLat').value=(+j[0].lat).toFixed(5); $('lgLng').value=(+j[0].lon).toFixed(5); } else { $('lgErr').textContent='No encontré esa dirección.'; $('lgErr').style.display='block'; } }).catch(function(){}); };
+$('lgGuardar').onclick=function(){ var d={id:F.edit.id||'', nombre:$('lgNombre').value.trim(), tipo:$('lgTipo').value, cuando:$('lgCuando').value.trim(), direccion:$('lgDir').value.trim(), nota:$('lgNota').value.trim(), web:$('lgWeb').value.trim(), lat:$('lgLat').value, lng:$('lgLng').value};
+  if(!d.nombre||!d.lat||!d.lng){ $('lgErr').textContent='Falta el nombre o la ubicación.'; $('lgErr').style.display='block'; return; }
+  api('analista-lugar-guardar', d).then(function(){ return api('analista-lugares-propios'); }).then(function(p){ F.propios=p; pintarFerias(); show('sFerias'); }).catch(function(e){ $('lgErr').textContent='No se guardó: '+e.message; $('lgErr').style.display='block'; }); };
+$('lgBorrar').onclick=function(){ if(!F.edit.id||!confirm('¿Borrar este lugar?')) return; api('analista-lugar-borrar',{id:F.edit.id}).then(function(){ return api('analista-lugares-propios'); }).then(function(p){ F.propios=p; pintarFerias(); show('sFerias'); }).catch(function(e){ alert('No se borró: '+e.message); }); };
+
+// --- enter envia en el chat ---
+$('chT').addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); enviar(); } });
 
 // --- arranque ---
 gps(); ultimos(); sync().then(ultimos).catch(function(){});

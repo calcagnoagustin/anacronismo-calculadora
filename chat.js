@@ -164,5 +164,5 @@
       .then(function(){ ocup=false; $("acS").disabled=false; });
   }
   $("acS").onclick=enviar;
-  $("acT").addEventListener("keydown",function(e){ if(e.key==="Enter"&&!e.shiftKey&&window.innerWidth>600){ e.preventDefault(); enviar(); } });
+  $("acT").addEventListener("keydown",function(e){ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); enviar(); } });
 })();
