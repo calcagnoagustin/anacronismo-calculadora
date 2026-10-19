@@ -215,10 +215,53 @@
   .an-f button{ font-family:inherit; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; padding:6px 9px; border:1.5px solid var(--negro); background:transparent; color:var(--negro); cursor:pointer; }
   .an-f button.on{ background:var(--negro); color:var(--crema); }
   .an .preg{ background:var(--crema2); padding:8px 10px; margin-bottom:6px; font-size:12.5px; }
+
+  /* ===== rediseño 19/10/2026 (mockups) ===== */
+  .wrap{ max-width:1180px; padding:22px 20px 70px; }
+  .hdr{ display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:22px; }
+  .hdr .logo{ flex-direction:row; align-items:center; gap:14px; margin:0; }
+  .hdr .logo .wm{ margin:0; font-size:15px; }
+  .hdr .logo .div{ margin:0 0 0 6px; }
+  .hdr .toggle.nav{ margin:0; border:none; gap:4px; }
+  .hdr .toggle.nav button{ flex:none; padding:11px 16px; font-size:11px; letter-spacing:.14em; font-weight:700; border-radius:3px; }
+  .hdr .toggle.nav button.on{ background:var(--negro); color:var(--crema); }
+  .sub{ font-size:14px; text-align:center; }
+  .instr{ border-radius:4px; }
+  .instr>summary{ padding:14px 16px; font-size:12px; }
+  .instr>summary .cv{ color:var(--rojoOsc); }
+  .instr .idesc{ display:block; font-size:12.5px; letter-spacing:0; text-transform:none; font-weight:400; color:var(--negro); opacity:.65; margin-top:5px; line-height:1.45; }
+  .btn.pri#rd_lanzar{ background:var(--rojoOsc); border-color:var(--rojoOsc); border-radius:4px; padding:15px; display:flex; align-items:center; justify-content:center; gap:12px; font-size:13.5px; letter-spacing:.14em; }
+  .btn.pri#rd_lanzar svg{ width:18px; height:18px; }
+  @media(min-width:700px){ .btn.pri#rd_lanzar{ background:var(--negro); border-color:var(--negro); } }
+  .barra.rule{ align-items:center; gap:14px; margin:20px 0 12px; }
+  .barra.rule .ln{ flex:1; height:1px; background:#1A1A1A33; }
+  .rd-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+  @media(min-width:860px){ .rd-grid{ grid-template-columns:1fr 1fr; } }
+  .card{ border-radius:4px; padding:14px; margin:0; }
+  .card .ch{ gap:14px; }
+  .card .ph{ width:112px; height:112px; flex:none; background:var(--crema2); border:1px solid #1A1A1A22; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .card .ph img{ width:100%; height:100%; object-fit:cover; }
+  .card .ph svg{ width:40px; height:40px; opacity:.25; }
+  .card .cb{ flex:1; min-width:0; }
+  .card .rk{ display:block; margin:0 0 2px; font-size:11px; }
+  .card .nm{ font-size:16px; }
+  .card .pr{ font-family:inherit; font-size:17px; }
+  .card .nt{ opacity:.75; }
+  .card .acts a, .card .acts button{ border-radius:3px; padding:10px 6px; display:flex; align-items:center; justify-content:center; gap:7px; }
+  .card .acts svg{ width:14px; height:14px; }
+  .card .ocultar{ position:absolute; right:8px; top:8px; width:26px; height:26px; border:none; background:transparent; opacity:.35; cursor:pointer; font-size:16px; line-height:1; color:var(--negro); }
+  .card .ocultar:hover{ opacity:1; }
+  .card{ position:relative; }
+  .fb>summary{ font-size:11px; }
+  #acFab{ width:60px; height:60px; }
+  .grupo{ grid-column:1/-1; margin:14px 0 2px; }
+  .ocultos-bar{ grid-column:1/-1; font-size:12px; opacity:.6; text-align:center; padding:8px; }
+  .ocultos-bar button{ background:none; border:none; text-decoration:underline; cursor:pointer; font:inherit; color:var(--rojoOsc); }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="hdr">
   <div class="logo">
     <svg width="40" height="40" viewBox="0 0 100 100" aria-label="Anacronismo">
       <line x1="27" y1="80" x2="50" y2="20" stroke="#1A1A1A" stroke-width="6.5" stroke-linecap="butt"/>
@@ -236,23 +279,24 @@
     <button data-s="compras">Compras</button>
     <button data-s="anal">Analista</button>
   </div>
+  </div>
 
   <!-- ===================== RADAR ===================== -->
   <section id="s_radar">
     <p class="sub">Lo que trajo el bot en su última pasada por eBay.</p>
     <details class="instr" id="rd_instr">
-      <summary><span>Instrucciones para el bot</span><span class="cv">&#9662;</span></summary>
+      <summary><span>Instrucciones para el bot<span class="idesc">Definí qué buscar, qué evitar y cómo priorizar los hallazgos. El bot usa esto en cada pasada por eBay.</span></span><span class="cv">&#9662;</span></summary>
       <div class="ib">
         <textarea id="rd_instr_txt" placeholder="Ej: no me traigas más Raketa con dial gastado; priorizá dials de color; bajá el techo a USD 40; sumá búsquedas de jump hour."></textarea>
         <span class="hint">El bot lee esto antes de buscar y despues vacia la caja: lo que escribiste queda archivado como regla permanente. Escribi solo lo nuevo.</span>
       </div>
     </details>
-    <button class="btn pri" id="rd_lanzar">Lanzar búsqueda</button>
+    <button class="btn pri" id="rd_lanzar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Lanzar búsqueda</button>
     <div class="estado" id="rd_costo_est" style="margin-top:8px"></div>
     <div class="estado" id="rd_lanzar_st" style="margin-bottom:6px"></div>
     <div class="estado" id="rd_costo_ult" style="margin-top:0;margin-bottom:14px"></div>
-    <div class="barra"><span id="rd_corrida">Última corrida —</span><span class="st" id="rd_estado">cargando…</span></div>
-    <div id="rd_lista"></div>
+    <div class="barra rule"><span id="rd_corrida">Última corrida —</span><span class="ln"></span><span class="st" id="rd_estado">cargando…</span></div>
+    <div id="rd_lista" class="rd-grid"></div>
     <div class="estado" id="rd_guardado"></div>
     <p class="foot">El bot corre los viernes y publica acá lo que pasa los filtros duros: foto del mecanismo, funcionando, estado cosmético sano y publicación activa. Los precios son del momento de la corrida — verificá antes de ofertar.</p>
   </section>
@@ -534,7 +578,18 @@ function pintarCostoEstimado(){
       el.textContent="Costo aprox.: 1 a 3 M tokens de tu plan (≈ US$ 3–8 a precio API). Estimado inicial: se ajusta solo con las corridas medidas. Sale del plan, no se cobra aparte.";
     });
 }
+/* piezas ocultas (borrables) y fotos de eBay (cuando hay claves) */
+var OCULTOS=[], ULT_RADAR=null, FOTOS_RD={}, fotosPedidas=false;
+try{ OCULTOS=JSON.parse(localStorage.getItem("anacro_ocultos")||"[]"); FOTOS_RD=JSON.parse(localStorage.getItem("anacro_fotos_rd")||"{}"); }catch(e){}
+function guardarOcultos(){ try{ localStorage.setItem("anacro_ocultos", JSON.stringify(OCULTOS)); }catch(e){} FEEDBACK.ocultos=OCULTOS; programarFeedback(); }
+function pedirFotosRadar(items){
+  var ids=items.map(function(i){ return String(i.item||""); }).filter(function(x){ return /^\d{9,15}$/.test(x) && FOTOS_RD[x]===undefined; }).slice(0,40);
+  if(!ids.length || fotosPedidas) return; fotosPedidas=true;
+  fetch(BASE+"/api/radar-fotos",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ids:ids})}).then(function(r){ return r.json(); })
+    .then(function(m){ var hay=false; Object.keys(m||{}).forEach(function(k){ FOTOS_RD[k]=m[k]||""; if(m[k]) hay=true; }); try{ localStorage.setItem("anacro_fotos_rd", JSON.stringify(FOTOS_RD)); }catch(e){} if(hay) pintarRadar(ULT_RADAR); }).catch(function(){});
+}
 function pintarRadar(d){
+  ULT_RADAR=d;
   var items=(d&&d.items)||[];
   var tc=textoCosto(d&&d.consumo);
   document.getElementById("rd_costo_ult").textContent = tc ? "Corrida del "+(d.corrida||"—")+": costó "+tc+"." : "";
@@ -544,7 +599,7 @@ function pintarRadar(d){
     document.getElementById("rd_lista").innerHTML="<div class='note'>El bot no dejó nada nuevo esta semana. No bajes la vara.</div>";
     return;
   }
-  var h="", primero=true;
+  var h="", primero=true, nOcultos=0;
   GRUPOS.forEach(function(g){
     var ls=items.filter(function(i){ return (i.estado||"candidato")===g.estado; });
     if(!ls.length) return;
@@ -554,15 +609,19 @@ function pintarRadar(d){
       var precio=num(i.precio);
       var idc=String(i.item||i.id||i.nombre), fc=FEEDBACK.comentarios[idc];
       var descartado = fc && (fc.tags||[]).indexOf("No va")>=0;
+      if(OCULTOS.indexOf(idc)>=0){ nOcultos++; return; }
+      var foto=FOTOS_RD[idc];
       h+="<div class='card"+(descartado?" descartado":"")+"'>";
+      h+="<button class='ocultar' title='Ocultar esta pieza' data-ocultar='"+esc(idc)+"'>×</button>";
       if(g.tag) h+="<span class='tag "+g.tag+"'>"+g.titulo+"</span>";
-      h+="<div class='ch'><div class='nm'>"+(i.pos?"<span class='rk'>"+i.pos+"</span>":"")+esc(i.nombre)+"</div>"+
-         "<div class='pr'>"+(precio?usd(precio):"—")+"</div></div>";
+      h+="<div class='ch'><div class='ph'>"+(foto? "<img src='"+esc(foto)+"' alt='' loading='lazy'>" : "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><circle cx='12' cy='12' r='8'/><path d='M12 7v5l3 2'/></svg>")+"</div>";
+      h+="<div class='cb'>"+(i.pos?"<span class='rk'>"+i.pos+"</span>":"")+"<div class='ch' style='gap:10px'><div class='nm'>"+esc(i.nombre)+"</div><div class='pr'>"+(precio?usd(precio):"—")+"</div></div>";
       if(i.vendedor) h+="<div class='nt'>Vendedor: "+esc(i.vendedor)+"</div>";
       if(i.nota) h+="<div class='nt'>"+esc(i.nota)+"</div>";
+      h+="</div></div>";
       h+="<div class='acts'>";
-      if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en eBay</a>";
-      h+="<button class='chatb' data-ctipo='radar' data-cid='"+esc(String(i.item||i.id||i.nombre))+"' data-cnom='"+esc(i.nombre)+"' data-curl='"+esc(i.url||"")+"'>Preguntarle a la IA</button>";
+      if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en eBay <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M14 4h6v6M20 4l-9 9M19 14v6H4V5h6'/></svg></a>";
+      h+="<button class='chatb' data-ctipo='radar' data-cid='"+esc(String(i.item||i.id||i.nombre))+"' data-cnom='"+esc(i.nombre)+"' data-curl='"+esc(i.url||"")+"'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M4 5h16v11H9l-5 4z'/></svg>Preguntarle a la IA</button>";
       h+="</div>";
       var id=String(i.item||i.id||i.nombre), f=fbDe(id);
       f.nombre=i.nombre;
@@ -577,7 +636,11 @@ function pintarRadar(d){
          "</div></details></div>";
     });
   });
+  if(nOcultos) h+="<div class='ocultos-bar'>"+nOcultos+(nOcultos===1?" pieza oculta":" piezas ocultas")+" · <button id='rd_verocultos'>mostrar</button></div>";
   document.getElementById("rd_lista").innerHTML=h;
+  var vo=document.getElementById("rd_verocultos"); if(vo) vo.onclick=function(){ OCULTOS=[]; guardarOcultos(); pintarRadar(ULT_RADAR); };
+  document.querySelectorAll("#rd_lista button[data-ocultar]").forEach(function(b){ b.onclick=function(){ var id=b.getAttribute("data-ocultar"); if(OCULTOS.indexOf(id)<0) OCULTOS.push(id); guardarOcultos(); pintarRadar(ULT_RADAR); }; });
+  pedirFotosRadar(items);
   document.querySelectorAll("#rd_lista .chips button").forEach(function(b){
     b.onclick=function(){
       var f=fbDe(b.getAttribute("data-fbid")), t=b.getAttribute("data-tag");
@@ -628,7 +691,7 @@ function guardarFeedback(){
   clearTimeout(fbTimer);
   marcarFbEstado("guardando…");
   try{ localStorage.setItem("anacro_feedback", JSON.stringify(FEEDBACK)); }catch(x){}
-  var envio = fbInstrDirty ? FEEDBACK : { comentarios:FEEDBACK.comentarios };
+  var envio = fbInstrDirty ? FEEDBACK : { comentarios:FEEDBACK.comentarios, ocultos:OCULTOS };
   fetch(BASE+"/api/feedback",{ method:"POST",
     headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN },
     body:JSON.stringify(envio) })
@@ -646,7 +709,7 @@ function cargarFeedback(){
     .catch(function(){
       try{ var c=JSON.parse(localStorage.getItem("anacro_feedback")||"null"); if(c) FEEDBACK=c; }catch(e){}
     })
-    .then(function(){ document.getElementById("rd_instr_txt").value=FEEDBACK.instrucciones||"";
+    .then(function(){ if(Array.isArray(FEEDBACK.ocultos)&&FEEDBACK.ocultos.length) OCULTOS=FEEDBACK.ocultos; document.getElementById("rd_instr_txt").value=FEEDBACK.instrucciones||"";
                       fbInstrDirty=false; });
 }
 document.getElementById("rd_instr_txt").addEventListener("input",function(){
