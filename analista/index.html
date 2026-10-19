@@ -258,7 +258,7 @@ function api(n, body){ return fetch(API+n, {method:'POST', headers:{'Content-Typ
   .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error||('error '+r.status)); return j; }); }); }
 function fotoUrl(fid, t){ return API+'analista-foto?id='+(t? fid.replace('.jpg','_t.jpg'): fid); }
 function fecha(iso){ var d=new Date(iso); return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); }
-function gps(){ if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(function(p){ S.pos={lat:p.coords.latitude,lng:p.coords.longitude}; if($('sFerias').classList.contains('on') && !F.datos) cargarFerias(''); }, function(){}, {enableHighAccuracy:true, timeout:8000, maximumAge:60000}); }
+function gps(){ if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(function(p){ S.pos={lat:p.coords.latitude,lng:p.coords.longitude}; if($('sFerias').classList.contains('on') && !F.datos && !F.cargando) cargarFerias(''); }, function(){}, {enableHighAccuracy:true, timeout:8000, maximumAge:60000}); }
 function guardar(){ try{ localStorage.setItem('an_items', JSON.stringify(S.items.slice(0,200))); }catch(e){} }
 function sync(){ return api('analista-historial').then(function(j){ S.items=j.items||[]; guardar(); }); }
 
@@ -366,7 +366,7 @@ $('eaGuardar').onclick=function(){ var it=S.actual; if(!it) return; var d={id:it
   Object.keys(d).forEach(function(k){ it[k]=d[k]; }); guardar(); reporte(it); show('sReporte'); api('analista-item', d).catch(function(e){ alert('No se guardó: '+e.message); }); };
 
 // --- ferias / lugares ---
-var F={mapa:null, capa:null, datos:null, propios:{propios:[],ediciones:{},ocultos:[]}, edit:null, centro:null};
+F={mapa:null, capa:null, datos:null, cargando:false, propios:{propios:[],ediciones:{},ocultos:[]}, edit:null, centro:null};
 var COL={feria:'#B4432C',mercado:'#B4432C',anticuario:'#5B7F62',relojeria:'#1C1A16',relojero:'#1C1A16',joyeria:'#1C1A16','segunda mano':'#C99A2E',vintage:'#C99A2E',otro:'#75705F'};
 function feEstado(t){ $('feEstado').textContent=t||''; }
 function lugaresTodos(){ if(!F.datos) return []; var oc=F.propios.ocultos||[], ed=F.propios.ediciones||{};
@@ -386,9 +386,9 @@ function pintarFerias(){ if(!F.mapa){ F.mapa=L.map('mapF'); L.tileLayer('https:/
   $('feFerias').innerHTML=fer.length? fer.map(fila).join(''):'<p class="mut">No encontré ferias periódicas conocidas acá. Si conocés alguna, agregala.</p>';
   $('feLocales').innerHTML=loc.length? loc.map(fila).join(''):'<p class="mut">Sin locales encontrados en la zona.</p>';
   document.querySelectorAll('#sFerias .hist').forEach(function(d){ d.querySelector('.t').onclick=function(){ editarLugar(d.dataset.lg); }; }); }
-function cargarFerias(q){ feEstado('Buscando lugares… (la primera vez tarda unos 20 segundos)'); var body={idioma:S.idioma}; if(q) body.ciudad=q; else if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; } else { feEstado('Sin ubicación: escribí una ciudad.'); return; }
+function cargarFerias(q){ F.cargando=true; feEstado('Buscando lugares… (la primera vez tarda unos 20 segundos)'); var body={idioma:S.idioma}; if(q) body.ciudad=q; else if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; } else { feEstado('Sin ubicación: escribí una ciudad.'); return; }
   Promise.all([api('analista-lugares', body), api('analista-lugares-propios')]).then(function(r){ F.datos=r[0]; F.propios=r[1]; F.centro={lat:r[0].lat,lng:r[0].lng}; feEstado((r[0].ciudad? r[0].ciudad+', '+r[0].pais: 'Zona')+' · '+lugaresTodos().length+' lugares'); pintarFerias(); })
-  .catch(function(e){ feEstado('No pude buscar: '+e.message); }); }
+  .catch(function(e){ feEstado('No pude buscar: '+e.message); }).then(function(){ F.cargando=false; }); }
 $('feBuscar').onclick=function(){ cargarFerias($('feCiudad').value.trim()); };
 $('feCiudad').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); $('feBuscar').click(); } });
 function editarLugar(id){ var l=id? lugaresTodos().find(function(x){ return x.id===id; }): null; F.edit=l||{id:''}; $('lgTit').textContent=l? 'Editar lugar':'Nuevo lugar';
