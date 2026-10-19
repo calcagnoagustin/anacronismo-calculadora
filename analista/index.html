@@ -76,7 +76,8 @@ input[type=text],input[type=number],select,textarea{width:100%;border:1px solid 
 .precio{font-size:32px;font-weight:700;text-align:center;font-family:"Playfair Display",serif}
 .precio small{display:block;font:500 11px Inter;color:var(--mut);letter-spacing:.14em}
 ul.simple{padding-left:18px;margin:6px 0}ul.simple li{margin:6px 0;font-size:15px}
-.fotos{display:flex;gap:8px;overflow-x:auto;padding:4px 0}.fotos img{height:120px;border-radius:12px}
+.fotos{display:flex;gap:8px;overflow-x:auto;padding:4px 0}.fotos img{height:110px;border-radius:12px}
+.step.opc{opacity:.85}
 .chk{display:flex;align-items:center;gap:10px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 0;font-size:15px}
 .chk input{width:22px;height:22px}
 nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:5}
@@ -147,11 +148,9 @@ nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
 <!-- CAPTURA -->
 <section id="sCaptura" class="screen">
   <div class="top"><div class="logo"><div class="wm" style="margin-top:12px">Anacronismo<b>Analista</b></div></div></div>
-  <p class="mut" style="margin:8px 0 2px">Buena luz, fondo neutro, sin reflejos. Cuanto más cerca y nítida, mejor.</p>
-  <div class="step" id="st0"><div class="th">🕰</div><div><b>1 · Frente</b><span>El dial completo, de cerca</span></div><label>Foto<input type="file" accept="image/*" capture="environment" data-i="0"></label></div>
-  <div class="step" id="st1"><div class="th">🔙</div><div><b>2 · Tapa de atrás</b><span>Grabados, número de serie</span></div><label>Foto<input type="file" accept="image/*" capture="environment" data-i="1"></label></div>
-  <div class="step" id="st2"><div class="th">⚙️</div><div><b>3 · Mecanismo o detalle</b><span>Si te dejan abrir la tapa (opcional)</span></div><label>Foto<input type="file" accept="image/*" capture="environment" data-i="2"></label></div>
-  <div class="row" style="margin-top:12px"><input type="number" id="precio" placeholder="Precio que piden (CHF)" inputmode="numeric"></div>
+  <p class="mut" style="margin:8px 0 2px">Buena luz, fondo neutro, sin reflejos, bien cerca y nítido. <b>Las primeras 4 son las que pide el Analista para opinar en serio</b>; las otras suben mucho la confianza (sobre todo el mecanismo).</p>
+  <div id="pasos"></div>
+  <div class="row" style="margin-top:12px"><input type="number" id="precio" placeholder="Precio que piden" inputmode="numeric"><select id="monedaCap" style="flex:0 0 110px"><option value="USD">USD</option><option value="ARS">ARS $</option><option value="CHF">CHF</option></select></div>
   <input type="text" id="nota" placeholder="Algo que viste o te dijeron (opcional)" style="margin-top:10px">
   <div id="eCap" class="err" style="display:none"></div>
   <button class="btn big serif rojo" id="bAnalizar" disabled>Analizar</button>
@@ -212,7 +211,8 @@ nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
   <input type="text" id="eaTitulo" placeholder="Título (marca y modelo)" style="margin:6px 0">
   <select id="eaVer" style="margin:6px 0"><option value="SI">SI</option><option value="NO">NO</option><option value="DUDA">DUDA</option></select>
   <input type="text" id="eaLugar" placeholder="Lugar" style="margin:6px 0">
-  <input type="number" id="eaPagado" placeholder="Precio pagado (CHF), si lo compraste" style="margin:6px 0">
+  <input type="number" id="eaTope" placeholder="Tope para pagar" style="margin:6px 0">
+  <input type="number" id="eaPagado" placeholder="Precio pagado, si lo compraste" style="margin:6px 0">
   <textarea id="eaNota" placeholder="Tu nota" style="margin:6px 0;min-height:80px"></textarea>
   <button class="btn" id="eaGuardar">Guardar</button>
   <button class="btn sec" id="eaCancelar">Cancelar</button>
@@ -221,9 +221,10 @@ nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
 <!-- AJUSTES -->
 <section id="sAjustes" class="screen">
   <div class="sect"><h2 class="serif">Ajustes</h2></div>
+  <div class="card"><b>Moneda de los precios</b><select id="moneda" style="margin-top:8px"><option value="USD">Dólares (USD)</option><option value="ARS">Pesos argentinos (ARS)</option><option value="CHF">Francos suizos (CHF)</option></select></div>
   <div class="card"><b>Idioma del reporte</b><select id="idioma" style="margin-top:8px"><option value="es">Español</option><option value="en">English</option><option value="de">Deutsch</option></select></div>
   <div class="card"><b>Instalar en el celu</b><p class="mut" id="instAj">Android: tocá “Instalar” acá abajo. iPhone: Compartir → “Agregar a pantalla de inicio”.</p><button class="btn" id="bInst2">Instalar app</button></div>
-  <div class="card"><b>Consejos para mejores fotos</b><ul class="simple"><li>Luz natural, sin flash ni reflejos.</li><li>Frente: que se lea el texto del dial.</li><li>Tapa: que se vean los grabados y números.</li><li>Si te dejan abrir la tapa, el mecanismo lo dice casi todo.</li></ul></div>
+  <div class="card"><b>Consejos para mejores fotos</b><ul class="simple"><li>Luz natural, sin flash ni reflejos.</li><li>Frente: que se lea el texto del dial.</li><li>Tapa: que se vean los grabados y números.</li><li>Si te dejan abrir la tapa, el mecanismo lo dice casi todo.</li><li>Orden ideal: frente, frente en ángulo, tapa, lateral con corona, mecanismo, macro del dial, entre asas.</li></ul></div>
   <p class="mut" style="text-align:center">Anacronismo · <a href="https://www.instagram.com/anacronismo.relojes/" style="color:var(--mut)">@anacronismo.relojes</a></p>
 </section>
 </main>
@@ -247,7 +248,9 @@ nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 var API = (location.hostname === 'anacronismo.com' ? 'https://anacronismo.com/api/' : 'https://vm.semillaredes.com/anacronismo/api/');
-var F; var S = {idioma: localStorage.getItem('an_idioma') || 'es', fotos: [null,null,null], items: [], pos: null, map: null, actual: null, ctx: null, pend: [], deferred: null};
+var F; var VISTAS=[['frente','1 · Frente, de frente','Dial completo, sin reflejos','🕰'],['angulo','2 · Frente en ángulo','Cristal, rayas, relieve de agujas','↗'],['tapa','3 · Tapa de atrás','Grabados, números, material','🔙'],['lateral','4 · Lateral con corona','Desgaste, cantos, corona','◧'],['mecanismo','5 · Mecanismo','Si te dejan abrir la tapa','⚙️'],['macro','6 · Macro del dial','Firma, "Swiss made", índices, pátina','🔍'],['asas','7 · Entre asas','Referencia o lo que veas','⌶'],['extra','8 · Extra','Lo que quieras sumar','➕']];
+var tzm=(Intl.DateTimeFormat().resolvedOptions().timeZone||''); var monDef=/Zurich|Europe\//.test(tzm)?'CHF':(/Argentina/.test(tzm)?'ARS':'USD');
+var S = {idioma: localStorage.getItem('an_idioma') || 'es', moneda: localStorage.getItem('an_moneda') || monDef, fotos: [null,null,null,null,null,null,null,null], items: [], pos: null, map: null, actual: null, ctx: null, pend: [], deferred: null};
 try{ S.items = JSON.parse(localStorage.getItem('an_items') || '[]'); }catch(e){}
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
@@ -275,24 +278,28 @@ if(!instalada && esIOS && !localStorage.getItem('an_inst_x')){ $('instTxt').text
 if(instalada){ $('inst').classList.remove('on'); }
 
 // --- nav / ajustes ---
-$('bAjustes').onclick = function(){ $('idioma').value=S.idioma; show('sAjustes'); };
+$('bAjustes').onclick = function(){ $('idioma').value=S.idioma; $('moneda').value=S.moneda; show('sAjustes'); };
 $('idioma').onchange = function(){ S.idioma=this.value; localStorage.setItem('an_idioma',S.idioma); };
 document.querySelectorAll('nav button').forEach(function(b){ b.onclick=function(){ show(b.dataset.s); }; });
 $('verTodos').onclick = function(e){ e.preventDefault(); show('sHist'); };
 
 // --- captura ---
-function resetCap(){ S.fotos=[null,null,null]; [0,1,2].forEach(function(i){ var st=$('st'+i); st.classList.remove('done'); st.querySelector('.th').innerHTML=['🕰','🔙','⚙️'][i]; st.querySelector('label').firstChild.nodeValue='Foto'; st.querySelector('input').value=''; });
+function pintarPasos(){ $('pasos').innerHTML=VISTAS.map(function(v,i){ return '<div class="step'+(i>=4?' opc':'')+'" id="st'+i+'"><div class="th">'+v[3]+'</div><div><b>'+v[1]+(i>=4?' <span class="mut" style="font-weight:400">(si podés)</span>':'')+'</b><span>'+v[2]+'</span></div><label>Foto<input type="file" accept="image/*" capture="environment" data-i="'+i+'"></label></div>'; }).join('');
+  document.querySelectorAll('#pasos input[type=file]').forEach(function(inp){ inp.onchange=function(){ var f=inp.files[0]; if(!f) return; var i=+inp.dataset.i;
+    comprimir(f).then(function(b64){ S.fotos[i]=b64; var st=$('st'+i); st.classList.add('done'); st.querySelector('.th').innerHTML='<img src="data:image/jpeg;base64,'+b64+'">'; st.querySelector('label').firstChild.nodeValue='Repetir'; $('bAnalizar').disabled=!S.fotos[0]; }); }; }); }
+function resetCap(){ S.fotos=[null,null,null,null,null,null,null,null]; pintarPasos(); $('monedaCap').value=S.moneda;
   $('precio').value=''; $('nota').value=''; $('eCap').style.display='none'; $('bAnalizar').disabled=true; }
 $('bNuevo').onclick = function(){ resetCap(); gps(); show('sCaptura'); };
 $('bOtro').onclick = $('bNuevo').onclick;
 $('bCancelar').onclick = function(){ show('sInicio'); };
-document.querySelectorAll('#sCaptura input[type=file]').forEach(function(inp){ inp.onchange=function(){ var f=inp.files[0]; if(!f) return; var i=+inp.dataset.i;
-  comprimir(f).then(function(b64){ S.fotos[i]=b64; var st=$('st'+i); st.classList.add('done'); st.querySelector('.th').innerHTML='<img src="data:image/jpeg;base64,'+b64+'">'; st.querySelector('label').firstChild.nodeValue='Repetir'; $('bAnalizar').disabled=!S.fotos[0]; }); }; });
+
 function comprimir(file){ return new Promise(function(res,rej){ var img=new Image(); var u=URL.createObjectURL(file); img.onload=function(){ var M=1600, w=img.width, h=img.height, k=Math.min(1, M/Math.max(w,h)); var c=document.createElement('canvas'); c.width=Math.round(w*k); c.height=Math.round(h*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg',0.9).split(',')[1]); }; img.onerror=rej; img.src=u; }); }
 var msgsEspera=['Mirando las fotos','Leyendo el dial','Revisando la tapa','Buscando el calibre','Comparando precios'];
-$('bAnalizar').onclick = function(){ var fotos=S.fotos.filter(Boolean).map(function(b){ return {b64:b}; }); if(!fotos.length) return;
+$('monedaCap').onchange=function(){ S.moneda=this.value; localStorage.setItem('an_moneda',S.moneda); };
+$('moneda').onchange=function(){ S.moneda=this.value; localStorage.setItem('an_moneda',S.moneda); };
+$('bAnalizar').onclick = function(){ var fotos=[]; S.fotos.forEach(function(b,i){ if(b) fotos.push({b64:b, vista:VISTAS[i][0]}); }); if(!fotos.length) return;
   show('sEspera'); var k=0; var iv=setInterval(function(){ k=(k+1)%msgsEspera.length; $('tEspera').textContent=msgsEspera[k]; },2500);
-  var body={fotos:fotos, idioma:S.idioma, precio:$('precio').value, nota:$('nota').value}; if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; }
+  var body={fotos:fotos, idioma:S.idioma, moneda:S.moneda, precio:$('precio').value, nota:$('nota').value}; if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; }
   api('analista-analizar', body).then(function(it){ clearInterval(iv); S.items.unshift(it); guardar(); reporte(it); show('sReporte'); })
   .catch(function(e){ clearInterval(iv); show('sCaptura'); $('eCap').textContent='No se pudo analizar: '+e.message; $('eCap').style.display='block'; }); };
 
@@ -302,9 +309,11 @@ function reporte(it){ S.actual=it; var v=it.veredicto; var tx={SI:'SÍ, comprá'
   if(it.confianza!=null) h+='<div class="conf">Confianza <i><b style="width:'+(+it.confianza||0)+'%"></b></i> '+esc(it.confianza)+'%</div>';
   h+='</div>';
   h+='<div class="card">'+esc(it.resumen)+'</div>';
-  if(it.precio_max_chf!=null) h+='<div class="card precio"><small>TOPE PARA PAGAR</small>CHF '+esc(it.precio_max_chf)+(it.precio_pedido? '<small>piden CHF '+esc(it.precio_pedido)+'</small>':'')+'</div>';
+  var mon=it.moneda||'CHF', tope=(it.precio_max!=null? it.precio_max: it.precio_max_chf);
+  if(tope!=null) h+='<div class="card precio"><small>TOPE PARA PAGAR</small>'+esc(mon)+' '+esc(Number(tope).toLocaleString('es-AR'))+(it.precio_pedido? '<small>piden '+esc(mon)+' '+esc(it.precio_pedido)+'</small>':'')+'</div>';
+  if(it.faltan&&it.faltan.length) h+='<div class="card" style="border-color:var(--duda);background:#FBF3DD"><b>📷 Faltan fotos para opinar en serio</b><ul class="simple">'+it.faltan.map(function(p){ return '<li>'+esc(p)+'</li>'; }).join('')+'</ul><label class="btn" style="margin:6px 0 0">Sacar más fotos y volver a analizar<input type="file" accept="image/*" multiple id="reFotos"></label></div>';
   h+='<div class="card"><ul class="crit">'+(it.criterios||[]).map(function(c){ var k=c.ok===true?'ok':(c.ok===false?'bad':'nn'); var s=c.ok===true?'✓':(c.ok===false?'✗':'?'); return '<li><div class="ic '+k+'">'+s+'</div><div><b>'+esc(c.nombre)+'</b><span>'+esc(c.nota)+'</span></div></li>'; }).join('')+'</ul></div>';
-  if(it.lo_que_leo) h+='<div class="card"><b>Lo que leo en las fotos</b><p style="margin:6px 0 0;font-size:14.5px">'+esc(it.lo_que_leo)+'</p></div>';
+  if(it.lo_que_leo) h+='<div class="card"><b>Lo que leo en las fotos</b><p style="margin:6px 0 0;font-size:14.5px">'+esc(it.lo_que_leo)+'</p>'+(it.fotos_vistas&&it.fotos_vistas.length? '<ul class="simple" style="font-size:13px;color:var(--mut)">'+it.fotos_vistas.map(function(p){ return '<li>'+esc(p)+'</li>'; }).join('')+'</ul>':'')+'</div>';
   if(it.preguntas&&it.preguntas.length) h+='<div class="card"><b>Probá / preguntá ahí mismo</b><ul class="simple">'+it.preguntas.map(function(p){ return '<li>'+esc(p)+'</li>'; }).join('')+'</ul></div>';
   if(it.alertas&&it.alertas.length) h+='<div class="card" style="border-color:#E8C9C5"><b style="color:var(--no)">Ojo</b><ul class="simple">'+it.alertas.map(function(p){ return '<li>'+esc(p)+'</li>'; }).join('')+'</ul></div>';
   h+='<div class="fotos">'+(it.fotos||[]).map(function(f){ return '<img src="'+fotoUrl(f,false)+'">'; }).join('')+'</div>';
@@ -314,7 +323,11 @@ function reporte(it){ S.actual=it; var v=it.veredicto; var tx={SI:'SÍ, comprá'
   if(it.nota_usuario) h+='<div class="card"><b>Tu nota</b><p style="margin:6px 0 0">'+esc(it.nota_usuario)+'</p></div>';
   h+='<div class="row"><button class="btn sec" id="bEditar">✎ Editar</button><button class="btn sec" id="bBorrar" style="color:var(--no)">Borrar</button></div>';
   $('reporte').innerHTML=h;
-  $('bEditar').onclick=function(){ $('eaTitulo').value=it.titulo||''; $('eaVer').value=it.veredicto||'DUDA'; $('eaLugar').value=it.lugar||''; $('eaPagado').value=it.precio_pagado||''; $('eaNota').value=it.nota_usuario||''; show('sEditAn'); };
+  $('bEditar').onclick=function(){ $('eaTitulo').value=it.titulo||''; $('eaVer').value=it.veredicto||'DUDA'; $('eaLugar').value=it.lugar||''; $('eaPagado').value=it.precio_pagado||''; $('eaTope').value=(it.precio_max!=null?it.precio_max:(it.precio_max_chf||'')); $('eaNota').value=it.nota_usuario||''; show('sEditAn'); };
+  var rf=$('reFotos'); if(rf) rf.onchange=function(){ var fs=Array.prototype.slice.call(rf.files,0,8-(it.fotos||[]).length); if(!fs.length){ alert('Ya tiene 8 fotos. Borrá el análisis y hacé uno nuevo.'); return; }
+    show('sEspera'); $('tEspera').textContent='Sumando fotos y volviendo a analizar'; Promise.all(fs.map(comprimir)).then(function(bs){ return api('analista-reanalizar',{id:it.id, fotos:bs.map(function(b){ return {b64:b}; })}); })
+    .then(function(n){ var idx=S.items.findIndex(function(x){ return x.id===n.id; }); if(idx>=0) S.items[idx]=n; else S.items.unshift(n); guardar(); reporte(n); show('sReporte'); })
+    .catch(function(e){ show('sReporte'); alert('No se pudo re-analizar: '+e.message); }); };
   $('chkComp').onchange=function(){ it.comprado=this.checked; guardar(); api('analista-item',{id:it.id,comprado:it.comprado}).catch(function(){}); };
   $('bBorrar').onclick=function(){ if(!confirm('¿Borrar?')) return; S.items=S.items.filter(function(x){ return x.id!==it.id; }); guardar(); api('analista-borrar',{id:it.id}).catch(function(){}); show('sInicio'); }; }
 $('bPreg').onclick = function(){ abrirChat(S.actual); };
@@ -351,7 +364,7 @@ function pintarPend(){ var P=$('chPend'); P.innerHTML=''; P.classList.toggle('on
 function enviar(){ var t=$('chT').value.trim(); var fotos=S.pend.slice(); if(!t && !fotos.length) return; $('chT').value=''; S.pend=[]; pintarPend(); $('chGo').disabled=true;
   if(!$('chMsgs').querySelector('.m')) $('chMsgs').innerHTML='';
   burbuja({rol:'yo',texto:t,fotos:fotos}); var w=burbuja({rol:'ia',texto:''}); w.innerHTML='<span class="dots">pensando</span>';
-  var body={id:S.ctx? S.ctx.id: null, texto:t, fotos:fotos.map(function(b){ return {b64:b}; }), idioma:S.idioma}; if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; }
+  var body={id:S.ctx? S.ctx.id: null, texto:t, fotos:fotos.map(function(b){ return {b64:b}; }), idioma:S.idioma, moneda:S.moneda}; if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; }
   api('analista-chat', body).then(function(j){ w.textContent=j.respuesta||'(sin respuesta)';
     if(j.item){ var idx=S.items.findIndex(function(x){ return x.id===j.item.id; }); if(idx>=0) S.items[idx]=j.item; else S.items.unshift(j.item); guardar(); S.ctx=j.item; $('chCtx').classList.add('on'); $('chCtxT').textContent=j.item.titulo||'este reloj';
       if(!S.actual || S.actual.id!==j.item.id){ var c=document.createElement('div'); c.className='m ia'; c.innerHTML='Te armé el reporte: <b>'+esc(j.item.veredicto)+'</b> · '+esc(j.item.titulo)+'. <a href="#" id="verRep">Ver reporte completo</a>'; $('chMsgs').appendChild(c); c.querySelector('#verRep').onclick=function(e){ e.preventDefault(); cerrarChat(); reporte(j.item); show('sReporte'); }; } }
@@ -362,7 +375,7 @@ $('chGo').onclick=enviar;
 
 // --- editar analisis ---
 $('eaCancelar').onclick=function(){ show('sReporte'); };
-$('eaGuardar').onclick=function(){ var it=S.actual; if(!it) return; var d={id:it.id, titulo:$('eaTitulo').value.trim(), veredicto:$('eaVer').value, lugar:$('eaLugar').value.trim(), precio_pagado:$('eaPagado').value, nota_usuario:$('eaNota').value.trim()};
+$('eaGuardar').onclick=function(){ var it=S.actual; if(!it) return; var d={id:it.id, titulo:$('eaTitulo').value.trim(), veredicto:$('eaVer').value, lugar:$('eaLugar').value.trim(), precio_pagado:$('eaPagado').value, precio_max:$('eaTope').value, nota_usuario:$('eaNota').value.trim()};
   Object.keys(d).forEach(function(k){ it[k]=d[k]; }); guardar(); reporte(it); show('sReporte'); api('analista-item', d).catch(function(e){ alert('No se guardó: '+e.message); }); };
 
 // --- ferias / lugares ---

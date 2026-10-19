@@ -993,7 +993,8 @@ function pintarAF(){
     var h="<details class='an' "+(anOpen["af"+a.id]?"open":"")+" data-afid='"+esc(a.id)+"'><summary>"+(a.fotos&&a.fotos[0]? "<img class='pfoto' src='"+afFoto(a.fotos[0],true)+"' alt=''>":"")+(a.confianza!=null? "<span class='ring' style='background:conic-gradient("+colr+" "+(cf*3.6)+"deg,#D9CFBA 0)'><i></i><b>"+cf+"%</b></span>":"")+"<span class='vd "+vd+"'>"+esc(a.veredicto)+"</span><span class='tit'>"+esc(a.titulo||"Reloj")+"</span><div class='meta'>"+esc(a.epoca||"")+(a.lugar? " · "+esc(a.lugar):"")+" · "+new Date(a.cuando).toLocaleDateString("es-AR")+(a.comprado?" · comprado":"")+"</div><div style='clear:both'></div></summary><div class='ab'>";
     h+="<div style='display:flex;gap:6px;overflow-x:auto;margin-bottom:8px'>"+(a.fotos||[]).map(function(f){ return "<a href='"+afFoto(f,false)+"' target='_blank'><img src='"+afFoto(f,true)+"' style='height:90px;border:1.5px solid var(--negro)'></a>"; }).join("")+"</div>";
     h+="<p>"+esc(a.resumen||"")+"</p>";
-    if(a.precio_max_chf!=null) h+="<p><b>Tope CHF "+esc(a.precio_max_chf)+"</b>"+(a.precio_pedido? " · piden CHF "+esc(a.precio_pedido):"")+"</p>";
+    var tp=(a.precio_max!=null?a.precio_max:a.precio_max_chf), mn=a.moneda||"CHF"; if(tp!=null) h+="<p><b>Tope "+esc(mn)+" "+esc(tp)+"</b>"+(a.precio_pedido? " · piden "+esc(mn)+" "+esc(a.precio_pedido):"")+"</p>";
+    if(a.faltan&&a.faltan.length) h+="<p style='color:#8a6a10'><b>Faltan fotos:</b> "+a.faltan.map(esc).join(" · ")+"</p>";
     h+="<ul style='padding-left:18px;margin:6px 0'>"+(a.criterios||[]).map(function(c){ return "<li>"+(c.ok===true?"✓":(c.ok===false?"✗":"?"))+" <b>"+esc(c.nombre)+"</b>: "+esc(c.nota)+"</li>"; }).join("")+"</ul>";
     if(a.lo_que_leo) h+="<p style='opacity:.8'><b>Lo que leyó:</b> "+esc(a.lo_que_leo)+"</p>";
     if(a.alertas&&a.alertas.length) h+="<p style='color:#9b1c1c'><b>Ojo:</b> "+a.alertas.map(esc).join(" · ")+"</p>";
