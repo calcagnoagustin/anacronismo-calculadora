@@ -248,9 +248,10 @@
   .rd-grid{ display:grid; grid-template-columns:1fr; gap:14px; }
   .card{ border-radius:10px; border-width:1px; padding:16px; margin:0; background:var(--papel); position:relative; }
   .card .ch{ gap:16px; }
-  .card .ph{ width:34%; max-width:200px; min-width:120px; aspect-ratio:3/4; flex:none; background:var(--crema2); border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .card .ph{ width:34%; max-width:200px; min-width:120px; aspect-ratio:3/4; align-self:flex-start; max-height:240px; flex:none; background:var(--crema2); border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
   .card .ph img{ width:100%; height:100%; object-fit:cover; }
   .card .ph svg{ width:46px; height:46px; opacity:.22; }
+  .card .ph.sin{ aspect-ratio:1; }
   .card .cb{ flex:1; min-width:0; }
   .card .rk{ display:inline-block; margin:0 8px 0 0; font-size:12px; opacity:.45; }
   .card .nm{ font-family:"Playfair Display",Georgia,serif; font-size:19px; font-weight:600; line-height:1.25; }
@@ -724,7 +725,7 @@ function pintarRadar(d){
       h+="<div class='card"+(descartado?" descartado":"")+"'>";
       h+="<button class='ocultar' title='Ocultar esta pieza' data-ocultar='"+esc(idc)+"'>×</button>";
       if(g.tag) h+="<span class='tag "+g.tag+"'>"+g.titulo+"</span>";
-      h+="<div class='ch'><div class='ph'>"+(foto? "<img src='"+esc(foto)+"' alt='' loading='lazy'>" : "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><circle cx='12' cy='12' r='8'/><path d='M12 7v5l3 2'/></svg>")+"</div>";
+      h+="<div class='ch'><div class='ph"+(foto?"":" sin")+"'>"+(foto? "<img src='"+esc(foto)+"' alt='' loading='lazy'>" : "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><circle cx='12' cy='12' r='8'/><path d='M12 7v5l3 2'/></svg>")+"</div>";
       h+="<div class='cb'>"+(i.pos?"<span class='rk'>"+i.pos+"</span>":"")+"<div class='ch' style='gap:10px'><div class='nm'>"+esc(i.nombre)+"</div><div class='pr'>"+(precio?usd(precio):"—")+"</div></div>";
       if(i.vendedor) h+="<div class='nt vd'>Vendedor: "+esc(i.vendedor)+"</div>";
       if(i.nota) h+="<div class='nt'>"+esc(i.nota)+"</div>";
@@ -837,7 +838,8 @@ document.addEventListener("visibilitychange",function(){
 function cargarRadar(){
   fetch(BASE+"/radar.json?t="+Date.now(),{cache:"no-store"})
     .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function(d){ try{ localStorage.setItem("anacro_radar", JSON.stringify(d)); }catch(e){} pintarRadar(d); })
+    .then(function(d){ try{ localStorage.setItem("anacro_radar", JSON.stringify(d)); }catch(e){} pintarRadar(d);
+      if((d.items||[]).some(function(i){ return !i.foto; })) setTimeout(cargarRadar, 60000); })
     .catch(function(){
       var cache=null;
       try{ cache=JSON.parse(localStorage.getItem("anacro_radar")||"null"); }catch(e){}
