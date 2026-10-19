@@ -352,6 +352,33 @@
   @media(max-width:600px){ .vst{ display:none; } .vbtn{ padding:9px 10px; font-size:10px; } .vgh em{ display:none; } }
   /* busquedas: no tapar los dias */
   @media(min-width:601px){ .agenda>*{ max-width:62%; } }
+  /* legibilidad */
+  html,body{ font-size:17px; }
+  .sub{ font-size:18px; }
+  .card .nm{ font-size:21px; }
+  .card .pr{ font-size:20px; }
+  .card .nt{ font-size:15px; opacity:.85; }
+  .card .acts a, .card .acts button{ font-size:12.5px; padding:13px 6px; }
+  .fb>summary{ font-size:12.5px; } .fb .fbe{ font-size:13px; }
+  .chips button{ font-size:12px; padding:8px 11px; }
+  .estado, .hint, .foot{ font-size:13.5px; }
+  .an .res, .an .meta{ font-size:15px; } .an .meta{ font-size:13.5px; }
+  .an .ab{ font-size:15px; }
+  .pza .ss{ font-size:13px; }
+  .toggle.nav button{ font-size:12.5px; }
+  .card .ph{ cursor:zoom-in; } .card .nm{ cursor:pointer; }
+  /* detalle de pieza del radar */
+  #rdDet{ position:fixed; inset:0; z-index:50; background:rgba(26,26,26,.55); display:none; align-items:flex-end; justify-content:center; }
+  #rdDet.on{ display:flex; }
+  #rdDet .sheet{ background:var(--crema); width:100%; max-width:720px; max-height:92vh; overflow-y:auto; border-radius:16px 16px 0 0; padding:18px 18px calc(24px + env(safe-area-inset-bottom)); }
+  @media(min-width:700px){ #rdDet{ align-items:center; } #rdDet .sheet{ border-radius:16px; } }
+  #rdDet .cerrar{ position:sticky; top:0; float:right; border:0; background:var(--crema2); width:40px; height:40px; border-radius:50%; font-size:20px; cursor:pointer; }
+  #rdDet img.big{ width:100%; max-height:62vh; object-fit:contain; border-radius:12px; background:var(--crema2); display:block; margin:8px 0 14px; }
+  #rdDet h2{ font-family:"Playfair Display",Georgia,serif; font-size:24px; margin:0 0 6px; line-height:1.2; }
+  #rdDet .pr{ font-family:"Playfair Display",Georgia,serif; font-size:26px; margin:4px 0 10px; }
+  #rdDet .dato{ display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid #1A1A1A22; font-size:15px; }
+  #rdDet .dato b{ opacity:.6; font-weight:500; font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+  #rdDet .nota{ font-size:16px; line-height:1.55; opacity:.9; margin:12px 0; }
 </style>
 </head>
 <body>
@@ -497,6 +524,7 @@
   <!-- ===================== CALCULADORA ===================== -->
 </div>
 
+<div id="rdDet"><div class="sheet"><button class="cerrar" id="rdDetX">×</button><div id="rdDetB"></div></div></div>
 <div class="pie"><span></span><b></b><span></span></div>
 <script>
 var BASE="https://vm.semillaredes.com/anacronismo";
@@ -699,6 +727,24 @@ function pedirFotosRadar(items){
   fetch(BASE+"/api/radar-fotos",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ids:ids})}).then(function(r){ return r.json(); })
     .then(function(m){ var hay=false; Object.keys(m||{}).forEach(function(k){ FOTOS_RD[k]=m[k]||""; if(m[k]) hay=true; }); try{ localStorage.setItem("anacro_fotos_rd", JSON.stringify(FOTOS_RD)); }catch(e){} if(hay) pintarRadar(ULT_RADAR); }).catch(function(){});
 }
+function detalleRadar(id){
+  var i=((ULT_RADAR||{}).items||[]).filter(function(x){ return String(x.item||x.id||x.nombre)===id; })[0]; if(!i) return;
+  var foto=i.foto||FOTOS_RD[id], f=fbDe(id), g=GRUPOS.filter(function(g){ return g.estado===(i.estado||"candidato"); })[0];
+  var h=(foto?"<img class='big' src='"+esc(foto)+"' alt=''>":"")+"<h2>"+(i.pos?"<span class='rk'>"+i.pos+"</span>":"")+esc(i.nombre)+"</h2>";
+  if(g&&g.tag) h+="<span class='tag "+g.tag+"'>"+g.titulo+"</span>";
+  h+="<div class='pr'>"+(num(i.precio)?usd(num(i.precio)):"—")+"</div>";
+  if(i.nota) h+="<div class='nota'>"+esc(i.nota)+"</div>";
+  if(i.vendedor) h+="<div class='dato'><b>Vendedor</b><span>"+esc(i.vendedor)+"</span></div>";
+  if(i.item) h+="<div class='dato'><b>Item eBay</b><span>"+esc(i.item)+"</span></div>";
+  if(i.estado) h+="<div class='dato'><b>Estado</b><span>"+esc(i.estado)+"</span></div>";
+  if(f&&(f.tags||[]).length||f.texto) h+="<div class='dato'><b>Mi comentario</b><span>"+esc(fbResumen(f))+"</span></div>";
+  h+="<div class='acts' style='display:flex;gap:10px;margin-top:16px'>"+(i.url?"<a class='btn pri' style='text-decoration:none;text-align:center' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en eBay ↗</a>":"")+"<button class='btn' id='rdDetIA'>Preguntarle a la IA</button></div>";
+  document.getElementById("rdDetB").innerHTML=h; document.getElementById("rdDet").classList.add("on"); document.documentElement.style.overflow="hidden";
+  var b=document.getElementById("rdDetIA"); if(b) b.onclick=function(){ cerrarDetalle(); if(window.anaChat) window.anaChat.abrir({tipo:"radar",id:id,nombre:i.nombre,url:i.url||""}); };
+}
+function cerrarDetalle(){ document.getElementById("rdDet").classList.remove("on"); document.documentElement.style.overflow=""; }
+document.getElementById("rdDetX").addEventListener("click", cerrarDetalle);
+document.getElementById("rdDet").addEventListener("click", function(e){ if(e.target.id==="rdDet") cerrarDetalle(); });
 function pintarRadar(d){
   ULT_RADAR=d;
   var items=(d&&d.items)||[];
@@ -722,7 +768,7 @@ function pintarRadar(d){
       var descartado = fc && (fc.tags||[]).indexOf("No va")>=0;
       if(OCULTOS.indexOf(idc)>=0){ nOcultos++; return; }
       var foto=i.foto||FOTOS_RD[idc];
-      h+="<div class='card"+(descartado?" descartado":"")+"'>";
+      h+="<div class='card"+(descartado?" descartado":"")+"' data-rid='"+esc(idc)+"'>";
       h+="<button class='ocultar' title='Ocultar esta pieza' data-ocultar='"+esc(idc)+"'>×</button>";
       if(g.tag) h+="<span class='tag "+g.tag+"'>"+g.titulo+"</span>";
       h+="<div class='ch'><div class='ph"+(foto?"":" sin")+"'>"+(foto? "<img src='"+esc(foto)+"' alt='' loading='lazy'>" : "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><circle cx='12' cy='12' r='8'/><path d='M12 7v5l3 2'/></svg>")+"</div>";
@@ -750,6 +796,7 @@ function pintarRadar(d){
   if(nOcultos) h+="<div class='ocultos-bar'>"+nOcultos+(nOcultos===1?" pieza oculta":" piezas ocultas")+" · <button id='rd_verocultos'>mostrar</button></div>";
   document.getElementById("rd_lista").innerHTML=h;
   var vo=document.getElementById("rd_verocultos"); if(vo) vo.onclick=function(){ OCULTOS=[]; guardarOcultos(); pintarRadar(ULT_RADAR); };
+  document.querySelectorAll("#rd_lista .card").forEach(function(c){ var id=c.getAttribute("data-rid"); if(!id) return; ["."+"ph",".nm"].forEach(function(sel){ var el=c.querySelector(sel); if(el) el.onclick=function(){ detalleRadar(id); }; }); });
   document.querySelectorAll("#rd_lista button[data-ocultar]").forEach(function(b){ b.onclick=function(){ var id=b.getAttribute("data-ocultar"); if(OCULTOS.indexOf(id)<0) OCULTOS.push(id); guardarOcultos(); pintarRadar(ULT_RADAR); }; });
   pedirFotosRadar(items);
   document.querySelectorAll("#rd_lista .chips button").forEach(function(b){
