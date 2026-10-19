@@ -333,6 +333,24 @@
   .pie{ display:flex; align-items:center; justify-content:center; gap:10px; margin-top:40px; opacity:.6; }
   .pie span{ width:80px; height:1px; background:var(--negro); } .pie b{ width:6px; height:6px; border-radius:50%; background:var(--rojoOsc); }
   @media(min-width:860px){ .rd-grid{ grid-template-columns:1fr; } }
+  /* vendedores */
+  .vgrupo{ border:1px solid var(--linea); border-radius:10px; background:var(--papel); margin-bottom:18px; overflow:hidden; }
+  .vgh{ display:flex; align-items:center; gap:14px; padding:16px 18px; border-bottom:1px solid #1A1A1A22; background:var(--crema); }
+  .vgh>div{ flex:1; } .vgh b{ display:block; font-size:12.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--rojoOsc); }
+  .vgh span{ font-family:"Playfair Display",Georgia,serif; font-size:13.5px; opacity:.75; }
+  .vgh em{ font-style:normal; font-family:"Playfair Display",Georgia,serif; font-size:14px; opacity:.7; border-left:1px solid #1A1A1A33; padding-left:14px; white-space:nowrap; }
+  .vico{ width:44px; height:44px; border-radius:50%; background:var(--crema2); display:flex; align-items:center; justify-content:center; font-size:19px; flex:none; }
+  .vrow{ border:0; border-bottom:1px solid #1A1A1A22; border-radius:0; margin:0; background:transparent; }
+  .vrow:last-child{ border-bottom:0; }
+  .vrow>summary{ gap:14px; }
+  .vrow .ext{ text-decoration:none; color:var(--negro); opacity:.6; font-size:14px; margin-left:4px; }
+  .vst{ text-align:center; border-left:1px solid #1A1A1A22; padding:0 14px; }
+  .vst b{ display:block; font-family:"Playfair Display",Georgia,serif; font-size:17px; } .vst small{ font-size:10.5px; opacity:.55; }
+  .vbtn{ border:1.5px solid var(--linea); border-radius:6px; padding:10px 14px; font:600 11px Inter; letter-spacing:.12em; text-transform:uppercase; white-space:nowrap; }
+  .vrow[open] .vbtn{ background:var(--negro); color:var(--crema); }
+  @media(max-width:600px){ .vst{ display:none; } .vbtn{ padding:9px 10px; font-size:10px; } .vgh em{ display:none; } }
+  /* busquedas: no tapar los dias */
+  @media(min-width:601px){ .agenda>*{ max-width:62%; } }
 </style>
 </head>
 <body>
@@ -543,16 +561,19 @@ function renderVend(){
     var g=[];
     VEND.items.forEach(function(v,ix){ if(num(v.tier)===t) g.push({v:v,ix:ix}); });
     if(!g.length) return;
-    h+="<p class='sub' style='margin:22px 0 8px;font-weight:700'>"+esc(TIERLBL[t])+"</p>";
+    var TDESC={1:"Vendedores con excelente reputación, atención profesional y algún tipo de garantía.",2:"Se evalúa pieza por pieza.",3:"Vendedores confiables y con buena reputación, pero sin garantía formal.",4:"Vendedores interesantes que no entran en las categorías anteriores.",5:"Fuera de eBay."};
+    var TICO={1:"\u{1F6E1}",2:"\u2696",3:"\u{1F4C4}",4:"\u{1F310}",5:"\u{1F3EA}"};
+    h+="<div class='vgrupo'><div class='vgh'><span class='vico'>"+TICO[t]+"</span><div><b>"+esc(TIERLBL[t])+"</b><span>"+esc(TDESC[t])+"</span></div><em>"+g.length+(g.length===1?" vendedor":" vendedores")+"</em></div>";
     g.forEach(function(o){
       var v=o.v, ix=o.ix, st=statsVend(v.id);
       var sub = st.n ? (st.n+(st.n===1?" pieza":" piezas")+" · landed prom. "+usd(st.prom)) : "sin compras";
       var ea = envAr(v);
       sub += " · " + ENVLBL[ea];
-      h+="<details class='pza' data-vix='"+ix+"'"+(vAbiertas[ix]?" open":"")+">"+
-         "<summary><div><div class='sm'>"+esc(v.nombre)+(envAr(v)==="no"?" <span style='color:#7A1F1A'>✕ AR</span>":(envAr(v)==="?"?" <span style='color:#9a8f80'>? AR</span>":""))+"</div><div class='ss'>"+esc(v.pais||"")+"</div></div>"+
-         "<div class='sr'><div class='sc'><span class='sc-n'>"+esc(String(st.n))+"</span><small class='sc-s'>"+(st.n?"compras":"—")+"</small></div>"+
-         "<span class='cv'>&#9662;</span></div></summary>"+
+      var pais=(v.pais||"").toUpperCase(), bandera=pais.length===2? String.fromCodePoint(...pais.split("").map(function(c){ return 127397+c.charCodeAt(0); })):"";
+      h+="<details class='pza vrow' data-vix='"+ix+"'"+(vAbiertas[ix]?" open":"")+">"+
+         "<summary><span class='vico'>\u{1F3EC}</span><div style='flex:1;min-width:0'><div class='sm'>"+esc(v.nombre)+(v.url? " <a href='"+esc(v.url)+"' target='_blank' rel='noopener' class='ext' title='Abrir tienda'>\u2197</a>":"")+"</div><div class='ss'>"+esc(pais||"—")+" "+bandera+(envAr(v)==="no"?" · <span style='color:#7A1F1A'>NO envía a AR</span>":(envAr(v)==="?"?" · envío a AR sin confirmar":""))+"</div></div>"+
+         "<div class='vst'><b>"+esc(String(st.n))+"</b><small>"+(st.n===1?"compra":"compras")+"</small></div>"+
+         "<span class='vbtn'>Ver detalles \u2192</span></summary>"+
          "<div class='body'>"+
          "<p class='sub' style='margin:0 0 12px'>"+esc(sub)+"</p>"+
          (v.url?"<p style='margin:0 0 14px'><a href='"+esc(v.url)+"' target='_blank' rel='noopener' style='color:#7A1F1A;font-weight:600'>Abrir tienda &rarr;</a></p>":"")+
@@ -572,6 +593,7 @@ function renderVend(){
          "<button class='btn del' data-vdel='"+ix+"'>Eliminar vendedor</button>"+
          "</div></details>";
     });
+    h+="</div>";
   });
   document.getElementById("vd_lista").innerHTML = h || "<p class='sub'>Todavía no hay vendedores cargados.</p>";
 
