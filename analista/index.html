@@ -259,6 +259,7 @@ function show(id){ document.querySelectorAll('.screen').forEach(function(s){ s.c
   if(id==='sMapa') setTimeout(mapa, 50); if(id==='sHist') hist(); if(id==='sInicio') ultimos(); if(id==='sFerias'){ if(F.datos) setTimeout(pintarFerias,50); else setTimeout(function(){ cargarFerias(''); },300); } }
 function api(n, body){ return fetch(API+n, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body||{})})
   .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error||('error '+r.status)); return j; }); }); }
+function esperar(r){ if(!r || r.estado!=='en curso') return Promise.resolve(r); var id=r.id; return new Promise(function(res,rej){ var n=0; (function p(){ setTimeout(function(){ api('analista-estado',{id:id}).then(function(j){ if(j.estado==='listo') res(j.item); else if(j.estado==='error') rej(new Error(j.error||'error')); else if(++n>60) rej(new Error('tardó demasiado, mirá el historial en un rato')); else p(); }).catch(function(){ if(++n>60) rej(new Error('sin conexión')); else p(); }); }, 2500); })(); }); }
 function fotoUrl(fid, t){ return API+'analista-foto?id='+(t? fid.replace('.jpg','_t.jpg'): fid); }
 function fecha(iso){ var d=new Date(iso); return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); }
 function gps(){ if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(function(p){ S.pos={lat:p.coords.latitude,lng:p.coords.longitude}; if($('sFerias').classList.contains('on') && !F.datos && !F.cargando) cargarFerias(''); }, function(){}, {enableHighAccuracy:true, timeout:8000, maximumAge:60000}); }
@@ -300,7 +301,7 @@ $('moneda').onchange=function(){ S.moneda=this.value; localStorage.setItem('an_m
 $('bAnalizar').onclick = function(){ var fotos=[]; S.fotos.forEach(function(b,i){ if(b) fotos.push({b64:b, vista:VISTAS[i][0]}); }); if(!fotos.length) return;
   show('sEspera'); var k=0; var iv=setInterval(function(){ k=(k+1)%msgsEspera.length; $('tEspera').textContent=msgsEspera[k]; },2500);
   var body={fotos:fotos, idioma:S.idioma, moneda:S.moneda, precio:$('precio').value, nota:$('nota').value}; if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; }
-  api('analista-analizar', body).then(function(it){ clearInterval(iv); S.items.unshift(it); guardar(); reporte(it); show('sReporte'); })
+  api('analista-analizar', body).then(esperar).then(function(it){ clearInterval(iv); S.items.unshift(it); guardar(); reporte(it); show('sReporte'); })
   .catch(function(e){ clearInterval(iv); show('sCaptura'); $('eCap').textContent='No se pudo analizar: '+e.message; $('eCap').style.display='block'; }); };
 
 // --- reporte ---
@@ -325,7 +326,7 @@ function reporte(it){ S.actual=it; var v=it.veredicto; var tx={SI:'SÍ, comprá'
   $('reporte').innerHTML=h;
   $('bEditar').onclick=function(){ $('eaTitulo').value=it.titulo||''; $('eaVer').value=it.veredicto||'DUDA'; $('eaLugar').value=it.lugar||''; $('eaPagado').value=it.precio_pagado||''; $('eaTope').value=(it.precio_max!=null?it.precio_max:(it.precio_max_chf||'')); $('eaNota').value=it.nota_usuario||''; show('sEditAn'); };
   var rf=$('reFotos'); if(rf) rf.onchange=function(){ var fs=Array.prototype.slice.call(rf.files,0,8-(it.fotos||[]).length); if(!fs.length){ alert('Ya tiene 8 fotos. Borrá el análisis y hacé uno nuevo.'); return; }
-    show('sEspera'); $('tEspera').textContent='Sumando fotos y volviendo a analizar'; Promise.all(fs.map(comprimir)).then(function(bs){ return api('analista-reanalizar',{id:it.id, fotos:bs.map(function(b){ return {b64:b}; })}); })
+    show('sEspera'); $('tEspera').textContent='Sumando fotos y volviendo a analizar'; Promise.all(fs.map(comprimir)).then(function(bs){ return api('analista-reanalizar',{id:it.id, fotos:bs.map(function(b){ return {b64:b}; })}).then(esperar); })
     .then(function(n){ var idx=S.items.findIndex(function(x){ return x.id===n.id; }); if(idx>=0) S.items[idx]=n; else S.items.unshift(n); guardar(); reporte(n); show('sReporte'); })
     .catch(function(e){ show('sReporte'); alert('No se pudo re-analizar: '+e.message); }); };
   $('chkComp').onchange=function(){ it.comprado=this.checked; guardar(); api('analista-item',{id:it.id,comprado:it.comprado}).catch(function(){}); };
