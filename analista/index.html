@@ -263,7 +263,7 @@ function esperar(r){ if(!r || r.estado!=='en curso') return Promise.resolve(r); 
 function fotoUrl(fid, t){ return API+'analista-foto?id='+(t? fid.replace('.jpg','_t.jpg'): fid); }
 function fecha(iso){ var d=new Date(iso); return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); }
 function gps(){ if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(function(p){ S.pos={lat:p.coords.latitude,lng:p.coords.longitude}; if($('sFerias').classList.contains('on') && !F.datos && !F.cargando) cargarFerias(''); }, function(){}, {enableHighAccuracy:true, timeout:8000, maximumAge:60000}); }
-function guardar(){ try{ localStorage.setItem('an_items', JSON.stringify(S.items.slice(0,200))); }catch(e){} }
+function guardar(){ S.items=S.items.filter(function(x){ return x && x.veredicto; }); try{ localStorage.setItem('an_items', JSON.stringify(S.items.slice(0,200))); }catch(e){} }
 function sync(){ return api('analista-historial').then(function(j){ S.items=j.items||[]; guardar(); }); }
 
 // --- instalar ---
@@ -300,7 +300,7 @@ $('monedaCap').onchange=function(){ S.moneda=this.value; localStorage.setItem('a
 $('moneda').onchange=function(){ S.moneda=this.value; localStorage.setItem('an_moneda',S.moneda); };
 $('bAnalizar').onclick = function(){ var fotos=[]; S.fotos.forEach(function(b,i){ if(b) fotos.push({b64:b, vista:VISTAS[i][0]}); }); if(!fotos.length) return;
   show('sEspera'); var k=0; var iv=setInterval(function(){ k=(k+1)%msgsEspera.length; $('tEspera').textContent=msgsEspera[k]; },2500);
-  var body={fotos:fotos, idioma:S.idioma, moneda:S.moneda, precio:$('precio').value, nota:$('nota').value}; if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; }
+  var body={fotos:fotos, idioma:S.idioma, moneda:S.moneda, precio:$('precio').value, nota:$('nota').value, async:1}; if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; }
   api('analista-analizar', body).then(esperar).then(function(it){ clearInterval(iv); S.items.unshift(it); guardar(); reporte(it); show('sReporte'); })
   .catch(function(e){ clearInterval(iv); show('sCaptura'); $('eCap').textContent='No se pudo analizar: '+e.message; $('eCap').style.display='block'; }); };
 
@@ -326,7 +326,7 @@ function reporte(it){ S.actual=it; var v=it.veredicto; var tx={SI:'SÍ, comprá'
   $('reporte').innerHTML=h;
   $('bEditar').onclick=function(){ $('eaTitulo').value=it.titulo||''; $('eaVer').value=it.veredicto||'DUDA'; $('eaLugar').value=it.lugar||''; $('eaPagado').value=it.precio_pagado||''; $('eaTope').value=(it.precio_max!=null?it.precio_max:(it.precio_max_chf||'')); $('eaNota').value=it.nota_usuario||''; show('sEditAn'); };
   var rf=$('reFotos'); if(rf) rf.onchange=function(){ var fs=Array.prototype.slice.call(rf.files,0,8-(it.fotos||[]).length); if(!fs.length){ alert('Ya tiene 8 fotos. Borrá el análisis y hacé uno nuevo.'); return; }
-    show('sEspera'); $('tEspera').textContent='Sumando fotos y volviendo a analizar'; Promise.all(fs.map(comprimir)).then(function(bs){ return api('analista-reanalizar',{id:it.id, fotos:bs.map(function(b){ return {b64:b}; })}).then(esperar); })
+    show('sEspera'); $('tEspera').textContent='Sumando fotos y volviendo a analizar'; Promise.all(fs.map(comprimir)).then(function(bs){ return api('analista-reanalizar',{id:it.id, async:1, fotos:bs.map(function(b){ return {b64:b}; })}).then(esperar); })
     .then(function(n){ var idx=S.items.findIndex(function(x){ return x.id===n.id; }); if(idx>=0) S.items[idx]=n; else S.items.unshift(n); guardar(); reporte(n); show('sReporte'); })
     .catch(function(e){ show('sReporte'); alert('No se pudo re-analizar: '+e.message); }); };
   $('chkComp').onchange=function(){ it.comprado=this.checked; guardar(); api('analista-item',{id:it.id,comprado:it.comprado}).catch(function(){}); };
