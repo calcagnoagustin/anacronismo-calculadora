@@ -292,9 +292,11 @@ document.querySelectorAll('nav button').forEach(function(b){ b.onclick=function(
 $('verTodos').onclick = function(e){ e.preventDefault(); show('sHist'); };
 
 // --- captura ---
-function pintarPasos(){ $('pasos').innerHTML=VISTAS.map(function(v,i){ return '<div class="step'+(i>=4?' opc':'')+'" id="st'+i+'"><div class="th">'+v[3]+'</div><div><b>'+v[1]+(i>=4?' <span class="mut" style="font-weight:400">(si podés)</span>':'')+'</b><span>'+v[2]+'</span></div><label>Foto<input type="file" accept="image/*" capture="environment" data-i="'+i+'"></label></div>'; }).join('');
-  document.querySelectorAll('#pasos input[type=file]').forEach(function(inp){ inp.onchange=function(){ var f=inp.files[0]; if(!f) return; var i=+inp.dataset.i;
-    comprimir(f).then(function(b64){ S.fotos[i]=b64; var st=$('st'+i); st.classList.add('done'); st.querySelector('.th').innerHTML='<img src="data:image/jpeg;base64,'+b64+'">'; st.querySelector('label').firstChild.nodeValue='Repetir'; $('bAnalizar').disabled=!S.fotos[0]; }); }; }); }
+function pintarPasos(){ $('pasos').innerHTML=VISTAS.map(function(v,i){ return '<div class="step'+(i>=4?' opc':'')+'" id="st'+i+'"><div class="th">'+v[3]+'</div><div><b>'+v[1]+(i>=4?' <span class="mut" style="font-weight:400">(si podés)</span>':'')+'</b><span>'+v[2]+'</span></div><label>Foto<input type="file" accept="image/*" multiple data-i="'+i+'"></label></div>'; }).join('');
+  document.querySelectorAll('#pasos input[type=file]').forEach(function(inp){ inp.onchange=function(){ var fs=Array.prototype.slice.call(inp.files); inp.value=''; if(!fs.length) return; var i=+inp.dataset.i;
+    var dest=[i]; for(var k=0;k<8&&dest.length<fs.length;k++){ if(k!==i&&!S.fotos[k]) dest.push(k); }
+    dest.forEach(function(d,n){ ponerFoto(d, fs[n]); }); }; }); }
+function ponerFoto(i,f){ return comprimir(f).then(function(b64){ S.fotos[i]=b64; var st=$('st'+i); st.classList.add('done'); st.querySelector('.th').innerHTML='<img src="data:image/jpeg;base64,'+b64+'">'; st.querySelector('label').firstChild.nodeValue='Repetir'; $('bAnalizar').disabled=!S.fotos[0]; }); }
 function resetCap(){ S.fotos=[null,null,null,null,null,null,null,null]; pintarPasos(); $('monedaCap').value=S.moneda;
   $('precio').value=''; $('nota').value=''; $('eCap').style.display='none'; $('bAnalizar').disabled=true; }
 $('bNuevo').onclick = function(){ resetCap(); gps(); show('sCaptura'); };
