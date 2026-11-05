@@ -117,6 +117,7 @@ nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}
 #chMsgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:flex;flex-direction:column;gap:10px}
 .m{max-width:88%;padding:11px 14px;border-radius:16px;white-space:pre-wrap;word-wrap:break-word;font-size:15px;line-height:1.45}
 .m.yo{align-self:flex-end;background:var(--ink);color:#F3ECDF;border-bottom-right-radius:4px}
+.boci{display:flex;align-items:center;gap:6px;width:fit-content;border:1px solid var(--line);background:var(--bg2);color:var(--ink);border-radius:999px;padding:7px 14px;font-size:16px;font-weight:600;margin-top:10px;cursor:pointer;font-family:inherit}.boci.on{background:var(--ink);color:#F3ECDF}
 .m.ia{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
 .m img{display:block;max-width:100%;max-height:220px;border-radius:10px;margin-top:6px}
 .m .dots:after{content:"\2026";animation:d 1.2s infinite}@keyframes d{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
@@ -313,12 +314,37 @@ $('bAnalizar').onclick = function(){ var fotos=[]; S.fotos.forEach(function(b,i)
   api('analista-analizar', body).then(esperar).then(function(it){ clearInterval(iv); S.items.unshift(it); guardar(); reporte(it); show('sReporte'); })
   .catch(function(e){ clearInterval(iv); show('sCaptura'); $('eCap').textContent='No se pudo analizar: '+e.message; $('eCap').style.display='block'; }); };
 
+// --- voz ---
+var VOZ={btn:null};
+function vozParar(){ try{ speechSynthesis.cancel(); }catch(e){} if(VOZ.btn){ VOZ.btn.classList.remove('on'); VOZ.btn.textContent=VOZ.btn.dataset.t; VOZ.btn=null; } }
+function vozElegir(){ var pref={es:['es-AR','es-US','es-MX','es-419','es-ES'],en:['en-US','en-GB'],de:['de-DE','de-CH']}[S.idioma]||['es-AR']; var vs=[]; try{ vs=speechSynthesis.getVoices()||[]; }catch(e){}
+  var n=function(l){ return (l||'').replace('_','-'); }; for(var i=0;i<pref.length;i++){ for(var k=0;k<vs.length;k++){ if(n(vs[k].lang)===pref[i]) return vs[k]; } }
+  for(var j=0;j<vs.length;j++){ if(n(vs[j].lang).slice(0,2)===S.idioma) return vs[j]; } return null; }
+function hablar(texto, btn){ if(!('speechSynthesis' in window)){ alert('Este navegador no puede leer en voz alta.'); return; }
+  if(VOZ.btn===btn){ vozParar(); return; } vozParar();
+  var limpio=String(texto||'').replace(/https?:\/\/\S+/g,'').replace(/[*_#`>|]/g,' ').replace(/\s+/g,' ').trim(); if(!limpio) return;
+  var partes=limpio.match(/[^.!?…\n]+[.!?…]*/g)||[limpio], trozos=[], buf=''; partes.forEach(function(x){ if((buf+x).length>180&&buf){ trozos.push(buf); buf=''; } buf+=x; }); if(buf) trozos.push(buf);
+  var v=vozElegir(); VOZ.btn=btn; btn.dataset.t=btn.dataset.t||btn.textContent; btn.classList.add('on'); btn.textContent='⏹ Parar';
+  trozos.forEach(function(t,i){ var u=new SpeechSynthesisUtterance(t); if(v){ u.voice=v; u.lang=v.lang; } else u.lang={es:'es-ES',en:'en-US',de:'de-DE'}[S.idioma]||'es-ES';
+    if(i===trozos.length-1){ u.onend=u.onerror=function(){ if(VOZ.btn===btn) vozParar(); }; } speechSynthesis.speak(u); }); }
+function boci(d, texto){ var b=document.createElement('button'); b.type='button'; b.className='boci'; b.textContent='🔊 Escuchar'; b.onclick=function(e){ e.stopPropagation(); hablar(texto,b); }; d.appendChild(b); return b; }
+function textoReporte(it){ var tx={SI:'Sí, comprá',NO:'No',DUDA:'Duda'}[it.veredicto]||it.veredicto||''; var mon=it.moneda||'CHF', tope=(it.precio_max!=null? it.precio_max: it.precio_max_chf); var L=[tx+'.', it.titulo, it.epoca, it.resumen];
+  if(tope!=null) L.push('Tope para pagar: '+tope+' '+mon);
+  (it.criterios||[]).forEach(function(c){ L.push(c.nombre+': '+(c.ok===true?'bien':(c.ok===false?'mal':'no se sabe'))+'. '+(c.nota||'')); });
+  if(it.faltan&&it.faltan.length) L.push('Faltan fotos: '+it.faltan.join('. '));
+  if(it.lo_que_leo) L.push('Lo que leo en las fotos: '+it.lo_que_leo);
+  if(it.preguntas&&it.preguntas.length) L.push('Probá o preguntá ahí mismo: '+it.preguntas.join('. '));
+  if(it.alertas&&it.alertas.length) L.push('Ojo: '+it.alertas.join('. '));
+  return L.filter(Boolean).map(function(x){ x=String(x).trim(); return /[.!?]$/.test(x)? x: x+'.'; }).join(' '); }
+document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('#repVoz'); if(b&&S.actual) hablar(textoReporte(S.actual),b); });
+try{ speechSynthesis.getVoices(); }catch(e){}
+window.addEventListener('pagehide',vozParar);
 // --- reporte ---
 function reporte(it){ S.actual=it; var v=it.veredicto; var tx={SI:'SÍ, comprá',NO:'NO',DUDA:'DUDA'}[v]||v;
   var h='<div class="ver"><div class="big '+v+'">'+tx+'</div><h2 class="serif">'+esc(it.titulo)+'</h2><div class="mut">'+esc(it.epoca)+(it.lugar? ' · '+esc(it.lugar):'')+'</div>';
   if(it.confianza!=null) h+='<div class="conf">Confianza <i><b style="width:'+(+it.confianza||0)+'%"></b></i> '+esc(it.confianza)+'%</div>';
   h+='</div>';
-  h+='<div class="card">'+esc(it.resumen)+'</div>';
+  h+='<div class="card">'+esc(it.resumen)+'<button class="boci" id="repVoz">🔊 Escuchar</button></div>';
   var mon=it.moneda||'CHF', tope=(it.precio_max!=null? it.precio_max: it.precio_max_chf);
   if(tope!=null) h+='<div class="card precio"><small>TOPE PARA PAGAR</small>'+esc(mon)+' '+esc(Number(tope).toLocaleString('es-AR'))+(it.precio_pedido? '<small>piden '+esc(mon)+' '+esc(it.precio_pedido)+'</small>':'')+'</div>';
   if(it.faltan&&it.faltan.length) h+='<div class="card" style="border-color:var(--duda);background:#FBF3DD"><b>📷 Faltan fotos para opinar en serio</b><ul class="simple">'+it.faltan.map(function(p){ return '<li>'+esc(p)+'</li>'; }).join('')+'</ul><label class="btn" style="margin:6px 0 0">Sacar más fotos y volver a analizar<input type="file" accept="image/*" multiple id="reFotos"></label></div>';
@@ -363,7 +389,7 @@ $('fab').onclick=function(){ abrirChat($('sReporte').classList.contains('on')? S
 $('chCerrar').onclick=cerrarChat;
 $('chCtxX').onclick=function(){ S.ctx=null; pintarChat(); };
 $('chNuevo').onclick=function(){ if(S.ctx){ if(confirm('¿Borrar la charla sobre este reloj?')){ S.ctx.chat=[]; guardar(); api('analista-item',{id:S.ctx.id,borrar_chat:1}).catch(function(){}); pintarChat(); } } else { S.libre=[]; api('analista-chat-libre-borrar').catch(function(){}); pintarChat(); } };
-function burbuja(m){ var d=document.createElement('div'); d.className='m '+(m.rol==='ia'?'ia':'yo'); d.textContent=m.texto||''; (m.fotos||[]).forEach(function(f){ var im=document.createElement('img'); im.src= f.length>200? 'data:image/jpeg;base64,'+f : fotoUrl(f,false); d.appendChild(im); }); $('chMsgs').appendChild(d); $('chMsgs').scrollTop=1e9; return d; }
+function burbuja(m){ var d=document.createElement('div'); d.className='m '+(m.rol==='ia'?'ia':'yo'); d.textContent=m.texto||''; (m.fotos||[]).forEach(function(f){ var im=document.createElement('img'); im.src= f.length>200? 'data:image/jpeg;base64,'+f : fotoUrl(f,false); d.appendChild(im); }); if(m.rol==='ia'&&m.texto) boci(d,m.texto); $('chMsgs').appendChild(d); $('chMsgs').scrollTop=1e9; return d; }
 function pintarChat(){ var M=$('chMsgs'); M.innerHTML=''; $('chCtx').classList.toggle('on', !!S.ctx); if(S.ctx) $('chCtxT').textContent=S.ctx.titulo||'este reloj';
   var hilo = S.ctx ? (S.ctx.chat||[]) : (S.libre||[]);
   if(!hilo.length){ var h=document.createElement('div'); h.className='hint'; h.textContent = S.ctx ? 'Preguntale lo que quieras sobre este reloj. Podés mandarle más fotos.' : 'Hola, soy el Analista de Anacronismo. Mandame fotos de un reloj o preguntame lo que quieras.'; M.appendChild(h);
@@ -375,7 +401,7 @@ function enviar(){ var t=$('chT').value.trim(); var fotos=S.pend.slice(); if(!t 
   if(!$('chMsgs').querySelector('.m')) $('chMsgs').innerHTML='';
   burbuja({rol:'yo',texto:t,fotos:fotos}); var w=burbuja({rol:'ia',texto:''}); w.innerHTML='<span class="dots">pensando</span>';
   var body={id:S.ctx? S.ctx.id: null, texto:t, fotos:fotos.map(function(b){ return {b64:b}; }), idioma:S.idioma, moneda:S.moneda}; if(S.pos){ body.lat=S.pos.lat; body.lng=S.pos.lng; }
-  api('analista-chat', body).then(function(j){ w.textContent=j.respuesta||'(sin respuesta)';
+  api('analista-chat', body).then(function(j){ w.textContent=j.respuesta||'(sin respuesta)'; if(j.respuesta) boci(w,j.respuesta);
     if(j.item){ var idx=S.items.findIndex(function(x){ return x.id===j.item.id; }); if(idx>=0) S.items[idx]=j.item; else S.items.unshift(j.item); guardar(); S.ctx=j.item; $('chCtx').classList.add('on'); $('chCtxT').textContent=j.item.titulo||'este reloj';
       if(!S.actual || S.actual.id!==j.item.id){ var c=document.createElement('div'); c.className='m ia'; c.innerHTML='Te armé el reporte: <b>'+esc(j.item.veredicto)+'</b> · '+esc(j.item.titulo)+'. <a href="#" id="verRep">Ver reporte completo</a>'; $('chMsgs').appendChild(c); c.querySelector('#verRep').onclick=function(e){ e.preventDefault(); cerrarChat(); reporte(j.item); show('sReporte'); }; } }
     else { S.libre=(S.libre||[]).concat([{rol:'yo',texto:t,fotos:j.fotos||[]},{rol:'ia',texto:j.respuesta}]); }
