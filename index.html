@@ -904,7 +904,7 @@ function radarConAli(d){
   var n=propios.length;
   var ali=ALI.items.map(function(a,k){
     var nota="Nuevo en AliExpress"+(a.descuento?" · -"+a.descuento+"% (lista US$ "+num(a.precio_lista).toFixed(0)+")":"")+" · "+num(a.rating).toFixed(1)+"★ · "+a.ventas+" ventas.";
-    return { fuente:"ali", ali_id:String(a.item), item:"ali-"+a.item, pos:n+k+1, nombre:a.marca+" · "+String(a.nombre||"").slice(0,90),
+    return { fuente:"ali", ali_id:String(a.item), item:"ali-"+a.item, pos:n+k+1, nombre:(String(a.nombre||"").toLowerCase().indexOf(String(a.marca||"").toLowerCase())===0?"":a.marca+" · ")+String(a.nombre||"").slice(0,90),
              precio:a.precio, url:a.url, foto:a.foto||"", nota:nota, estado:"candidato" };
   });
   var r={}; for(var k in d) r[k]=d[k];
