@@ -423,7 +423,16 @@
     <div class="barra rule"><span id="rd_corrida">Última corrida —</span><span class="ln"></span><span class="st" id="rd_estado">cargando…</span></div>
     <div id="rd_lista" class="rd-grid"></div>
     <div class="estado" id="rd_guardado"></div>
-    <p class="foot">El bot corre los viernes y publica acá lo que pasa los filtros duros: foto del mecanismo, funcionando, estado cosmético sano y publicación activa. Los precios son del momento de la corrida — verificá antes de ofertar.</p>
+    <div id="ali_claves" class="card hidden" style="margin-top:16px">
+      <span class="lab2">Conectar AliExpress (una sola vez)</span>
+      <p class="sub" style="margin:0 0 12px">Cuando aprueben tu cuenta de afiliado, pegá las tres claves. Se verifican antes de guardarse y desde ahí el radar también trae chinos nuevos de AliExpress.</p>
+      <input class="an-in" id="ali_k1" placeholder="App Key" autocomplete="off">
+      <input class="an-in" id="ali_k2" placeholder="App Secret" type="password" autocomplete="off">
+      <input class="an-in" id="ali_k3" placeholder="Tracking ID" autocomplete="off">
+      <button class="btn pri" id="ali_kgo">Guardar y buscar</button>
+      <div class="estado" id="ali_st"></div>
+    </div>
+    <p class="foot">El bot corre los viernes y publica acá lo que pasa los filtros duros: foto del mecanismo, funcionando, estado cosmético sano y publicación activa. Los precios son del momento de la corrida — verificá antes de ofertar. Las piezas de AliExpress son nuevas (chinos de primera línea) y se reconocen por el botón "Ver en AliExpress".</p>
   </section>
 
   <!-- ===================== BÚSQUEDAS ===================== -->
@@ -739,17 +748,18 @@ function detalleRadar(id){
   h+="<div class='pr'>"+(num(i.precio)?usd(num(i.precio)):"—")+"</div>";
   if(i.nota) h+="<div class='nota'>"+esc(i.nota)+"</div>";
   if(i.vendedor) h+="<div class='dato'><b>Vendedor</b><span>"+esc(i.vendedor)+"</span></div>";
-  if(i.item) h+="<div class='dato'><b>Item eBay</b><span>"+esc(i.item)+"</span></div>";
+  if(i.item) h+="<div class='dato'><b>"+(i.fuente==="ali"?"Producto AliExpress":"Item eBay")+"</b><span>"+esc(i.item)+"</span></div>";
   if(i.estado) h+="<div class='dato'><b>Estado</b><span>"+esc(i.estado)+"</span></div>";
   if(f&&(f.tags||[]).length||f.texto) h+="<div class='dato'><b>Mi comentario</b><span>"+esc(fbResumen(f))+"</span></div>";
-  h+="<div class='acts' style='display:flex;gap:10px;margin-top:16px'>"+(i.url?"<a class='btn pri' style='text-decoration:none;text-align:center' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en eBay ↗</a>":"")+"<button class='btn' id='rdDetIA'>Preguntarle a la IA</button></div>";
+  h+="<div class='acts' style='display:flex;gap:10px;margin-top:16px'>"+(i.url?"<a class='btn pri' style='text-decoration:none;text-align:center' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en "+(i.fuente==="ali"?"AliExpress":"eBay")+" ↗</a>":"")+"<button class='btn' id='rdDetIA'>Preguntarle a la IA</button></div>";
   document.getElementById("rdDetB").innerHTML=h; document.getElementById("rdDet").classList.add("on"); document.documentElement.style.overflow="hidden";
-  var b=document.getElementById("rdDetIA"); if(b) b.onclick=function(){ cerrarDetalle(); if(window.anaChat) window.anaChat.abrir({tipo:"radar",id:id,nombre:i.nombre,url:i.url||""}); };
+  var b=document.getElementById("rdDetIA"); if(b) b.onclick=function(){ cerrarDetalle(); if(window.anaChat) window.anaChat.abrir({tipo:i.fuente==="ali"?"ali":"radar",id:i.fuente==="ali"?i.ali_id:id,nombre:i.nombre,url:i.url||""}); };
 }
 function cerrarDetalle(){ document.getElementById("rdDet").classList.remove("on"); document.documentElement.style.overflow=""; }
 document.getElementById("rdDetX").addEventListener("click", cerrarDetalle);
 document.getElementById("rdDet").addEventListener("click", function(e){ if(e.target.id==="rdDet") cerrarDetalle(); });
 function pintarRadar(d){
+  d=radarConAli(d);
   ULT_RADAR=d;
   var items=(d&&d.items)||[];
   var tc=textoCosto(d&&d.consumo);
@@ -781,8 +791,8 @@ function pintarRadar(d){
       if(i.nota) h+="<div class='nt'>"+esc(i.nota)+"</div>";
       h+="</div></div>";
       h+="<div class='acts'>";
-      if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en eBay <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M14 4h6v6M20 4l-9 9M19 14v6H4V5h6'/></svg></a>";
-      h+="<button class='chatb' data-ctipo='radar' data-cid='"+esc(String(i.item||i.id||i.nombre))+"' data-cnom='"+esc(i.nombre)+"' data-curl='"+esc(i.url||"")+"'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M4 5h16v11H9l-5 4z'/></svg>Preguntarle a la IA</button>";
+      if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en "+(i.fuente==="ali"?"AliExpress":"eBay")+" <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M14 4h6v6M20 4l-9 9M19 14v6H4V5h6'/></svg></a>";
+      h+="<button class='chatb' data-ctipo='"+(i.fuente==="ali"?"ali":"radar")+"' data-cid='"+esc(String(i.fuente==="ali"?i.ali_id:(i.item||i.id||i.nombre)))+"' data-cnom='"+esc(i.nombre)+"' data-curl='"+esc(i.url||"")+"'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M4 5h16v11H9l-5 4z'/></svg>Preguntarle a la IA</button>";
       h+="</div>";
       var id=String(i.item||i.id||i.nombre), f=fbDe(id);
       f.nombre=i.nombre;
@@ -886,6 +896,50 @@ document.addEventListener("visibilitychange",function(){
   cargarFeedback();
 });
 
+/* ---- AliExpress (bot #4, corre en la VM): sus piezas se suman al radar ---- */
+var ALI={estado:"",items:[],corrida:""};
+function radarConAli(d){
+  d=d||{};
+  var propios=(d.items||[]).filter(function(i){ return i.fuente!=="ali"; });
+  var n=propios.length;
+  var ali=ALI.items.map(function(a,k){
+    var nota="Nuevo en AliExpress"+(a.descuento?" · -"+a.descuento+"% (lista US$ "+num(a.precio_lista).toFixed(0)+")":"")+" · "+num(a.rating).toFixed(1)+"★ · "+a.ventas+" ventas.";
+    return { fuente:"ali", ali_id:String(a.item), item:"ali-"+a.item, pos:n+k+1, nombre:a.marca+" · "+String(a.nombre||"").slice(0,90),
+             precio:a.precio, url:a.url, foto:a.foto||"", nota:nota, estado:"candidato" };
+  });
+  var r={}; for(var k in d) r[k]=d[k];
+  r.items=propios.concat(ali);
+  return r;
+}
+function aliCargar(){
+  return fetch(BASE+"/ali_radar.json?t="+Date.now(),{cache:"no-store"}).then(function(r){ return r.ok?r.json():{estado:"sin_claves",items:[]}; })
+    .then(function(a){
+      ALI.estado=a.estado||""; ALI.items=a.items||[]; ALI.corrida=a.corrida||""; ALI.act=a.actualizado||"";
+      document.getElementById("ali_claves").classList.toggle("hidden", ALI.estado!=="sin_claves");
+      if(ULT_RADAR) pintarRadar(ULT_RADAR);
+    }).catch(function(){});
+}
+function aliSt(t,err){ var e=document.getElementById("ali_st"); if(!e) return; e.textContent=t; e.style.color=err?"#9b1c1c":""; e.style.opacity=err?"1":""; }
+function aliPost(ruta, body){
+  return fetch(BASE+"/api/"+ruta,{ method:"POST", headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN }, body:JSON.stringify(body) })
+    .then(function(r){ return r.json().then(function(d){ return {st:r.status,d:d}; }); });
+}
+function aliEsperar(antes,n){ setTimeout(function(){ aliCargar().then(function(){ if(n>0 && ALI.act===antes) aliEsperar(antes,n-1); else aliSt(""); }); }, 8000); }
+function aliLanzar(){
+  if(ALI.estado==="sin_claves") return;
+  var antes=ALI.act; aliPost("ali-lanzar",{}).then(function(x){ if(x.st===200) aliEsperar(antes,12); }).catch(function(){});
+}
+document.getElementById("ali_kgo").onclick=function(){
+  var b={app_key:document.getElementById("ali_k1").value.trim(), app_secret:document.getElementById("ali_k2").value.trim(), tracking_id:document.getElementById("ali_k3").value.trim()};
+  if(!b.app_key||!b.app_secret||!b.tracking_id){ aliSt("faltan datos: App Key, App Secret y Tracking ID",true); return; }
+  var antes=ALI.act; aliSt("verificando claves con AliExpress…");
+  aliPost("ali-claves",b).then(function(x){
+    if(x.st===200){ ["ali_k1","ali_k2","ali_k3"].forEach(function(i){ document.getElementById(i).value=""; }); aliSt("claves guardadas ✓ — buscando en AliExpress…"); aliEsperar(antes,12); }
+    else aliSt(x.d.error||("error "+x.st),true);
+  }).catch(function(){ aliSt("sin conexión",true); });
+};
+aliCargar();
+
 function cargarRadar(){
   fetch(BASE+"/radar.json?t="+Date.now(),{cache:"no-store"})
     .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
@@ -915,7 +969,7 @@ function lanzarBusqueda(nota){
     .then(function(r){ return r.json().then(function(d){ return {st:r.status, d:d}; }); })
     .then(function(x){
       var link=x.d.session_url? " · <a href='"+esc(x.d.session_url)+"' target='_blank' rel='noopener'>ver sesión</a>":"";
-      if(x.st===200){ lanzarEstado("búsqueda lanzada ✓ — al terminar se actualiza el radar y acá abajo ves cuánto costó"+link); return; }
+      if(x.st===200){ aliLanzar(); lanzarEstado("búsqueda lanzada ✓ — al terminar se actualiza el radar y acá abajo ves cuánto costó"+link); return; }
       if(x.st===429){ lanzarEstado("ya hay una lanzada hace poco — probá en "+x.d.minutos+" min"+link, true); return; }
       if(x.st===428){
         var t=prompt("Falta conectar el bot con Claude Code (una sola vez).\nPegá el token de la rutina (empieza con sk-ant-):");
