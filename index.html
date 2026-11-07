@@ -402,7 +402,6 @@
     <button data-s="vend"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c0-3.3 2.7-6 6-6s6 2.7 6 6M15 19c0-2.2 1.3-4 3-4.5 2 .3 3 2 3 4.5"/></svg>Vendedores</button>
     <button data-s="busq"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg>Búsquedas</button>
     <button data-s="compras"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg>Compras</button>
-    <button data-s="ali"><svg viewBox="0 0 24 24"><path d="M4 8l8-4 8 4v8l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v8"/></svg>AliExpress</button>
     <button data-s="anal"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V5M19 20v-8"/></svg>Analista</button>
   </div>
 
@@ -425,38 +424,6 @@
     <div id="rd_lista" class="rd-grid"></div>
     <div class="estado" id="rd_guardado"></div>
     <p class="foot">El bot corre los viernes y publica acá lo que pasa los filtros duros: foto del mecanismo, funcionando, estado cosmético sano y publicación activa. Los precios son del momento de la corrida — verificá antes de ofertar.</p>
-  </section>
-
-  <!-- ===================== ALIEXPRESS (bot #4) ===================== -->
-  <section id="s_ali" class="hidden">
-    <h1 class="ht">Chinos nuevos en AliExpress.</h1>
-    <p class="sub" style="text-align:center">Sea-Gull, San Martin, Addiesdive y otras marcas de primera, nuevos, de tiendas con buenas ventas.</p>
-    <div id="ali_claves" class="card hidden" style="margin-bottom:16px">
-      <span class="lab2">Conectar AliExpress (una sola vez)</span>
-      <p class="sub" style="margin:0 0 12px">Pegá las tres claves de tu cuenta de afiliado. Se verifican antes de guardarse y no se ven más.</p>
-      <input class="an-in" id="ali_k1" placeholder="App Key" autocomplete="off">
-      <input class="an-in" id="ali_k2" placeholder="App Secret" type="password" autocomplete="off">
-      <input class="an-in" id="ali_k3" placeholder="Tracking ID" autocomplete="off">
-      <button class="btn pri" id="ali_kgo">Guardar y buscar</button>
-    </div>
-    <button class="btn pri" id="ali_lanzar" style="display:flex;align-items:center;justify-content:center;gap:14px;padding:18px;font-size:14px;letter-spacing:.16em"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:20px;height:20px"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Buscar ahora</button>
-    <div class="estado" id="ali_st" style="margin-bottom:14px"></div>
-    <details class="instr" id="ali_cfg">
-      <summary><span>Qué busca<span class="idesc">Marcas, búsquedas, techo de precio y mínimos de calidad de la tienda.</span></span><span class="cv">&#9662;</span></summary>
-      <div class="ib">
-        <span class="lab2">Techo (US$)</span><input class="an-in" id="ali_techo" type="number" inputmode="decimal">
-        <span class="lab2">Rating mínimo de la tienda (de 5)</span><input class="an-in" id="ali_rating" type="number" step="0.1" inputmode="decimal">
-        <span class="lab2">Ventas mínimas del producto</span><input class="an-in" id="ali_ventas" type="number" inputmode="numeric">
-        <span class="lab2">Marcas (una por línea; el título tiene que nombrar alguna)</span><textarea class="an-in" id="ali_marcas" style="min-height:140px"></textarea>
-        <span class="lab2">Búsquedas (una por línea)</span><textarea class="an-in" id="ali_queries" style="min-height:180px"></textarea>
-        <span class="lab2">Palabras que descartan (una por línea)</span><textarea class="an-in" id="ali_excluir" style="min-height:120px"></textarea>
-        <button class="btn pri" id="ali_cfg_go">Guardar</button>
-        <div class="estado" id="ali_cfg_st"></div>
-      </div>
-    </details>
-    <div class="barra rule"><span id="ali_corrida">Última corrida —</span><span class="ln"></span><span class="st" id="ali_estado">cargando…</span></div>
-    <div id="ali_lista" class="rd-grid"></div>
-    <p class="foot">Corre solo los viernes a la mañana (en la VM, sin costo de IA) y te manda un mail. Son piezas nuevas: precios y stock cambian rápido, verificá antes de comprar.</p>
   </section>
 
   <!-- ===================== BÚSQUEDAS ===================== -->
@@ -575,7 +542,7 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ retu
 function num(v){ var n=parseFloat(v); return isNaN(n)?0:n; }
 
 /* ===================== NAVEGACIÓN ===================== */
-var SECS={ radar:"s_radar", vend:"s_vend", busq:"s_busq", compras:"s_compras", ali:"s_ali", anal:"s_anal" };
+var SECS={ radar:"s_radar", vend:"s_vend", busq:"s_busq", compras:"s_compras", anal:"s_anal" };
 function irA(s){
   document.querySelectorAll("#navT button").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-s")===s); });
   for(var k in SECS) document.getElementById(SECS[k]).classList.toggle("hidden", k!==s);
@@ -586,90 +553,6 @@ document.querySelectorAll("#navT button").forEach(function(b){
   b.onclick=function(){ irA(b.getAttribute("data-s")); };
 });
 
-
-/* ===================== ALIEXPRESS (bot #4) ===================== */
-var ALI={d:null,cfg:null,ocultos:[]};
-try{ ALI.ocultos=JSON.parse(localStorage.getItem("anacro_ali_ocultos")||"[]"); }catch(e){}
-function aliSt(t,err){ var e=document.getElementById("ali_st"); e.textContent=t; e.style.color=err?"#9b1c1c":""; e.style.opacity=err?"1":""; }
-function aliPintar(d){
-  ALI.d=d||{}; var items=(ALI.d.items||[]);
-  document.getElementById("ali_corrida").textContent="Última corrida · "+(ALI.d.corrida||"—");
-  var est=ALI.d.estado||"";
-  document.getElementById("ali_claves").classList.toggle("hidden", est!=="sin_claves" && est!=="error");
-  var vis=items.filter(function(i){ return ALI.ocultos.indexOf(String(i.item))<0; });
-  document.getElementById("ali_estado").textContent=vis.length+(vis.length===1?" pieza":" piezas");
-  var L=document.getElementById("ali_lista");
-  if(est==="sin_claves"){ L.innerHTML="<div class='note'>Falta conectar AliExpress: cuando aprueben tu cuenta de afiliado, pegá las claves arriba.</div>"; return; }
-  if(est==="error"){ L.innerHTML="<div class='note'>La última corrida falló: "+esc(ALI.d.resumen||"")+"</div>"; return; }
-  if(!vis.length){ L.innerHTML="<div class='note'>"+(items.length?"Ocultaste todas las piezas. <button id='ali_verocultos' class='lnk'>mostrar</button>":"Todavía no hay resultados. Tocá Buscar ahora.")+"</div>"; }
-  else {
-    var h="";
-    vis.forEach(function(i){
-      h+="<div class='card'><button class='ocultar' title='Ocultar esta pieza' data-aliocultar='"+esc(String(i.item))+"'>×</button>";
-      h+="<div class='ch'><div class='ph"+(i.foto?"":" sin")+"'>"+(i.foto?"<img src='"+esc(i.foto)+"' alt='' loading='lazy'>":"<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><circle cx='12' cy='12' r='8'/><path d='M12 7v5l3 2'/></svg>")+"</div>";
-      h+="<div class='cb'>"+(i.pos?"<span class='rk'>"+i.pos+"</span>":"")+"<div class='ch' style='gap:10px'><div class='nm'>"+esc(i.marca)+"</div><div class='pr'>"+usd(num(i.precio))+"</div></div>";
-      h+="<div class='nt'>"+esc(i.nombre)+"</div>";
-      h+="<div class='nt' style='font-weight:600'>"+(i.descuento?"-"+i.descuento+"% sobre US$ "+num(i.precio_lista).toFixed(0)+" · ":"")+num(i.rating).toFixed(1)+"★ · "+i.ventas+" ventas</div>";
-      h+="</div></div><div class='acts'>";
-      if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en AliExpress <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M14 4h6v6M20 4l-9 9M19 14v6H4V5h6'/></svg></a>";
-      h+="<button class='chatb' data-ctipo='ali' data-cid='"+esc(String(i.item))+"' data-cnom='"+esc(i.marca+" · "+i.nombre)+"' data-curl='"+esc(i.url||"")+"'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M4 5h16v11H9l-5 4z'/></svg>Preguntarle a la IA</button>";
-      h+="</div></div>";
-    });
-    var nOc=items.length-vis.length;
-    if(nOc) h+="<div class='ocultos-bar'>"+nOc+(nOc===1?" pieza oculta":" piezas ocultas")+" · <button id='ali_verocultos'>mostrar</button></div>";
-    L.innerHTML=h;
-  }
-  var vo=document.getElementById("ali_verocultos"); if(vo) vo.onclick=function(){ ALI.ocultos=[]; try{localStorage.setItem("anacro_ali_ocultos","[]");}catch(e){} aliPintar(ALI.d); };
-  L.querySelectorAll("button[data-aliocultar]").forEach(function(b){ b.onclick=function(){ ALI.ocultos.push(b.getAttribute("data-aliocultar")); try{localStorage.setItem("anacro_ali_ocultos",JSON.stringify(ALI.ocultos));}catch(e){} aliPintar(ALI.d); }; });
-}
-function aliCargar(){
-  return fetch(BASE+"/ali_radar.json?t="+Date.now(),{cache:"no-store"}).then(function(r){ return r.ok?r.json():{estado:"sin_claves",items:[]}; })
-    .then(aliPintar).catch(function(){ document.getElementById("ali_lista").innerHTML="<div class='note'>No pude traer los resultados. Probá de nuevo con señal.</div>"; });
-}
-function aliCfgCargar(){
-  fetch(BASE+"/ali_busquedas.json?t="+Date.now(),{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(c){
-    ALI.cfg=c;
-    document.getElementById("ali_techo").value=c.techo_usd||"";
-    document.getElementById("ali_rating").value=c.rating_min||"";
-    document.getElementById("ali_ventas").value=c.ordenes_min||"";
-    document.getElementById("ali_marcas").value=(c.marcas||[]).join("\n");
-    document.getElementById("ali_queries").value=(c.queries||[]).map(function(q){ return q.q; }).join("\n");
-    document.getElementById("ali_excluir").value=(c.excluir||[]).join("\n");
-  }).catch(function(){});
-}
-function aliLineas(id){ return document.getElementById(id).value.split("\n").map(function(x){ return x.trim(); }).filter(Boolean); }
-function aliPost(ruta, body){
-  return fetch(BASE+"/api/"+ruta,{ method:"POST", headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN }, body:JSON.stringify(body) })
-    .then(function(r){ return r.json().then(function(d){ return {st:r.status,d:d}; }); });
-}
-function aliEsperar(n){ setTimeout(function(){ aliCargar().then(function(){ if(n>0 && (ALI.d||{}).actualizado===ALI.antes) aliEsperar(n-1); else aliSt("listo ✓"); }); }, 6000); }
-document.getElementById("ali_lanzar").onclick=function(){
-  ALI.antes=(ALI.d||{}).actualizado; aliSt("buscando en AliExpress… (tarda menos de un minuto)");
-  aliPost("ali-lanzar",{}).then(function(x){ if(x.st===200) aliEsperar(15); else aliSt("no se pudo lanzar ("+(x.d.error||x.st)+")",true); }).catch(function(){ aliSt("sin conexión",true); });
-};
-document.getElementById("ali_kgo").onclick=function(){
-  var b={app_key:document.getElementById("ali_k1").value.trim(), app_secret:document.getElementById("ali_k2").value.trim(), tracking_id:document.getElementById("ali_k3").value.trim()};
-  if(!b.app_key||!b.app_secret||!b.tracking_id){ aliSt("faltan datos: App Key, App Secret y Tracking ID",true); return; }
-  ALI.antes=(ALI.d||{}).actualizado; aliSt("verificando claves con AliExpress…");
-  aliPost("ali-claves",b).then(function(x){
-    if(x.st===200){ ["ali_k1","ali_k2","ali_k3"].forEach(function(i){ document.getElementById(i).value=""; }); aliSt("claves guardadas ✓ — buscando…"); aliEsperar(15); }
-    else aliSt(x.d.error||("error "+x.st),true);
-  }).catch(function(){ aliSt("sin conexión",true); });
-};
-document.getElementById("ali_cfg_go").onclick=function(){
-  var c=JSON.parse(JSON.stringify(ALI.cfg||{})), st=document.getElementById("ali_cfg_st");
-  var viejas={}; (c.queries||[]).forEach(function(q){ viejas[q.q]=q; });
-  c.techo_usd=num(document.getElementById("ali_techo").value)||250;
-  c.rating_min=num(document.getElementById("ali_rating").value)||4.7;
-  c.ordenes_min=parseInt(document.getElementById("ali_ventas").value,10)||0;
-  c.marcas=aliLineas("ali_marcas");
-  c.queries=aliLineas("ali_queries").map(function(q){ return viejas[q]||{q:q,activa:true}; });
-  c.excluir=aliLineas("ali_excluir").map(function(x){ return x.toLowerCase(); });
-  st.textContent="guardando…";
-  aliPost("ali_busquedas",c).then(function(x){ if(x.st===200){ ALI.cfg=c; st.textContent="guardado ✓ — vale desde la próxima búsqueda"; } else st.textContent="no se pudo guardar ("+(x.d.error||x.st)+")"; })
-    .catch(function(){ st.textContent="sin conexión"; });
-};
-aliCargar(); aliCfgCargar();
 
 /* ===================== VENDEDORES ===================== */
 var VEND={tiers:{},items:[]}, vendTimer=null, vAbiertas={};
