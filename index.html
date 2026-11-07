@@ -609,7 +609,7 @@ function aliPintar(d){
       h+="<div class='ch'><div class='ph"+(i.foto?"":" sin")+"'>"+(i.foto?"<img src='"+esc(i.foto)+"' alt='' loading='lazy'>":"<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5'><circle cx='12' cy='12' r='8'/><path d='M12 7v5l3 2'/></svg>")+"</div>";
       h+="<div class='cb'>"+(i.pos?"<span class='rk'>"+i.pos+"</span>":"")+"<div class='ch' style='gap:10px'><div class='nm'>"+esc(i.marca)+"</div><div class='pr'>"+usd(num(i.precio))+"</div></div>";
       h+="<div class='nt'>"+esc(i.nombre)+"</div>";
-      h+="<div class='nt vd'>"+(i.descuento?"-"+i.descuento+"% sobre US$ "+num(i.precio_lista).toFixed(0)+" · ":"")+num(i.rating).toFixed(1)+"★ · "+i.ventas+" ventas</div>";
+      h+="<div class='nt' style='font-weight:600'>"+(i.descuento?"-"+i.descuento+"% sobre US$ "+num(i.precio_lista).toFixed(0)+" · ":"")+num(i.rating).toFixed(1)+"★ · "+i.ventas+" ventas</div>";
       h+="</div></div><div class='acts'>";
       if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en AliExpress <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M14 4h6v6M20 4l-9 9M19 14v6H4V5h6'/></svg></a>";
       h+="<button class='chatb' data-ctipo='ali' data-cid='"+esc(String(i.item))+"' data-cnom='"+esc(i.marca+" · "+i.nombre)+"' data-curl='"+esc(i.url||"")+"'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M4 5h16v11H9l-5 4z'/></svg>Preguntarle a la IA</button>";
