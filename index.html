@@ -565,8 +565,8 @@ document.querySelectorAll("#navT button").forEach(function(b){
 
 /* ===================== VENDEDORES ===================== */
 var VEND={tiers:{},items:[]}, vendTimer=null, vAbiertas={};
-var TIERS=[1,2,3,4,5];
-var TIERLBL={1:"Tier 1 · service y garantía formal",2:"Tier 2 · caso por caso",3:"Sin garantía formal",4:"Otras fuentes",5:"Fuera de eBay"};
+var TIERS=[1,2,3,4,5,6];
+var TIERLBL={1:"Tier 1 · service y garantía formal",2:"Tier 2 · caso por caso",3:"Sin garantía formal",4:"Otras fuentes",5:"Fuera de eBay",6:"AliExpress"};
 
 var ENVLBL={"si":"envía a AR","no":"NO envía a AR","?":"envío a AR sin confirmar"};
 function envAr(v){ var e=(v&&v.envia_ar)||"?"; return ENVLBL[e]?e:"?"; }
@@ -603,8 +603,8 @@ function renderVend(){
     var g=[];
     VEND.items.forEach(function(v,ix){ if(num(v.tier)===t) g.push({v:v,ix:ix}); });
     if(!g.length) return;
-    var TDESC={1:"Vendedores con excelente reputación, atención profesional y algún tipo de garantía.",2:"Se evalúa pieza por pieza.",3:"Vendedores confiables y con buena reputación, pero sin garantía formal.",4:"Vendedores interesantes que no entran en las categorías anteriores.",5:"Fuera de eBay."};
-    var TICO={1:"\u{1F6E1}",2:"\u2696",3:"\u{1F4C4}",4:"\u{1F310}",5:"\u{1F3EA}"};
+    var TDESC={1:"Vendedores con excelente reputación, atención profesional y algún tipo de garantía.",2:"Se evalúa pieza por pieza.",3:"Vendedores confiables y con buena reputación, pero sin garantía formal.",4:"Vendedores interesantes que no entran en las categorías anteriores.",5:"Fuera de eBay.",6:"Tiendas de AliExpress de chinos nuevos de primera línea. Las suma solo el bot; si borrás una, no vuelve."};
+    var TICO={1:"\u{1F6E1}",2:"\u2696",3:"\u{1F4C4}",4:"\u{1F310}",5:"\u{1F3EA}",6:"\u{1F6D2}"};
     h+="<div class='vgrupo'><div class='vgh'><span class='vico'>"+TICO[t]+"</span><div><b>"+esc(TIERLBL[t])+"</b><span>"+esc(TDESC[t])+"</span></div><em>"+g.length+(g.length===1?" vendedor":" vendedores")+"</em></div>";
     g.forEach(function(o){
       var v=o.v, ix=o.ix, st=statsVend(v.id);
@@ -620,7 +620,7 @@ function renderVend(){
          "<p class='sub' style='margin:0 0 12px'>"+esc(sub)+"</p>"+
          (v.url?"<p style='margin:0 0 14px'><a href='"+esc(v.url)+"' target='_blank' rel='noopener' style='color:#7A1F1A;font-weight:600'>Abrir tienda &rarr;</a></p>":"")+
          "<label class='f'><span class='lab'>Nombre</span><span class='inp'><input class='txt' type='text' data-vk='nombre' value='"+esc(v.nombre)+"'></span></label>"+
-         "<label class='f'><span class='lab'>Usuario eBay</span><span class='inp'><input class='txt' type='text' data-vk='usuario' value='"+esc(v.usuario||"")+"'></span></label>"+
+         "<label class='f'><span class='lab'>"+(num(v.tier)===6?"ID de tienda AliExpress":"Usuario eBay")+"</span><span class='inp'><input class='txt' type='text' data-vk='usuario' value='"+esc(v.usuario||"")+"'></span></label>"+
          "<label class='f'><span class='lab'>Link</span><span class='inp'><input class='txt' type='url' data-vk='url' placeholder='https://www.ebay.com/str/...' value='"+esc(v.url||"")+"'></span></label>"+
          "<div class='row2'>"+
          "<div><label class='f'><span class='lab'>Clasificación</span><span class='inp'><select class='txt' data-vk='tier'>"+
@@ -905,7 +905,8 @@ function radarConAli(d){
   var ali=ALI.items.map(function(a,k){
     var nota="Nuevo en AliExpress"+(a.descuento?" · -"+a.descuento+"% (lista US$ "+num(a.precio_lista).toFixed(0)+")":"")+" · "+num(a.rating).toFixed(1)+"★ · "+a.ventas+" ventas.";
     return { fuente:"ali", ali_id:String(a.item), item:"ali-"+a.item, pos:n+k+1, nombre:(String(a.nombre||"").toLowerCase().indexOf(String(a.marca||"").toLowerCase())===0?"":a.marca+" · ")+String(a.nombre||"").slice(0,90),
-             precio:a.precio, url:a.url, foto:a.foto||"", nota:nota, estado:"candidato" };
+             precio:a.precio, url:a.url, foto:a.foto||"", nota:nota, estado:"candidato",
+             vendedor:a.tienda_nombre||(a.tienda_id?"tienda AliExpress "+a.tienda_id:"") };
   });
   var r={}; for(var k in d) r[k]=d[k];
   r.items=propios.concat(ali);
