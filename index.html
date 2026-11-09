@@ -407,10 +407,10 @@
 
   <!-- ===================== RADAR ===================== -->
   <section id="s_radar">
-    <h1 class="ht">Lo que trajo el bot en su última pasada por eBay.</h1>
+    <h1 class="ht">Lo que trajo el bot en su última pasada.</h1>
     <p class="sub" style="text-align:center">Revisá los hallazgos, filtrá, comentá y seguí lo que te interesa.</p>
     <details class="instr" id="rd_instr">
-      <summary><span>Instrucciones para el bot<span class="idesc">Definí qué buscar, qué evitar y cómo priorizar los hallazgos. El bot usa esto en cada pasada por eBay.</span></span><span class="cv">&#9662;</span></summary>
+      <summary><span>Instrucciones para el bot<span class="idesc">Definí qué buscar, qué evitar y cómo priorizar los hallazgos. El bot usa esto en cada pasada.</span></span><span class="cv">&#9662;</span></summary>
       <div class="ib">
         <textarea id="rd_instr_txt" placeholder="Ej: no me traigas más Raketa con dial gastado; priorizá dials de color; bajá el techo a USD 40; sumá búsquedas de jump hour."></textarea>
         <span class="hint">El bot lee esto antes de buscar y despues vacia la caja: lo que escribiste queda archivado como regla permanente. Escribi solo lo nuevo.</span>
@@ -432,7 +432,7 @@
       <button class="btn pri" id="ali_kgo">Guardar y buscar</button>
       <div class="estado" id="ali_st"></div>
     </div>
-    <p class="foot">El bot corre los viernes y publica acá lo que pasa los filtros duros: foto del mecanismo, funcionando, estado cosmético sano y publicación activa. Los precios son del momento de la corrida — verificá antes de ofertar. Las piezas de AliExpress son nuevas (chinos de primera línea) y se reconocen por el botón "Ver en AliExpress".</p>
+    <p class="foot">El bot corre los viernes en eBay y AliExpress. De eBay trae lo que pasa los filtros duros: foto del mecanismo, funcionando, estado cosmético sano y publicación activa. De AliExpress, chinos nuevos de primera línea de tiendas con buenas ventas. Cada pieza dice en su botón a dónde te lleva. Los precios son del momento de la corrida: verificá antes de comprar.</p>
   </section>
 
   <!-- ===================== BÚSQUEDAS ===================== -->
@@ -477,7 +477,7 @@
     <div id="vd_lista"></div>
     <button class="btn pri" id="vd_add">+ Agregar vendedor</button>
     <div class="estado" id="vd_estado"></div>
-    <p class="foot">El tier es criterio propio, no de eBay. Las piezas compradas y el landed promedio se calculan solos desde Compras.</p>
+    <p class="foot">La clasificación es criterio propio, no de la plataforma. Las piezas compradas y el landed promedio se calculan solos desde Compras.</p>
   </section>
 
   <section id="s_busq" class="hidden">
@@ -693,7 +693,7 @@ function cargarVend(){
     .then(function(){ renderVend(); renderCompras(); });
 }
 document.getElementById("vd_add").onclick=function(){
-  var n=prompt("Nombre o usuario de eBay del vendedor:");
+  var n=prompt("Nombre o usuario del vendedor (eBay, AliExpress u otra tienda):");
   if(!n) return;
   var id=slugVend(n), base=id, k=2;
   while(vendPorId(id)){ id=base+"-"+(k++); }
@@ -748,10 +748,10 @@ function detalleRadar(id){
   h+="<div class='pr'>"+(num(i.precio)?usd(num(i.precio)):"—")+"</div>";
   if(i.nota) h+="<div class='nota'>"+esc(i.nota)+"</div>";
   if(i.vendedor) h+="<div class='dato'><b>Vendedor</b><span>"+esc(i.vendedor)+"</span></div>";
-  if(i.item) h+="<div class='dato'><b>"+(i.fuente==="ali"?"Producto AliExpress":"Item eBay")+"</b><span>"+esc(i.item)+"</span></div>";
+  if(i.item) h+="<div class='dato'><b>"+fuenteDe(i).item+"</b><span>"+esc(i.item)+"</span></div>";
   if(i.estado) h+="<div class='dato'><b>Estado</b><span>"+esc(i.estado)+"</span></div>";
   if(f&&(f.tags||[]).length||f.texto) h+="<div class='dato'><b>Mi comentario</b><span>"+esc(fbResumen(f))+"</span></div>";
-  h+="<div class='acts' style='display:flex;gap:10px;margin-top:16px'>"+(i.url?"<a class='btn pri' style='text-decoration:none;text-align:center' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en "+(i.fuente==="ali"?"AliExpress":"eBay")+" ↗</a>":"")+"<button class='btn' id='rdDetIA'>Preguntarle a la IA</button></div>";
+  h+="<div class='acts' style='display:flex;gap:10px;margin-top:16px'>"+(i.url?"<a class='btn pri' style='text-decoration:none;text-align:center' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en "+fuenteDe(i).nombre+" ↗</a>":"")+"<button class='btn' id='rdDetIA'>Preguntarle a la IA</button></div>";
   document.getElementById("rdDetB").innerHTML=h; document.getElementById("rdDet").classList.add("on"); document.documentElement.style.overflow="hidden";
   var b=document.getElementById("rdDetIA"); if(b) b.onclick=function(){ cerrarDetalle(); if(window.anaChat) window.anaChat.abrir({tipo:i.fuente==="ali"?"ali":"radar",id:i.fuente==="ali"?i.ali_id:id,nombre:i.nombre,url:i.url||""}); };
 }
@@ -791,7 +791,7 @@ function pintarRadar(d){
       if(i.nota) h+="<div class='nt'>"+esc(i.nota)+"</div>";
       h+="</div></div>";
       h+="<div class='acts'>";
-      if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en "+(i.fuente==="ali"?"AliExpress":"eBay")+" <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M14 4h6v6M20 4l-9 9M19 14v6H4V5h6'/></svg></a>";
+      if(i.url) h+="<a class='pri' href='"+esc(i.url)+"' target='_blank' rel='noopener'>Ver en "+fuenteDe(i).nombre+" <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M14 4h6v6M20 4l-9 9M19 14v6H4V5h6'/></svg></a>";
       h+="<button class='chatb' data-ctipo='"+(i.fuente==="ali"?"ali":"radar")+"' data-cid='"+esc(String(i.fuente==="ali"?i.ali_id:(i.item||i.id||i.nombre)))+"' data-cnom='"+esc(i.nombre)+"' data-curl='"+esc(i.url||"")+"'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M4 5h16v11H9l-5 4z'/></svg>Preguntarle a la IA</button>";
       h+="</div>";
       var id=String(i.item||i.id||i.nombre), f=fbDe(id);
@@ -896,6 +896,9 @@ document.addEventListener("visibilitychange",function(){
   cargarFeedback();
 });
 
+/* ---- Fuentes del radar: para sumar una plataforma, agregarla acá ---- */
+var FUENTES={ ebay:{nombre:"eBay", item:"Item eBay"}, ali:{nombre:"AliExpress", item:"Producto AliExpress"} };
+function fuenteDe(i){ return FUENTES[(i&&i.fuente)||"ebay"]||FUENTES.ebay; }
 /* ---- AliExpress (bot #4, corre en la VM): sus piezas se suman al radar ---- */
 var ALI={estado:"",items:[],corrida:""};
 function radarConAli(d){
@@ -962,7 +965,7 @@ function lanzarEstado(html, err){
 }
 function lanzarBusqueda(nota){
   var b=document.getElementById("rd_lanzar");
-  if(nota===undefined && !confirm("¿Lanzar ahora una pasada completa del bot por eBay? Tarda un rato y llega el mail al terminar.")) return;
+  if(nota===undefined && !confirm("¿Lanzar ahora una pasada completa del bot (eBay y AliExpress)? Tarda un rato y llega el mail al terminar.")) return;
   b.disabled=true; lanzarEstado("lanzando…");
   fetch(BASE+"/api/lanzar",{ method:"POST",
     headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+TOKEN },
