@@ -1649,7 +1649,7 @@ cargarFeedback().then(cargarRadar); pintarCostoEstimado(); cargarCompras().then(
 try{ var ult=localStorage.getItem("anacro_seccion"); if(ult&&SECS[ult]) irA(ult); }catch(e){}
 window.addEventListener("beforeunload",function(){ if(guardarTimer) guardarCompras(); if(fbTimer) guardarFeedback(); if(bqTimer) guardarBusq(); if(vendTimer) guardarVend(); });
 </script>
-<script src="./chat.js?v=1"></script>
+<script src="./chat.js?v=2"></script>
 <script src="./refresco.js?v=1"></script>
 </body>
 </html>
